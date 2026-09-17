@@ -1,118 +1,101 @@
-# 🚀 Guia de Implantação do AssDoc (TermoEP) em Ubuntu com Docker
+# 🚀 Guia de Implantação do AssDoc (TermoEP) em Ubuntu com Docker e Git
 
-Este guia contém o passo a passo completo e detalhado para transferir e executar o sistema **AssDoc** em um servidor **Ubuntu Linux**, utilizando **Docker** e **Docker Compose**, preservando todos os dados, usuários, termos gerados e fotos já cadastradas, além de disponibilizá-lo para a rede interna da empresa.
+Este guia contém o passo a passo completo, prático e direto para clonar o repositório do **GitHub** e executar o sistema **AssDoc** em um servidor **Ubuntu Linux** utilizando **Docker** e **Docker Compose**, preservando todos os dados e liberando o acesso na rede interna.
 
 ---
 
 ## 📋 Sumário
-1. [Estrutura e Arquivos Necessários](#1-estrutura-e-arquivos-necessários)
-2. [Passo 1: Empacotamento no Windows](#passo-1-empacotamento-no-windows)
-3. [Passo 2: Transferência para o Servidor Ubuntu](#passo-2-transferência-para-o-servidor-ubuntu)
-4. [Passo 3: Preparação do Ambiente no Ubuntu](#passo-3-preparação-do-ambiente-no-ubuntu)
+1. [Repositório e Pré-requisitos](#1-repositório-e-pré-requisitos)
+2. [Passo 1: Instalação do Docker e Git no Ubuntu](#passo-1-instalação-do-docker-e-git-no-ubuntu)
+3. [Passo 2: Clonagem do Repositório](#passo-2-clonagem-do-repositório)
+4. [Passo 3: Permissões de Pastas de Dados](#passo-3-permissões-de-pastas-de-dados)
 5. [Passo 4: Configuração das Variáveis (.env)](#passo-4-configuração-das-variáveis-env)
 6. [Passo 5: Inicialização com Docker Compose](#passo-5-inicialização-com-docker-compose)
 7. [Passo 6: Liberação no Firewall e Acesso na Rede Interna](#passo-6-liberação-no-firewall-e-acesso-na-rede-interna)
-8. [Manutenção, Logs e Backup](#manutenção-logs-e-backup)
+8. [Como Atualizar o Sistema (Git Pull)](#como-atualizar-o-sistema-git-pull)
+9. [Comandos Úteis e Backup](#comandos-úteis-e-backup)
 
 ---
 
-## 1. Estrutura e Arquivos Necessários
+## 1. Repositório e Pré-requisitos
 
-Para que nada se perca, os seguintes diretórios e arquivos devem ser transferidos:
-
-| Item | Descrição | Obrigatório |
-|---|---|---|
-| `database/` | Contém os arquivos `.db` (termos, usuários, configurações). | **Sim (Persistência)** |
-| `uploads/` | Contém as fotos de equipamentos e devoluções. | **Sim (Persistência)** |
-| `public/` | Interface web (HTML, CSS, JS, logos). | **Sim** |
-| `server.js` | Backend da aplicação Express. | **Sim** |
-| `package.json` e `package-lock.json` | Definição de dependências do Node.js. | **Sim** |
-| `Dockerfile` | Configuração da imagem Docker. | **Sim** |
-| `docker-compose.yml` | Orquestração do container e volumes. | **Sim** |
-| `.dockerignore` | Evita envio de arquivos desnecessários ao build. | **Sim** |
-| `.env` | Variáveis de ambiente (e-mail, caminhos, chaves). | **Sim** |
-
-> ⚠️ **NÃO copie a pasta `node_modules/`**. O Docker fará a instalação limpa das dependências compatíveis com Linux durante a criação da imagem.
+* **URL do Repositório**: `https://github.com/jmarques029/Termos.git`
+* **Porta padrão**: `3000` (ou `80`)
+* **Sistema Operacional**: Ubuntu Server 20.04 LTS, 22.04 LTS ou 24.04 LTS
 
 ---
 
-## Passo 1: Empacotamento no Windows
+## Passo 1: Instalação do Docker e Git no Ubuntu
 
-No seu computador Windows, abra o **PowerShell** dentro da pasta do projeto e execute o comando para criar um arquivo compactado:
+Conecte ao seu servidor Ubuntu via SSH ou abra o terminal dele:
 
-```powershell
-Compress-Archive -Path database, uploads, public, package.json, package-lock.json, server.js, Dockerfile, docker-compose.yml, .dockerignore, .env -DestinationPath assdoc-deploy.zip -Force
-```
-
----
-
-## Passo 2: Transferência para o Servidor Ubuntu
-
-Você pode transferir o arquivo `assdoc-deploy.zip` usando qualquer um dos métodos abaixo:
-
-### Método A: Via terminal (SCP)
 ```bash
-# Substitua usuario pelo seu usuário e IP_DO_SERVIDOR pelo IP do Ubuntu
-scp assdoc-deploy.zip usuario@192.168.X.X:/home/usuario/
-```
-
-### Método B: Via Interface Gráfica (WinSCP ou FileZilla)
-1. Baixe e abra o **WinSCP** ou **FileZilla**.
-2. Conecte ao servidor via **SFTP** usando o IP, usuário e senha do servidor Ubuntu.
-3. Arraste o arquivo `assdoc-deploy.zip` para a pasta `/home/usuario/`.
-
----
-
-## Passo 3: Preparação do Ambiente no Ubuntu
-
-Acesse o terminal do servidor Ubuntu via SSH:
-```bash
-ssh usuario@192.168.X.X
-```
-
-### 1. Atualize o sistema e instale o Docker e utilitários
-```bash
+# 1. Atualiza os pacotes do sistema
 sudo apt update && sudo apt upgrade -y
-sudo apt install -y docker.io docker-compose-v2 unzip
-```
 
-### 2. Permita executar o Docker sem `sudo` (Opcional, mas recomendado)
-```bash
+# 2. Instala o Git, Docker e o plugin Docker Compose
+sudo apt install -y git docker.io docker-compose-v2
+
+# 3. Habilita o serviço do Docker para iniciar com o sistema
+sudo systemctl enable --now docker
+
+# 4. Adiciona seu usuário ao grupo docker (permite rodar comandos docker sem sudo)
 sudo usermod -aG docker $USER
 newgrp docker
 ```
 
-### 3. Extraia o projeto
+---
+
+## Passo 2: Clonagem do Repositório
+
+Clone o código diretamente do GitHub para a pasta `~/assdoc`:
+
 ```bash
-# Cria diretório de instalação
-mkdir -p ~/assdoc && cd ~/assdoc
+# Clona o repositório
+git clone https://github.com/jmarques029/Termos.git ~/assdoc
 
-# Descompacta os arquivos
-unzip ~/assdoc-deploy.zip -d ~/assdoc
+# Entra na pasta do projeto
+cd ~/assdoc
+```
 
-# Garante permissões de gravação nas pastas de banco e uploads
-chmod -R 777 database uploads
+---
+
+## Passo 3: Permissões de Pastas de Dados
+
+O sistema armazena os bancos de dados (`database/`) e os uploads de fotos (`uploads/`) em volumes persistidos no disco do servidor. Garanta as permissões para o container:
+
+```bash
+# Cria as pastas de persistência se ainda não existirem
+mkdir -p database uploads/fotos uploads/devolucao
+
+# Garante permissões totais de gravação
+sudo chmod -R 777 database uploads
 ```
 
 ---
 
 ## Passo 4: Configuração das Variáveis (.env)
 
-Edite o arquivo `.env` dentro da pasta `~/assdoc`:
+Crie o arquivo `.env` a partir do modelo de exemplo:
 
 ```bash
+cp .env.example .env
 nano .env
 ```
 
-Verifique e ajuste as seguintes linhas:
+Ajuste as configurações no editor:
+
 ```dotenv
-# Caminho interno no container Docker (mantenha como /app/database)
+# Caminho interno do banco de dados no container (mantenha como /app/database)
 DB_PATH=/app/database
 
-# Se for habilitar Microsoft OAuth, coloque a URL interna ou domínio do servidor:
+# Se for usar login com Microsoft na rede interna, informe o IP do seu servidor:
+MICROSOFT_CLIENT_ID=
+MICROSOFT_CLIENT_SECRET=
+MICROSOFT_TENANT_ID=common
 MICROSOFT_REDIRECT_URI=http://192.168.X.X:3000/api/auth/microsoft/callback
 
-# Configurações de SMTP para envio de e-mails
+# Configurações de envio de e-mail (SMTP)
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_SECURE=false
@@ -121,76 +104,64 @@ SMTP_PASS=sua_senha_de_app
 SMTP_FROM=TermoEP <seuemail@empresa.com>
 ```
 
-> *Pressione `Ctrl + O` e `Enter` para salvar, depois `Ctrl + X` para sair.*
+> *Pressione `Ctrl + O` e depois `Enter` para salvar; pressione `Ctrl + X` para sair.*
 
 ---
 
 ## Passo 5: Inicialização com Docker Compose
 
-Dentro da pasta `~/assdoc`, construa e inicie o container:
+Construa a imagem e inicie o container em segundo plano:
 
 ```bash
 docker compose up -d --build
 ```
 
-### Verifique se o container está rodando:
+### Verificar se está rodando:
 ```bash
 docker compose ps
 ```
-A saída deve mostrar o serviço `assdoc_app` com status **Up**.
 
-### Para acompanhar os logs em tempo real:
+### Ver logs em tempo real:
 ```bash
 docker compose logs -f
 ```
-Você verá:
-```
-🚀 Sistema AssDoc rodando em http://localhost:3000
-   Login: admin@empresa.com | Senha: admin123
-```
+*(Para sair da visualização dos logs, pressione `Ctrl + C`)*
 
 ---
 
 ## Passo 6: Liberação no Firewall e Acesso na Rede Interna
 
-### 1. Libere a porta no firewall do Ubuntu (`ufw`)
+### 1. Libere a porta no firewall (`ufw`):
 ```bash
 sudo ufw allow 3000/tcp
 sudo ufw reload
 ```
 
-### 2. Descubra o IP local do servidor Ubuntu
+### 2. Descubra o IP local do servidor:
 ```bash
 hostname -I
 ```
 *(Exemplo: `192.168.1.150`)*
 
-### 3. Acesse de qualquer máquina da empresa
-Abra o navegador em qualquer computador conectado à rede interna ou VPN e digite:
+### 3. Acesse no navegador:
+Em qualquer computador da rede interna ou VPN, abra o navegador e acesse:
 ```
 http://192.168.1.150:3000
 ```
+* **Login inicial**: `admin@empresa.com`
+* **Senha inicial**: `admin123`
 
 ---
 
-## 🌟 Configuração Opcional: Acesso direto na Porta 80 (sem `:3000`)
+## 🌟 Opcional: Acessar na Porta 80 (sem precisar digitar `:3000`)
 
-Se quiser que os usuários acessem simplesmente digitando `http://192.168.1.150` no navegador:
+Se quiser que os usuários acessem digitando apenas `http://192.168.1.150`:
 
-1. Edite o arquivo `docker-compose.yml`:
+1. Edite o `docker-compose.yml`:
    ```bash
    nano docker-compose.yml
    ```
-2. Altere a seção `ports:` de:
-   ```yaml
-   ports:
-     - "3000:3000"
-   ```
-   Para:
-   ```yaml
-   ports:
-     - "80:3000"
-   ```
+2. Mude `ports:` de `"3000:3000"` para `"80:3000"`.
 3. Libere a porta 80 no firewall:
    ```bash
    sudo ufw allow 80/tcp
@@ -202,30 +173,37 @@ Se quiser que os usuários acessem simplesmente digitando `http://192.168.1.150`
 
 ---
 
-## Manutenção, Logs e Backup
+## Como Atualizar o Sistema (Git Pull)
 
-### 🔄 Como reiniciar o sistema
+Sempre que você fizer alterações no código no Windows e der `git push`, para atualizar o servidor Ubuntu basta executar:
+
 ```bash
 cd ~/assdoc
-docker compose restart
+
+# 1. Baixa as atualizações do GitHub
+git pull origin main
+
+# 2. Reconstrói e reinicia o container com o novo código
+docker compose up -d --build
+```
+> 💡 **Nota**: Seus dados de termos, usuários e fotos cadastradas não serão apagados na atualização, pois estão preservados nos volumes de `./database` e `./uploads`.
+
+---
+
+## Comandos Úteis e Backup
+
+### 🔄 Reiniciar o sistema
+```bash
+cd ~/assdoc && docker compose restart
 ```
 
-### 🛑 Como parar o sistema
+### 🛑 Parar o sistema
+```bash
+cd ~/assdoc && docker compose down
+```
+
+### 💾 Fazer Backup dos Dados
 ```bash
 cd ~/assdoc
-docker compose down
-```
-
-### 🔄 Como atualizar o código no futuro
-1. Substitua os arquivos modificados na pasta `~/assdoc`.
-2. Execute:
-   ```bash
-   docker compose up -d --build
-   ```
-
-### 💾 Como fazer Backup dos Dados
-Como o `docker-compose.yml` mapeia as pastas `database` e `uploads` diretamente para o disco do Ubuntu, basta copiar essas duas pastas:
-```bash
-# Cria um backup compactado com data e hora
 tar -czvf backup_assdoc_$(date +%Y%m%d_%H%M%S).tar.gz database/ uploads/
 ```
