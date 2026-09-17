@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const https = require('https');
 const path = require('path');
 const fs = require('fs');
 const bcrypt = require('bcryptjs');
@@ -7,6 +8,7 @@ const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
 const nodemailer = require('nodemailer');
+const selfsigned = require('selfsigned');
 const { usuarios, termos, configuracoes } = require('./database/db');
 
 const app = express();
@@ -1026,7 +1028,42 @@ app.get('/conta', (req, res) => res.sendFile(path.join(__dirname, 'public', 'con
 app.get('/supervisor', (req, res) => res.sendFile(path.join(__dirname, 'public', 'supervisor.html')));
 app.get('/configuracoes', (req, res) => res.sendFile(path.join(__dirname, 'public', 'configuracoes.html')));
 
-app.listen(PORT, () => {
-  console.log(`\n🚀 Sistema AssDoc rodando em http://localhost:${PORT}`);
-  console.log(`   Login: admin@empresa.com | Senha: admin123\n`);
-});
+async function iniciarServidor() {
+  // Servidor HTTP
+  app.listen(PORT, () => {
+    console.log(`\n🚀 Sistema AssDoc rodando em http://localhost:${PORT}`);
+    console.log(`   Login: admin@empresa.com | Senha: admin123`);
+  });
+
+  // Servidor HTTPS (permite acesso nativo à câmera e webcam em qualquer dispositivo/notebook)
+  try {
+    const CERTS_DIR = path.join(__dirname, 'certs');
+    if (!fs.existsSync(CERTS_DIR)) fs.mkdirSync(CERTS_DIR, { recursive: true });
+
+    const KEY_FILE = path.join(CERTS_DIR, 'server.key');
+    const CERT_FILE = path.join(CERTS_DIR, 'server.cert');
+
+    let sslOptions = null;
+    if (fs.existsSync(KEY_FILE) && fs.existsSync(CERT_FILE)) {
+      sslOptions = {
+        key: fs.readFileSync(KEY_FILE),
+        cert: fs.readFileSync(CERT_FILE)
+      };
+    } else {
+      const pems = await selfsigned.generate([{ name: 'commonName', value: 'AssDoc Server' }], { days: 3650 });
+      fs.writeFileSync(KEY_FILE, pems.private);
+      fs.writeFileSync(CERT_FILE, pems.cert);
+      sslOptions = { key: pems.private, cert: pems.cert };
+    }
+
+    const HTTPS_PORT = parseInt(process.env.HTTPS_PORT) || 3443;
+    https.createServer(sslOptions, app).listen(HTTPS_PORT, () => {
+      console.log(`🔒 Servidor HTTPS rodando em https://localhost:${HTTPS_PORT}`);
+      console.log(`   (Acesso com câmera ao vivo liberada para notebooks e smartphones)\n`);
+    });
+  } catch (err) {
+    console.warn('⚠️ Não foi possível iniciar servidor HTTPS:', err.message);
+  }
+}
+
+iniciarServidor();

@@ -213,8 +213,19 @@
           <div id="painel-opcoes-foto" style="text-align: center; padding: 12px 6px; width: 100%;">
             <div style="font-size: 42px; margin-bottom: 8px;">📸</div>
             <div style="font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 6px;">Tire uma foto para validar sua assinatura</div>
-            <div style="font-size: 13px; color: var(--text-2); margin-bottom: 18px; max-width: 380px; margin-left: auto; margin-right: auto; line-height: 1.5;">
+            <div style="font-size: 13px; color: var(--text-2); margin-bottom: 16px; max-width: 380px; margin-left: auto; margin-right: auto; line-height: 1.5;">
               Tire uma foto sua segurando o equipamento ou ao lado dele para registrar a entrega.
+            </div>
+
+            <!-- Dica HTTPS para Notebooks -->
+            <div id="banner-https-pc" style="display: none; background: rgba(0, 212, 255, 0.08); border: 1px solid rgba(0, 212, 255, 0.25); border-radius: var(--radius-sm); padding: 10px; margin-bottom: 14px; text-align: left; font-size: 12px; max-width: 340px; margin-left: auto; margin-right: auto;">
+              <div style="font-weight: 700; color: var(--primary-light); margin-bottom: 4px;">💻 No Notebook ou PC?</div>
+              <div style="color: var(--text-2); margin-bottom: 8px; line-height: 1.5;">
+                Para usar a webcam ao vivo na tela do notebook, acesse pelo modo seguro HTTPS:
+              </div>
+              <button type="button" class="btn btn-xs btn-primary" onclick="alternarParaHttps()" style="width: 100%;">
+                🔒 Abrir com HTTPS (Câmera ao Vivo)
+              </button>
             </div>
 
             <!-- Botões de ação direta no Celular e PC -->
@@ -530,6 +541,10 @@
       
       if (!isDispositivoMovel()) {
         mostrarQRCode();
+        if (window.location.protocol === 'http:') {
+          const banner = document.getElementById('banner-https-pc');
+          if (banner) banner.style.display = 'block';
+        }
       }
     }
   }
@@ -556,6 +571,12 @@
     }
   }
 
+  function alternarParaHttps() {
+    const host = window.location.hostname;
+    const targetPort = window.location.port === '3000' ? '3443' : (window.location.port || '3443');
+    window.location.href = `https://${host}:${targetPort}${window.location.pathname}${window.location.search}${window.location.hash}`;
+  }
+
   async function iniciarCameraStream() {
     pararCamera();
     const boxStream = document.getElementById('box-video-stream');
@@ -568,7 +589,14 @@
     msgErro.style.display = 'none';
 
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      msgErro.innerHTML = '⚠️ Acesso direto à webcam requer conexão segura (HTTPS) ou localhost no computador. Utilize os botões de envio acima ou aponte a câmera do celular para o QR Code abaixo.';
+      msgErro.innerHTML = `
+        <div style="font-weight:700; margin-bottom:6px;">🔒 Webcam bloqueada pelo navegador em conexões HTTP.</div>
+        <div style="font-size:12px; line-height:1.6; margin-bottom:8px;">O Chrome e o Edge exigem conexão HTTPS para transmitir a webcam ao vivo.</div>
+        <button type="button" class="btn btn-sm btn-primary" onclick="alternarParaHttps()" style="width:100%; margin-bottom:6px;">
+          🔒 Abrir em Modo HTTPS Seguro (Recomendado)
+        </button>
+        <div style="font-size:11px; color:var(--text-3);">Ou utilize os botões de foto/anexo acima.</div>
+      `;
       msgErro.style.display = 'block';
       mostrarQRCode();
       return;
@@ -590,7 +618,7 @@
       status.textContent = 'Câmera ao vivo ativa';
     } catch (err) {
       console.warn('Falha ao abrir stream de vídeo:', err);
-      msgErro.innerHTML = '⚠️ Não foi possível abrir a transmissão da webcam. Utilize os botões de envio acima ou o QR Code.';
+      msgErro.innerHTML = '⚠️ Não foi possível abrir a transmissão da webcam. Verifique se outro aplicativo (Teams, Meet) está usando a câmera ou utilize os botões de envio acima.';
       msgErro.style.display = 'block';
     }
   }
