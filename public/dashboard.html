@@ -208,9 +208,9 @@
     <div class="modal-title">🔗 Link de Assinatura</div>
     <div class="modal-subtitle">Copie o link abaixo e envie para o colaborador via WhatsApp ou e-mail.</div>
 
-    <div class="link-box">
-      <div class="link-box-url" id="modal-link-url"></div>
-      <button class="btn btn-sm btn-primary" onclick="copiarLink()">Copiar</button>
+    <div class="link-box" style="display:flex; align-items:center; gap:8px;">
+      <input type="text" id="modal-link-url" class="link-box-url" readonly onclick="this.select()" style="flex:1; background:transparent; border:none; color:var(--text); font-family:inherit; font-size:13px; outline:none; text-overflow:ellipsis; cursor:pointer;" title="Clique para selecionar">
+      <button class="btn btn-sm btn-primary" id="btn-copiar-dash" onclick="copiarLink(this)">Copiar</button>
     </div>
 
     <div class="modal-actions">
@@ -413,14 +413,21 @@
 
   function abrirModalLink(token) {
     const link = `${window.location.protocol}//${window.location.host}/assinar.html?token=${token}`;
-    document.getElementById('modal-link-url').textContent = link;
-    document.getElementById('modal-link-url').dataset.link = link;
+    const inputLink = document.getElementById('modal-link-url');
+    inputLink.value = link;
+    inputLink.textContent = link;
+    inputLink.dataset.link = link;
     document.getElementById('modal-link').classList.add('open');
   }
 
-  function copiarLink() {
-    const url = document.getElementById('modal-link-url').dataset.link;
-    navigator.clipboard.writeText(url).then(() => toast('Link copiado!', 'success'));
+  function copiarLink(btn) {
+    const el = document.getElementById('modal-link-url');
+    const url = el.value || el.dataset.link || el.textContent;
+    if (window.copiarTextoUniversal) {
+      window.copiarTextoUniversal(url, btn || document.getElementById('btn-copiar-dash'));
+    } else {
+      navigator.clipboard.writeText(url).then(() => toast('Link copiado!', 'success'));
+    }
   }
 
   function fecharModal(id) {

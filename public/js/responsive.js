@@ -112,6 +112,64 @@
     });
   }
 
+  /**
+   * Copiador Universal de Texto com suporte total a HTTP, HTTPS e navegadores móveis/desktop
+   */
+  window.copiarTextoUniversal = function (texto, btnElement) {
+    if (!texto) return;
+
+    function onSucesso() {
+      if (typeof toast === 'function') {
+        toast('Link copiado para a área de transferência!', 'success');
+      }
+      if (btnElement) {
+        const originalText = btnElement.textContent;
+        btnElement.textContent = '✅ Copiado!';
+        btnElement.style.background = 'var(--success)';
+        btnElement.style.borderColor = 'var(--success)';
+        setTimeout(() => {
+          btnElement.textContent = originalText;
+          btnElement.style.background = '';
+          btnElement.style.borderColor = '';
+        }, 2500);
+      }
+    }
+
+    // Tenta API moderna se estiver em ambiente seguro
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(texto)
+        .then(onSucesso)
+        .catch(() => execCopyFallback(texto, onSucesso));
+    } else {
+      execCopyFallback(texto, onSucesso);
+    }
+  };
+
+  function execCopyFallback(texto, onSucesso) {
+    const textArea = document.createElement('textarea');
+    textArea.value = texto;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    textArea.setAttribute('readonly', '');
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+
+    try {
+      const ok = document.execCommand('copy');
+      if (ok) {
+        onSucesso();
+      } else {
+        prompt('Copie o link abaixo manualmente (Ctrl+C ou pressione para copiar):', texto);
+      }
+    } catch (e) {
+      prompt('Copie o link abaixo manualmente (Ctrl+C ou pressione para copiar):', texto);
+    } finally {
+      document.body.removeChild(textArea);
+    }
+  }
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initResponsive);
   } else {

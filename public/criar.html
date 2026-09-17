@@ -275,9 +275,9 @@
         ℹ️ O link é único e pode ser acessado de qualquer dispositivo (celular, tablet ou computador).
       </div>
 
-      <div class="link-box">
-        <div class="link-box-url" id="sucesso-link-url"></div>
-        <button class="btn btn-sm btn-primary" onclick="copiarLinkSucesso()">Copiar</button>
+      <div class="link-box" style="display:flex; align-items:center; gap:8px;">
+        <input type="text" id="sucesso-link-url" class="link-box-url" readonly onclick="this.select()" style="flex:1; background:transparent; border:none; color:var(--text); font-family:inherit; font-size:13px; outline:none; text-overflow:ellipsis; cursor:pointer;" title="Clique para selecionar">
+        <button class="btn btn-sm btn-primary" id="btn-copiar-sucesso" onclick="copiarLinkSucesso(this)">Copiar</button>
       </div>
 
       <!-- Envio por email -->
@@ -475,9 +475,11 @@
         const termoId = (data.termo && data.termo._id) || data.id || '';
         const linkGerado = `${window.location.protocol}//${window.location.host}/assinar.html?token=${tokenUnico}`;
 
-        document.getElementById('sucesso-link-url').textContent = linkGerado;
-        document.getElementById('sucesso-link-url').dataset.link = linkGerado;
-        document.getElementById('sucesso-link-url').dataset.id = termoId;
+        const inputLink = document.getElementById('sucesso-link-url');
+        inputLink.value = linkGerado;
+        inputLink.textContent = linkGerado;
+        inputLink.dataset.link = linkGerado;
+        inputLink.dataset.id = termoId;
 
         // Pré-preenche email do colaborador se informado
         const emailColaborador = document.getElementById('colaborador_email').value.trim();
@@ -507,9 +509,14 @@
       }
     }
 
-    function copiarLinkSucesso() {
-      const url = document.getElementById('sucesso-link-url').dataset.link;
-      navigator.clipboard.writeText(url).then(() => toast('Link copiado!', 'success'));
+    function copiarLinkSucesso(btn) {
+      const el = document.getElementById('sucesso-link-url');
+      const url = el.value || el.dataset.link || el.textContent;
+      if (window.copiarTextoUniversal) {
+        window.copiarTextoUniversal(url, btn || document.getElementById('btn-copiar-sucesso'));
+      } else {
+        navigator.clipboard.writeText(url).then(() => toast('Link copiado!', 'success'));
+      }
     }
 
     async function enviarEmail() {
