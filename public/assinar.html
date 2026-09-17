@@ -10,6 +10,7 @@
   <script src="/js/signature_pad.umd.min.js?v=2"></script>
   <!-- QRCode -->
   <script src="/js/qrcode.min.js"></script>
+  <script src="/js/responsive.js" defer></script>
   <style>
     body { background: var(--bg); }
     .sign-progress {
@@ -458,20 +459,35 @@
 
   function inicializarCanvas() {
     const canvas = document.getElementById('canvas-assinatura');
-    // Ajusta tamanho real do canvas
-    const ratio = window.devicePixelRatio || 1;
-    const rect = canvas.parentElement.getBoundingClientRect();
-    canvas.width = rect.width * ratio;
-    canvas.height = 200 * ratio;
-    const ctx = canvas.getContext('2d');
-    ctx.scale(ratio, ratio);
+    if (!canvas) return;
+
+    function redimensionarCanvas() {
+      const ratio = Math.max(window.devicePixelRatio || 1, 1);
+      const rect = canvas.parentElement.getBoundingClientRect();
+      if (!rect || rect.width === 0) return;
+
+      const dados = signaturePad ? signaturePad.toData() : null;
+      canvas.width = rect.width * ratio;
+      canvas.height = 200 * ratio;
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `200px`;
+      const ctx = canvas.getContext('2d');
+      ctx.scale(ratio, ratio);
+      if (signaturePad && dados && dados.length > 0) {
+        signaturePad.fromData(dados);
+      }
+    }
 
     signaturePad = new SignaturePad(canvas, {
       backgroundColor: 'rgba(0,0,0,0)',
-      penColor: '#f1f1f8',
+      penColor: '#00D4FF',
       minWidth: 1.5,
-      maxWidth: 3
+      maxWidth: 3.5
     });
+
+    redimensionarCanvas();
+    window.addEventListener('resize', redimensionarCanvas);
+    window.addEventListener('orientationchange', redimensionarCanvas);
 
     signaturePad.addEventListener('beginStroke', () => {
       document.getElementById('hint-assinatura').style.opacity = '0';
