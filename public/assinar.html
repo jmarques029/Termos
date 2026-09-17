@@ -189,30 +189,42 @@
 
       <!-- Assinatura por Foto / Câmera -->
       <div id="area-foto" class="hidden">
+        <!-- Barra de Ações Rápidas de Câmera -->
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px;">
+          <label class="btn btn-primary btn-sm" style="cursor: pointer; display: inline-flex; align-items: center; gap: 6px; flex: 1; justify-content: center; min-width: 160px;">
+            📸 Tirar Foto com a Câmera
+            <input type="file" id="input-foto-camera" accept="image/*" capture="user" style="display: none;" onchange="carregarFotoCelular(event)">
+          </label>
+          <button class="btn btn-secondary btn-sm" id="btn-iniciar-stream" type="button" onclick="iniciarCamera()" style="display: inline-flex; align-items: center; gap: 6px; flex: 1; justify-content: center; min-width: 160px;">
+            🎥 Abrir Câmera na Tela
+          </button>
+          <label class="btn btn-ghost btn-sm" style="cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+            📁 Galeria / Arquivo
+            <input type="file" id="input-foto-arquivo" accept="image/*" style="display: none;" onchange="carregarFotoCelular(event)">
+          </label>
+        </div>
+
         <div class="camera-container" style="border: 2px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--bg-3); position: relative; min-height: 220px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px;">
-          <!-- Feed de vídeo -->
-          <video id="video-feed" autoplay playsinline style="width: 100%; max-height: 240px; border-radius: var(--radius-sm); object-fit: cover; display: none;"></video>
+          <!-- Feed de vídeo ao vivo -->
+          <video id="video-feed" autoplay playsinline style="width: 100%; max-height: 280px; border-radius: var(--radius-sm); object-fit: cover; display: none;"></video>
           <!-- Imagem capturada -->
-          <img id="img-capturada" style="width: 100%; max-height: 240px; border-radius: var(--radius-sm); object-fit: contain; display: none;" alt="Foto capturada">
+          <img id="img-capturada" style="width: 100%; max-height: 280px; border-radius: var(--radius-sm); object-fit: contain; display: none;" alt="Foto capturada">
           <!-- Canvas oculto para captura -->
           <canvas id="canvas-captura" style="display: none;"></canvas>
           
-          <!-- Fallback / Ajuda de câmera -->
-          <div id="fallback-camera" style="text-align: center; padding: 16px; width: 100%;">
-            <div id="msg-erro-camera" style="margin-bottom: 14px; font-size: 13px; color: var(--text-2);">Não foi possível acessar a câmera.</div>
+          <!-- Fallback / Painel de opções de câmera -->
+          <div id="fallback-camera" style="text-align: center; padding: 20px 14px; width: 100%;">
+            <div style="font-size: 38px; margin-bottom: 8px;">📸</div>
+            <div id="msg-erro-camera" style="margin-bottom: 14px; font-size: 14px; color: var(--text);">Tire uma foto sua segurando ou ao lado do equipamento para assinar.</div>
 
             <!-- Painel de ajuda -->
             <div id="painel-ajuda" style="display:none; text-align:left; background:rgba(0,212,255,0.06); border:1px solid rgba(0,212,255,0.2); border-radius:var(--radius); padding:16px; margin-bottom:14px; font-size:13px;">
-              <div style="font-weight:700; color:var(--primary-light); margin-bottom:10px;">&#x1F527; Como liberar a câmera:</div>
+              <div style="font-weight:700; color:var(--primary-light); margin-bottom:10px;">🔧 Dicas para Câmera:</div>
               <ol style="padding-left:20px; line-height:2; color:var(--text-2);">
-                <li><strong style="color:var(--text);">Windows:</strong> Configurações &gt; Privacidade &gt; Câmera &gt; <em>Permitir que os aplicativos acessem sua câmera</em> ✅</li>
-                <li><strong style="color:var(--text);">Navegador (barra de endereços):</strong> Clique no ícone 🔒 ou 📷 ao lado da URL &gt; <em>Permissões do site</em> &gt; Câmera &gt; <em>Permitir</em></li>
-                <li><strong style="color:var(--text);">Feche</strong> Teams, Zoom, Skype, Meet ou qualquer app usando a câmera</li>
-                <li>Clique em <strong style="color:var(--primary);">🔄 Tentar câmera novamente</strong> abaixo</li>
+                <li><strong style="color:var(--text);">Celular:</strong> Clique no botão azul <strong>"📸 Tirar Foto com a Câmera"</strong> acima para abrir a câmera nativa do seu celular.</li>
+                <li><strong style="color:var(--text);">Notebook/PC:</strong> Clique em <strong>"🎥 Abrir Câmera na Tela"</strong> e permita o acesso à câmera quando o navegador solicitar.</li>
+                <li><strong style="color:var(--text);">Permissões:</strong> Se estiver bloqueado, clique no ícone 🔒 ao lado do endereço do site e marque <em>Câmera: Permitir</em>.</li>
               </ol>
-              <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
-                <a href="ms-settings:privacy-webcam" class="btn btn-sm btn-secondary" style="font-size:12px;">&#x1F4F7; Abrir Configurações de Câmera (Windows)</a>
-              </div>
             </div>
 
             <!-- Seletor de câmera (quando há múltiplas) -->
@@ -221,31 +233,27 @@
               <select id="camera-selector" class="input" style="font-size:13px; padding:6px 10px;" onchange="trocarCamera(this.value)"></select>
             </div>
 
-            <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:16px;">
-              <button id="btn-retentar-camera" class="btn btn-sm btn-primary" type="button" onclick="resetarEstadoCamera()">
-                &#x1F504; Tentar câmera novamente
-              </button>
+            <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:12px;">
+              <label class="btn btn-sm btn-primary" style="cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                📸 Abrir Câmera do Dispositivo
+                <input type="file" accept="image/*" capture="user" style="display: none;" onchange="carregarFotoCelular(event)">
+              </label>
               <button class="btn btn-sm btn-secondary" type="button" onclick="document.getElementById('painel-ajuda').style.display = document.getElementById('painel-ajuda').style.display==='none' ? 'block' : 'none'">
-                &#x2753; Como resolver?
+                ❓ Ajuda / Dicas
               </button>
             </div>
 
             <!-- QR Code Fallback para Assinatura por Celular -->
-            <div id="qr-container" style="display: none; flex-direction: column; align-items: center; gap: 8px; margin-top: 8px; margin-bottom: 16px;">
-              <p class="text-sm" style="color: var(--primary-light); font-weight: 600; margin-bottom: 2px;">&#x1F4F1; Assinar pelo Celular (Recomendado)</p>
-              <p class="text-xs text-muted" style="max-width: 320px; margin: 0 auto 10px auto; line-height: 1.5;">Aponte a câmera do seu celular para o QR Code abaixo para abrir este documento no celular e bater a foto com facilidade!</p>
+            <div id="qr-container" style="display: none; flex-direction: column; align-items: center; gap: 8px; margin-top: 12px; margin-bottom: 12px;">
+              <p class="text-sm" style="color: var(--primary-light); font-weight: 600; margin-bottom: 2px;">📱 Abrir no Celular</p>
+              <p class="text-xs text-muted" style="max-width: 320px; margin: 0 auto 10px auto; line-height: 1.5;">Aponte a câmera do seu celular para o QR Code abaixo para abrir este termo no celular e fotografar facilmente:</p>
               <div id="qrcode-box" style="padding: 10px; background: white; border-radius: var(--radius-sm); display: inline-block;"></div>
             </div>
-
-            <label class="btn btn-secondary btn-sm" style="cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
-              &#x1F4F7; Carregar Foto do Computador
-              <input type="file" id="input-foto-celular" accept="image/*" style="display: none;" onchange="carregarFotoCelular(event)">
-            </label>
           </div>
         </div>
 
         <div class="camera-actions mt-2" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-          <span class="text-sm text-muted" id="camera-status">Carregando câmera...</span>
+          <span class="text-sm text-muted" id="camera-status">Pronto para capturar foto</span>
           <div class="flex gap-2">
             <button class="btn btn-secondary btn-sm hidden" id="btn-retake" onclick="resetarCamera()" type="button">🔄 Tirar Outra</button>
             <button class="btn btn-primary btn-sm hidden" id="btn-capture" onclick="capturarFoto()" type="button">📸 Capturar Foto</button>
@@ -775,23 +783,55 @@
   }
 
   function carregarFotoCelular(event) {
-    const file = event.target.files[0];
+    const file = event.target.files && event.target.files[0];
     if (!file) return;
+
+    const status = document.getElementById('camera-status');
+    status.textContent = 'Processando foto...';
 
     const reader = new FileReader();
     reader.onload = function(e) {
-      fotoBase64 = e.target.result;
-      
-      const imgCapturada = document.getElementById('img-capturada');
-      const fallback = document.getElementById('fallback-camera');
-      const btnRetake = document.getElementById('btn-retake');
-      const status = document.getElementById('camera-status');
+      const img = new Image();
+      img.onload = function() {
+        const maxDim = 1280;
+        let w = img.width;
+        let h = img.height;
 
-      fallback.style.display = 'none';
-      imgCapturada.src = fotoBase64;
-      imgCapturada.style.display = 'block';
-      btnRetake.classList.remove('hidden');
-      status.textContent = 'Foto do arquivo carregada';
+        if (w > maxDim || h > maxDim) {
+          if (w > h) {
+            h = Math.round((h * maxDim) / w);
+            w = maxDim;
+          } else {
+            w = Math.round((w * maxDim) / h);
+            h = maxDim;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+
+        fotoBase64 = canvas.toDataURL('image/jpeg', 0.85);
+
+        const video = document.getElementById('video-feed');
+        const imgCapturada = document.getElementById('img-capturada');
+        const fallback = document.getElementById('fallback-camera');
+        const btnRetake = document.getElementById('btn-retake');
+        const btnCapture = document.getElementById('btn-capture');
+
+        pararCamera();
+        if (video) video.style.display = 'none';
+        if (fallback) fallback.style.display = 'none';
+        if (btnCapture) btnCapture.classList.add('hidden');
+
+        imgCapturada.src = fotoBase64;
+        imgCapturada.style.display = 'block';
+        btnRetake.classList.remove('hidden');
+        status.textContent = 'Foto capturada com sucesso ✅';
+      };
+      img.src = e.target.result;
     };
     reader.readAsDataURL(file);
   }
