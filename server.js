@@ -76,6 +76,14 @@ function autenticar(req, res, next) {
   }
 }
 
+// Helper para obter URL base da aplicação
+function getBaseUrl(req) {
+  if (process.env.BASE_URL && !process.env.BASE_URL.includes('192.168.X.X')) {
+    return process.env.BASE_URL.replace(/\/$/, '');
+  }
+  return `${req.protocol}://${req.get('host')}`;
+}
+
 // ─── AUTENTICAÇÃO ─────────────────────────────────────────────
 
 // POST /api/auth/login
@@ -581,13 +589,6 @@ app.post('/api/termos', autenticar, upload.single('foto'), async (req, res) => {
       criado_por_nome: req.usuario.nome,
       criado_em: new Date().toISOString()
     });
-
-function getBaseUrl(req) {
-  if (process.env.BASE_URL && !process.env.BASE_URL.includes('192.168.X.X')) {
-    return process.env.BASE_URL.replace(/\/$/, '');
-  }
-  return `${req.protocol}://${req.get('host')}`;
-}
 
     const BASE_URL = getBaseUrl(req);
     const linkAssinatura = `${BASE_URL}/assinar.html?token=${token_unico}`;
