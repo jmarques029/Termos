@@ -471,9 +471,13 @@
           return;
         }
 
-        document.getElementById('sucesso-link-url').textContent = data.linkAssinatura;
-        document.getElementById('sucesso-link-url').dataset.link = data.linkAssinatura;
-        document.getElementById('sucesso-link-url').dataset.id = data.id;
+        const tokenUnico = (data.termo && data.termo.token_unico) || '';
+        const termoId = (data.termo && data.termo._id) || data.id || '';
+        const linkGerado = `${window.location.protocol}//${window.location.host}/assinar.html?token=${tokenUnico}`;
+
+        document.getElementById('sucesso-link-url').textContent = linkGerado;
+        document.getElementById('sucesso-link-url').dataset.link = linkGerado;
+        document.getElementById('sucesso-link-url').dataset.id = termoId;
 
         // Pré-preenche email do colaborador se informado
         const emailColaborador = document.getElementById('colaborador_email').value.trim();
