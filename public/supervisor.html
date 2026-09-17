@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TermoEP — Painel do Supervisor</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .termo-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px 22px;display:flex;align-items:center;gap:16px;transition:all var(--transition);cursor:pointer;}
+    .termo-card:hover{border-color:rgba(255,255,255,0.12);background:var(--surface-hover);transform:translateY(-1px);}
+    .termo-icon{width:44px;height:44px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+    .termo-info{flex:1;min-width:0;}
+    .termo-nome{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .termo-sub{font-size:12px;color:var(--text-2);margin-top:2px;}
+    .termo-meta{font-size:11px;color:var(--text-3);margin-top:4px;}
+    .termo-status{flex-shrink:0;}
+    .termos-grid{display:flex;flex-direction:column;gap:10px;}
+    .filter-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;align-items:center;}
+    .filter-bar input{flex:1;min-width:200px;}
+    .filter-bar select{min-width:160px;}
+    .dept-header{font-size:13px;font-weight:700;color:var(--text-2);padding:4px 0;margin-top:8px;display:flex;align-items:center;gap:8px;}
+    .dept-header-line{height:1px;background:var(--border);flex:1;}
+    .badge-pendente{display:inline-flex;padding:3px 10px;background:rgba(245,158,11,0.12);color:#f59e0b;border-radius:99px;font-size:11px;font-weight:700;}
+    .badge-assinado{display:inline-flex;padding:3px 10px;background:rgba(16,185,129,0.12);color:#10b981;border-radius:99px;font-size:11px;font-weight:700;}
+    .welcome-banner{background:linear-gradient(135deg,rgba(245,158,11,0.12),rgba(245,158,11,0.04));border:1px solid rgba(245,158,11,0.2);border-radius:var(--radius-lg);padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;gap:16px;}
+    .welcome-icon{font-size:36px;}
+    .welcome-title{font-size:17px;font-weight:700;color:var(--text-1);}
+    .welcome-sub{font-size:13px;color:var(--text-2);margin-top:4px;}
+  </style>
+</head>
+<body>
+<div id="toast-container"></div>
+<div class="page-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon"><img src="/termoep_logo.jpg" alt="TermoEP"></div>
+      <div class="sidebar-logo-text"><span style="color:#00D4FF">Termo</span><span style="color:white;font-weight:900">EP</span></div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="/supervisor.html" class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        Meus Termos
+      </a>
+      <a href="/conta.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Minha Conta
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="user-initials" style="background:linear-gradient(135deg,#f59e0b,#d97706);">S</div>
+        <div>
+          <div class="user-name" id="user-name">Supervisor</div>
+          <div class="user-role">Supervisor de Departamento</div>
+        </div>
+      </div>
+      <button class="nav-item" onclick="logout()" style="margin-top:4px;color:var(--danger);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sair
+      </button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-title">Painel do Supervisor</div>
+    <div class="page-subtitle">Visualize os equipamentos e termos do seu departamento</div>
+
+    <!-- Banner boas-vindas -->
+    <div class="welcome-banner" id="welcome-banner" style="display:none;">
+      <div class="welcome-icon">👁️</div>
+      <div>
+        <div class="welcome-title" id="welcome-title">Bem-vindo!</div>
+        <div class="welcome-sub" id="welcome-sub">Você tem acesso aos termos do seu departamento.</div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid" style="margin-bottom:24px;">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(245,158,11,0.12);font-size:22px;">📄</div>
+        <div class="stat-value" id="stat-total" style="color:#f59e0b">0</div>
+        <div class="stat-label">Total de Termos</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(245,158,11,0.12);font-size:22px;">⏳</div>
+        <div class="stat-value" id="stat-pendentes" style="color:#f59e0b">0</div>
+        <div class="stat-label">Pendentes</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(16,185,129,0.12);font-size:22px;">✅</div>
+        <div class="stat-value" id="stat-assinados" style="color:#10b981">0</div>
+        <div class="stat-label">Assinados</div>
+      </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filter-bar">
+      <input id="busca" type="text" class="input" placeholder="🔍 Buscar por colaborador, equipamento..." oninput="filtrar()">
+      <select id="filtro-status" class="input" onchange="filtrar()">
+        <option value="">Todos os status</option>
+        <option value="pendente">Pendentes</option>
+        <option value="assinado">Assinados</option>
+      </select>
+      <select id="filtro-dept" class="input" onchange="filtrar()">
+        <option value="">Todos os departamentos</option>
+      </select>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading" class="loading-screen">
+      <div class="spinner"></div>
+      <span>Carregando termos...</span>
+    </div>
+
+    <!-- Lista de termos -->
+    <div id="termos-grid" class="termos-grid hidden"></div>
+
+    <!-- Empty state -->
+    <div id="empty-state" class="empty-state hidden">
+      <div class="empty-state-icon">📂</div>
+      <h3>Nenhum termo encontrado</h3>
+      <p id="empty-msg">Ainda não há termos registrados para o seu departamento.</p>
+    </div>
+
+    <!-- Sem departamento -->
+    <div id="no-dept-state" class="empty-state hidden">
+      <div class="empty-state-icon">🏢</div>
+      <h3>Sem departamentos configurados</h3>
+      <p>Nenhum departamento foi atribuído à sua conta ainda. Entre em contato com um administrador.</p>
+    </div>
+  </main>
+</div>
+
+<script>
+  const token = localStorage.getItem('assdoc_token');
+  if (!token) { window.location.href = '/index.html'; }
+
+  const tokenPayload = JSON.parse(atob(token.split('.')[1]));
+  if (tokenPayload.role === 'admin') window.location.href = '/dashboard.html';
+
+  const usuarioLogado = JSON.parse(localStorage.getItem('assdoc_usuario') || '{}');
+  if (usuarioLogado.nome) {
+    document.getElementById('user-name').textContent = usuarioLogado.nome;
+    document.getElementById('user-initials').textContent = usuarioLogado.nome.charAt(0).toUpperCase();
+    document.getElementById('welcome-title').textContent = `Olá, ${usuarioLogado.nome.split(' ')[0]}!`;
+  }
+
+  function headers() { return { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }; }
+
+  let todosTermos = [];
+
+  const TIPO_ICONES = { celular: '📱', tablet: '📟', notebook: '💻' };
+  const TIPO_CORES = { celular: 'rgba(99,102,241,0.12)', tablet: 'rgba(16,185,129,0.12)', notebook: 'rgba(245,158,11,0.12)' };
+
+  async function carregarTermos() {
+    try {
+      const res = await fetch('/api/termos/supervisor', { headers: headers() });
+      if (res.status === 401) { logout(); return; }
+      if (res.status === 403) {
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('no-dept-state').classList.remove('hidden');
+        return;
+      }
+      todosTermos = await res.json();
+      document.getElementById('loading').classList.add('hidden');
+      atualizarStats();
+      preencherFiltrosDept();
+      filtrar();
+
+      // Banner boas-vindas
+      const banner = document.getElementById('welcome-banner');
+      banner.style.display = 'flex';
+      const deptList = [...new Set(todosTermos.map(t => t.departamento).filter(Boolean))];
+      if (deptList.length > 0) {
+        document.getElementById('welcome-sub').textContent = `Você visualiza os departamentos: ${deptList.join(', ')}.`;
+      }
+    } catch {
+      toast('Erro ao carregar termos', 'error');
+      document.getElementById('loading').classList.add('hidden');
+    }
+  }
+
+  function atualizarStats() {
+    document.getElementById('stat-total').textContent = todosTermos.length;
+    document.getElementById('stat-pendentes').textContent = todosTermos.filter(t => t.status === 'pendente').length;
+    document.getElementById('stat-assinados').textContent = todosTermos.filter(t => t.status === 'assinado').length;
+  }
+
+  function preencherFiltrosDept() {
+    const depts = [...new Set(todosTermos.map(t => t.departamento).filter(Boolean))].sort();
+    const sel = document.getElementById('filtro-dept');
+    depts.forEach(d => {
+      const opt = document.createElement('option');
+      opt.value = d; opt.textContent = d;
+      sel.appendChild(opt);
+    });
+  }
+
+  function filtrar() {
+    const busca = document.getElementById('busca').value.toLowerCase();
+    const status = document.getElementById('filtro-status').value;
+    const dept = document.getElementById('filtro-dept').value;
+
+    let filtrados = todosTermos.filter(t => {
+      const matchBusca = !busca ||
+        (t.colaborador_nome || '').toLowerCase().includes(busca) ||
+        (t.equipamento_marca || '').toLowerCase().includes(busca) ||
+        (t.equipamento_modelo || '').toLowerCase().includes(busca) ||
+        (t.numero_patrimonio || '').toLowerCase().includes(busca) ||
+        (t.cargo || '').toLowerCase().includes(busca);
+      const matchStatus = !status || t.status === status;
+      const matchDept = !dept || t.departamento === dept;
+      return matchBusca && matchStatus && matchDept;
+    });
+
+    renderTermos(filtrados);
+  }
+
+  function renderTermos(lista) {
+    const grid = document.getElementById('termos-grid');
+    const empty = document.getElementById('empty-state');
+    const noDepth = document.getElementById('no-dept-state');
+    noDepth.classList.add('hidden');
+
+    if (lista.length === 0) {
+      grid.classList.add('hidden');
+      empty.classList.remove('hidden');
+      document.getElementById('empty-msg').textContent = todosTermos.length === 0
+        ? 'Ainda não há termos registrados para o seu departamento.'
+        : 'Nenhum termo corresponde ao filtro aplicado.';
+      return;
+    }
+
+    empty.classList.add('hidden');
+    grid.classList.remove('hidden');
+
+    grid.innerHTML = lista.map(t => {
+      const icone = TIPO_ICONES[t.tipo] || '📄';
+      const cor = TIPO_CORES[t.tipo] || 'rgba(99,102,241,0.12)';
+      const data = t.data_entrega ? new Date(t.data_entrega).toLocaleDateString('pt-BR') : '—';
+      let statusBadge;
+      if (t.devolvido) {
+        statusBadge = `<span class="badge-assinado" style="background:rgba(16,185,129,0.15);color:#10b981;">📦 Devolvido</span>`;
+      } else if (t.status === 'assinado') {
+        statusBadge = `<span class="badge-assinado">✅ Assinado</span>`;
+      } else {
+        statusBadge = `<span class="badge-pendente">⏳ Pendente</span>`;
+      }
+      const dept = t.departamento ? `· ${t.departamento}` : '';
+      const equip = [t.equipamento_marca, t.equipamento_modelo].filter(Boolean).join(' ');
+
+      return `
+        <div class="termo-card" onclick="verTermo('${t._id}')">
+          <div class="termo-icon" style="background:${cor}">${icone}</div>
+          <div class="termo-info">
+            <div class="termo-nome">${t.colaborador_nome}</div>
+            <div class="termo-sub">${equip} ${t.numero_patrimonio ? '· Patr. ' + t.numero_patrimonio : ''}</div>
+            <div class="termo-meta">${t.cargo || ''} ${dept} · Entrega: ${data}</div>
+          </div>
+          <div class="termo-status" style="display:flex;align-items:center;gap:8px;">
+            ${statusBadge}
+            ${t.status === 'pendente' && t.token_unico
+              ? `<button class="btn btn-sm btn-primary" onclick="assinarTermo('${t.token_unico}', event)" title="Abrir formulário de assinatura" style="font-size:12px;padding:5px 12px;">✍️ Assinar</button>`
+              : `<button class="btn btn-sm btn-ghost" onclick="verTermo('${t._id}'); event.stopPropagation();" style="font-size:12px;padding:5px 10px;">👁️ Ver</button>`}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function verTermo(id) {
+    window.open(`/visualizar.html?id=${id}`, '_blank');
+  }
+
+  function assinarTermo(token_unico, event) {
+    event.stopPropagation(); // não disparar verTermo
+    window.open(`/assinar.html?token=${token_unico}`, '_blank');
+  }
+
+  function logout() { localStorage.removeItem('assdoc_token'); localStorage.removeItem('assdoc_usuario'); window.location.href = '/index.html'; }
+
+  function toast(msg, tipo = 'info') {
+    const c = document.getElementById('toast-container');
+    const t = document.createElement('div');
+    t.className = `toast toast-${tipo}`;
+    t.innerHTML = `<span>${tipo === 'success' ? '✅' : tipo === 'error' ? '❌' : 'ℹ️'}</span> ${msg}`;
+    c.appendChild(t);
+    setTimeout(() => { t.style.animation = 'fadeOut 0.3s ease forwards'; setTimeout(() => t.remove(), 300); }, 4000);
+  }
+
+  carregarTermos();
+</script>
+</body>
+</html>
+
+

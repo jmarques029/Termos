@@ -1,0 +1,6 @@
+{"nome":"Teste Supervisor","email":"supervisor@teste.com","senha_hash":"$2a$10$/ak2CDtt2.0mLMUWle09r.zvmH6D0d1kj93AEd2xmS25AU7EEuusy","role":"supervisor","departamentos_permitidos":["TI"],"criado_por":"8eqYoKCPl4Yozikw","criado_por_nome":"Administrador","criado_em":"2026-09-02T17:45:18.200Z","_id":"6ARYP7n3r4HbQ9l4"}
+{"nome":"Novo Admin","email":"admin2@empresa.com","senha_hash":"$2a$10$0T20bVx0R4k4ghnZGmjfnumwF2dePCTldzg9xL7cr0GK9tRg2BGky","role":"admin","departamentos_permitidos":[],"criado_por":"8eqYoKCPl4Yozikw","criado_por_nome":"Administrador","criado_em":"2026-09-02T17:46:02.532Z","_id":"7l6CefLYqNQEhx9b"}
+{"nome":"Administrador","email":"admin@empresa.com","senha_hash":"$2a$10$92JDyy85k/YbZgFF7xmDnOf.qq3XoSkCBr8n66JAmcyMRrjijGyNK","criado_em":"2026-08-26T16:51:11.618Z","_id":"8eqYoKCPl4Yozikw"}
+{"nome":"João Teste","email":"joao@empresa.com","senha_hash":"$2a$10$2.qoKt4vws9Ft1Slr7MxAOwg1T5Qo8CXD0ooPrqWP5ba2aeOUkJZq","role":"supervisor","departamentos_permitidos":["TI"],"criado_por":"8eqYoKCPl4Yozikw","criado_por_nome":"Administrador","criado_em":"2026-09-02T17:39:10.527Z","_id":"W0FJLAOXfNy3HyVU"}
+{"$$indexCreated":{"fieldName":"email","unique":true,"sparse":false}}
+{"$$indexCreated":{"fieldName":"email","unique":true}}

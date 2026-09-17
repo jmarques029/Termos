@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  assdoc:
+    build: .
+    container_name: assdoc_app
+    restart: unless-stopped
+    ports:
+      - "3000:3000" # Mapeia a porta 3000 (pode alterar para "80:3000" se quiser acessar na porta 80 padrão)
+    environment:
+      - NODE_ENV=production
+      - TZ=America/Sao_Paulo
+      - DB_PATH=/app/database
+    env_file:
+      - .env
+    volumes:
+      # Garante a persistência dos dados NeDB e fotos no disco do servidor Ubuntu
+      - ./database:/app/database
+      - ./uploads:/app/uploads

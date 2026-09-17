@@ -1,0 +1,189 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TermoEP — Login</title>
+  <meta name="description" content="Sistema de Termos de Compromisso de Equipamentos — Login do Administrador">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<div class="login-page">
+  <!-- Visual lado esquerdo -->
+  <div class="login-visual">
+    <div class="login-visual-content">
+      <div style="margin-bottom: 20px;"><img src="/termoep_logo.jpg" alt="TermoEP" style="height:64px;object-fit:contain;background:white;border-radius:12px;padding:8px 16px;"></div>
+      <h1>TermoEP</h1>
+      <p>Sistema de gerenciamento de termos de compromisso de equipamentos corporativos.</p>
+
+      <div class="login-features">
+        <div class="login-feature">
+          <div class="login-feature-icon">✍️</div>
+          <span>Assinatura digital via link único</span>
+        </div>
+        <div class="login-feature">
+          <div class="login-feature-icon">📱</div>
+          <span>Termos para celular e notebook</span>
+        </div>
+        <div class="login-feature">
+          <div class="login-feature-icon">📄</div>
+          <span>Download do PDF assinado</span>
+        </div>
+        <div class="login-feature">
+          <div class="login-feature-icon">🔒</div>
+          <span>Dados armazenados com segurança</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulário de login -->
+  <div class="login-form-area">
+    <div class="login-logo">
+      <div class="login-logo-icon" style="background:white;border-radius:12px;padding:4px;overflow:hidden;"><img src="/termoep_logo.jpg" alt="TermoEP" style="width:48px;height:48px;object-fit:contain;display:block;"></div>
+      <div class="login-logo-text"><span style="color:#00D4FF">Termo</span><span style="color:#1D3461;font-weight:900">EP</span></div>
+    </div>
+
+    <div class="login-form">
+      <div>
+        <h2>Bem-vindo de volta</h2>
+        <p class="subtitle">Faça login para acessar o painel.</p>
+      </div>
+
+      <div id="login-error" class="alert alert-error hidden" role="alert">
+        <span>⚠️</span>
+        <span id="login-error-msg"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="email">E-mail</label>
+        <input
+          id="email"
+          type="email"
+          class="input"
+          placeholder="admin@empresa.com"
+          autocomplete="email"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="senha">Senha</label>
+        <input
+          id="senha"
+          type="password"
+          class="input"
+          placeholder="••••••••"
+          autocomplete="current-password"
+          required
+        >
+      </div>
+
+      <button id="btn-login" class="btn btn-primary btn-lg" onclick="fazerLogin()" style="width: 100%; margin-top: 8px;">
+        Entrar
+      </button>
+
+      <div class="divider-text"><span>ou entrar com</span></div>
+
+      <a href="/api/auth/microsoft" class="btn btn-secondary btn-lg" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; background: var(--surface-2); border: 1px solid var(--border);">
+        <svg width="18" height="18" viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="10.5" height="10.5" fill="#F25022"/>
+          <rect x="12.5" width="10.5" height="10.5" fill="#7FBA00"/>
+          <rect y="12.5" width="10.5" height="10.5" fill="#00A1F1"/>
+          <rect x="12.5" y="12.5" width="10.5" height="10.5" fill="#FFB900"/>
+        </svg>
+        Entrar com a Microsoft
+      </a>
+
+      <p class="text-sm text-muted text-center">
+        Esqueceu a senha? Contate o administrador do sistema.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Redireciona se já estiver logado
+  const token = localStorage.getItem('assdoc_token');
+  if (token) {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      window.location.href = payload.role === 'supervisor' ? '/supervisor.html' : '/dashboard.html';
+    } catch { window.location.href = '/dashboard.html'; }
+  }
+
+  // Trata erros de login via Microsoft OAuth na URL
+  const params = new URLSearchParams(window.location.search);
+  const oauthError = params.get('error');
+  if (oauthError) {
+    const erroDiv = document.getElementById('login-error');
+    const erroMsg = document.getElementById('login-error-msg');
+    
+    let mensagem = 'Ocorreu um erro no login com a Microsoft.';
+    if (oauthError === 'connection_failed') mensagem = 'Não foi possível conectar com a Microsoft.';
+    if (oauthError === 'invalid_client') mensagem = 'A credencial do Azure ID no servidor está incorreta.';
+    
+    erroMsg.textContent = mensagem;
+    erroDiv.classList.remove('hidden');
+    // Remove query param da URL sem recarregar a página
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+
+  async function fazerLogin() {
+    const email = document.getElementById('email').value.trim();
+    const senha = document.getElementById('senha').value;
+    const btn = document.getElementById('btn-login');
+    const erroDiv = document.getElementById('login-error');
+    const erroMsg = document.getElementById('login-error-msg');
+
+    if (!email || !senha) {
+      erroMsg.textContent = 'Preencha e-mail e senha.';
+      erroDiv.classList.remove('hidden');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Entrando...';
+    erroDiv.classList.add('hidden');
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, senha })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        erroMsg.textContent = data.erro || 'Erro ao fazer login.';
+        erroDiv.classList.remove('hidden');
+        return;
+      }
+
+      localStorage.setItem('assdoc_token', data.token);
+      localStorage.setItem('assdoc_usuario', JSON.stringify(data.usuario));
+      // Redirecionar baseado no role
+      const payload = JSON.parse(atob(data.token.split('.')[1]));
+      window.location.href = payload.role === 'supervisor' ? '/supervisor.html' : '/dashboard.html';
+
+    } catch (err) {
+      erroMsg.textContent = 'Erro de conexão com o servidor.';
+      erroDiv.classList.remove('hidden');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Entrar';
+    }
+  }
+
+  // Login ao pressionar Enter
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') fazerLogin();
+  });
+</script>
+
+</body>
+</html>
+
+

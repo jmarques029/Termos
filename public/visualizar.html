@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TermoEP — Visualizar Termo</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <!-- jsPDF -->
+  <script src="/js/jspdf.umd.min.js?v=2"></script>
+  <script src="/js/html2canvas.min.js?v=2"></script>
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+      .page-wrapper { display: block; }
+      .sidebar { display: none; }
+      .main-content { padding: 0; }
+    }
+  </style>
+</head>
+<body>
+<div id="toast-container"></div>
+
+<div class="page-wrapper">
+  <!-- Sidebar -->
+  <aside class="sidebar no-print">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon"><img src="/termoep_logo.jpg" alt="TermoEP"></div>
+      <div class="sidebar-logo-text"><span style="color:#00D4FF">Termo</span><span style="color:white;font-weight:900">EP</span></div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="/dashboard.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a href="/criar.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Novo Termo
+      </a>
+      <a href="/cidades.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Por Cidade
+      </a>
+      <a href="/usuarios.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Usuários
+      </a>
+      <a href="/conta.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Minha Conta
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="user-initials">A</div>
+        <div>
+          <div class="user-name" id="user-name">Admin</div>
+          <div class="user-role">Administrador</div>
+        </div>
+      </div>
+      <button class="nav-item" onclick="logout()" style="margin-top:4px; color: var(--danger);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sair
+      </button>
+    </div>
+  </aside>
+
+  <!-- Conteúdo -->
+  <main class="main-content">
+    <div class="flex items-center gap-3 mb-4 no-print" style="justify-content: space-between;">
+      <a href="/dashboard.html" class="btn btn-ghost btn-sm">← Voltar</a>
+      <div class="flex gap-2">
+        <button class="btn btn-secondary btn-sm" onclick="window.print()">🖨️ Imprimir</button>
+        <button id="btn-pdf" class="btn btn-primary btn-sm" onclick="gerarPDF()">📥 Baixar PDF</button>
+      </div>
+    </div>
+
+    <div id="loading" class="loading-screen">
+      <div class="spinner"></div>
+      <span>Carregando termo...</span>
+    </div>
+
+    <div id="conteudo" class="hidden">
+
+      <!-- Status badge + Título -->
+      <div class="flex items-center gap-3 mb-4" style="flex-wrap: wrap;">
+        <div class="page-title" id="titulo-termo">Termo de Compromisso</div>
+        <span id="status-badge" class="badge badge-pendente">⏳ Pendente</span>
+      </div>
+      <p class="page-subtitle" id="subtitulo-termo">Visualização completa do documento</p>
+
+      <!-- Documento imprimível -->
+      <div id="documento-pdf" class="term-document" style="margin-bottom: 24px;">
+
+        <!-- Cabeçalho do documento -->
+        <div style="text-align: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border);">
+          <div style="font-size: 36px; margin-bottom: 8px;">📋</div>
+          <h2 style="font-size: 20px; font-weight: 800; letter-spacing: -0.3px;" id="doc-titulo">TERMO DE COMPROMISSO DE EQUIPAMENTO</h2>
+          <p style="font-size: 13px; color: var(--text-3); margin-top: 4px;" id="doc-numero">Nº —</p>
+        </div>
+
+        <!-- Dados da Empresa Emissora -->
+        <div class="term-section hidden" id="v-empresa-secao">
+          <div class="term-section-title">🏢 Empresa Emissora</div>
+          <div class="term-fields">
+            <div class="term-field" style="grid-column: span 2;">
+              <div class="term-field-label">Razão Social</div>
+              <div class="term-field-value" id="v-empresa-razao">—</div>
+            </div>
+            <div class="term-field">
+              <div class="term-field-label">CNPJ</div>
+              <div class="term-field-value" id="v-empresa-cnpj" style="font-family: monospace;">—</div>
+            </div>
+            <div class="term-field" style="grid-column: span 3;">
+              <div class="term-field-label">Endereço</div>
+              <div class="term-field-value" id="v-empresa-endereco">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider hidden" id="v-empresa-divider"></div>
+
+        <!-- Dados do Colaborador -->
+        <div class="term-section">
+          <div class="term-section-title">👤 Dados do Colaborador</div>
+          <div class="term-fields">
+            <div class="term-field">
+              <div class="term-field-label">Nome Completo</div>
+              <div class="term-field-value" id="v-nome">—</div>
+            </div>
+            <div class="term-field">
+              <div class="term-field-label">Matrícula</div>
+              <div class="term-field-value" id="v-matricula">—</div>
+            </div>
+            <div class="term-field">
+              <div class="term-field-label">Cargo</div>
+              <div class="term-field-value" id="v-cargo">—</div>
+            </div>
+            <div class="term-field">
+              <div class="term-field-label">Departamento</div>
+              <div class="term-field-value" id="v-departamento">—</div>
+            </div>
+            <div class="term-field">
+              <div class="term-field-label">Cidade</div>
+              <div class="term-field-value" id="v-cidade">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Dados do Equipamento -->
+        <div class="term-section">
+          <div class="term-section-title" id="v-tipo-titulo">📱 Dados do Equipamento</div>
+          <div class="term-fields">
+            <div class="term-field">
+              <div class="term-field-label">Marca</div>
+              <div class="term-field-value" id="v-marca">—</div>
+            </div>
+            <div class="term-field">
+              <div class="term-field-label">Modelo</div>
+              <div class="term-field-value" id="v-modelo">—</div>
+            </div>
+            <div class="term-field">
+              <div class="term-field-label">Nº de Série / IMEI</div>
+              <div class="term-field-value" id="v-serie">—</div>
+            </div>
+            <div class="term-field">
+              <div class="term-field-label">Número de Patrimônio</div>
+              <div class="term-field-value" id="v-patrimonio">—</div>
+            </div>
+            <div class="term-field">
+              <div class="term-field-label">Número da T.I</div>
+              <div class="term-field-value" id="v-numero-ti">—</div>
+            </div>
+            <div class="term-field">
+              <div class="term-field-label">Data de Entrega</div>
+              <div class="term-field-value" id="v-entrega">—</div>
+            </div>
+            <div class="term-field">
+              <div class="term-field-label">Devolução Prevista</div>
+              <div class="term-field-value" id="v-devolucao">—</div>
+            </div>
+          </div>
+          <div id="v-foto-container" class="hidden" style="margin-top: 16px;">
+            <div class="term-field-label" style="margin-bottom: 8px;">Foto do Equipamento</div>
+            <img id="v-foto" class="equip-photo" alt="Foto do equipamento" style="max-height: 220px;">
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Cláusulas -->
+        <div class="term-section">
+          <div class="term-section-title">📜 Cláusulas e Condições</div>
+          <div class="term-clauses" id="v-clausulas"></div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Assinatura -->
+        <div class="term-section" id="secao-assinatura">
+          <div class="term-section-title">✍️ Assinatura</div>
+          <div id="assinatura-pendente" class="hidden">
+            <div class="alert alert-info">
+              ⏳ Este termo ainda não foi assinado pelo colaborador.
+            </div>
+          </div>
+          <div id="assinatura-realizada" class="hidden">
+            <div style="display: flex; flex-wrap: wrap; align-items: flex-start;">
+              <div style="margin-right: 28px; margin-bottom: 16px;">
+                <div class="term-field-label" style="margin-bottom: 8px;">Assinatura Digital</div>
+                <div id="box-assinatura-digital" style="background: var(--bg-3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px; display: inline-block;">
+                  <img id="v-assinatura" alt="Assinatura" style="max-width: 260px; max-height: 120px; width: auto; height: auto; display: block; position: relative; z-index: 2;">
+                </div>
+              </div>
+              <div style="flex: 1; min-width: 200px;">
+                <div class="term-field" style="margin-bottom: 12px;">
+                  <div class="term-field-label">Assinado por</div>
+                  <div class="term-field-value" id="v-assinado-nome">—</div>
+                </div>
+                <div class="term-field" style="margin-bottom: 12px;">
+                  <div class="term-field-label">Data e Hora</div>
+                  <div class="term-field-value" id="v-assinado-em">—</div>
+                </div>
+                <div class="term-field">
+                  <div class="term-field-label">IP do Dispositivo</div>
+                  <div class="term-field-value" id="v-assinado-ip" style="font-family: monospace; font-size: 13px;">—</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Devolução — aparece somente em termos assinados -->
+        <div class="divider hidden" id="divider-devolucao"></div>
+        <div class="term-section hidden" id="secao-devolucao-info">
+          <div class="term-section-title">📦 Devolução do Equipamento</div>
+          <div class="term-fields" id="devolucao-info-fields"></div>
+          <div id="fotos-devolucao-salvas" style="margin-top: 16px;"></div>
+        </div>
+
+      </div>
+
+      <!-- Painel de registro de devolução (admin/supervisor, só quando assinado) -->
+      <div id="painel-devolucao" class="card hidden no-print" style="margin-bottom: 24px; border: 1px solid rgba(0,212,255,0.2);">
+        <h3 style="margin-bottom: 6px;">📦 Registro de Devolução</h3>
+        <p style="font-size: 14px; color: var(--text-2); margin-bottom: 20px;">Registre se o equipamento foi devolvido e anexe fotos como evidência.</p>
+
+        <!-- Toggle Devolvido -->
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label style="font-weight: 600; margin-bottom: 8px; display: block;">Status da Devolução *</label>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <label id="label-dev-sim" style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px 18px; border-radius: var(--radius-sm); border: 2px solid var(--border); transition: all 0.2s;">
+              <input type="radio" name="status-devolucao" id="radio-devolvido-sim" value="true" onchange="onToggleDevolucao()" style="accent-color: var(--success); width:16px; height:16px;">
+              <span>✅ Devolvido</span>
+            </label>
+            <label id="label-dev-nao" style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px 18px; border-radius: var(--radius-sm); border: 2px solid var(--border); transition: all 0.2s;">
+              <input type="radio" name="status-devolucao" id="radio-devolvido-nao" value="false" onchange="onToggleDevolucao()" style="accent-color: var(--danger); width:16px; height:16px;">
+              <span>❌ Não Devolvido</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Data real de devolução (aparece ao marcar Sim) -->
+        <div id="campo-data-devolucao" class="form-group hidden" style="margin-bottom: 16px;">
+          <label for="input-data-devolucao-real">Data Real de Devolução</label>
+          <input type="date" id="input-data-devolucao-real" class="input" style="max-width: 240px;">
+        </div>
+
+        <!-- Observação -->
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label for="input-observacao-devolucao">Observações (opcional)</label>
+          <textarea id="input-observacao-devolucao" class="input" rows="2" style="resize: vertical;" placeholder="Ex: Equipamento devolvido com arranhões na tela..."></textarea>
+        </div>
+
+        <!-- Upload de fotos -->
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label style="font-weight: 600; margin-bottom: 8px; display: block;">Fotos da Devolução <span style="color: var(--text-3); font-weight: 400;">(máx. 4)</span></label>
+          <div id="fotos-devolucao-preview" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;"></div>
+          <div id="btn-add-foto-wrap" style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <label class="btn btn-secondary btn-sm" style="cursor: pointer;" id="label-upload-devolucao">
+              📁 Carregar Foto
+              <input type="file" id="input-fotos-devolucao" accept="image/*" multiple style="display: none;" onchange="adicionarFotosDevolucao(event)">
+            </label>
+          </div>
+          <p style="font-size: 12px; color: var(--text-3); margin-top: 6px;">Formatos aceitos: JPG, PNG, WEBP. Máx. 10MB por foto.</p>
+        </div>
+
+        <div id="devolucao-error" class="alert alert-error hidden" style="margin-bottom: 12px;"></div>
+
+        <button id="btn-salvar-devolucao" class="btn btn-primary" onclick="salvarDevolucao()" style="min-width: 200px;">
+          💾 Salvar Registro de Devolução
+        </button>
+      </div>
+
+      <!-- Link de assinatura (se pendente) -->
+      <div id="area-link" class="card hidden no-print" style="margin-bottom: 24px;">
+        <h3 style="margin-bottom: 8px;">🔗 Link de Assinatura</h3>
+        <p style="font-size: 14px; color: var(--text-2); margin-bottom: 12px;">Este termo ainda aguarda assinatura. Copie o link e envie para o colaborador.</p>
+        <div class="link-box">
+          <div class="link-box-url" id="v-link-url"></div>
+          <button class="btn btn-sm btn-primary" onclick="copiarLink()">Copiar</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  const token = localStorage.getItem('assdoc_token');
+  if (!token) window.location.href = '/index.html';
+
+  let tokenPayload = null;
+  try { tokenPayload = JSON.parse(atob(token.split('.')[1])); } catch {}
+
+  const usuario = JSON.parse(localStorage.getItem('assdoc_usuario') || '{}');
+  if (usuario.nome) {
+    document.getElementById('user-name').textContent = usuario.nome;
+    document.getElementById('user-initials').textContent = usuario.nome.charAt(0).toUpperCase();
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  let termoData = null;
+
+  function headers() {
+    return { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
+  }
+
+  async function carregarTermo() {
+    if (!id) { window.location.href = '/dashboard.html'; return; }
+    try {
+      const res = await fetch(`/api/termos/${id}`, { headers: headers() });
+      if (res.status === 401) { logout(); return; }
+      if (res.status === 403) {
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('conteudo').classList.add('hidden');
+        toast('Acesso negado: este termo não pertence ao seu departamento.', 'error');
+        setTimeout(() => { window.location.href = '/supervisor.html'; }, 2500);
+        return;
+      }
+      if (!res.ok) { toast('Termo não encontrado', 'error'); return; }
+      termoData = await res.json();
+
+      // Ajusta botão "Voltar" para supervisores
+      if (tokenPayload && tokenPayload.role === 'supervisor') {
+        const btnVoltar = document.querySelector('a[href="/dashboard.html"].btn-ghost');
+        if (btnVoltar) btnVoltar.href = '/supervisor.html';
+      }
+
+      preencherDocumento(termoData);
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('conteudo').classList.remove('hidden');
+    } catch {
+      toast('Erro ao carregar termo', 'error');
+    }
+  }
+
+  function preencherDocumento(t) {
+    const tipoIcons = { celular: '📱', tablet: '📲', notebook: '💻' };
+    const tipoLabels = { celular: 'Celular', tablet: 'Tablet', notebook: 'Notebook' };
+    const tipo = `${tipoIcons[t.tipo] || '📱'} ${tipoLabels[t.tipo] || t.tipo}`;
+
+    document.getElementById('titulo-termo').textContent = `Termo — ${tipo}`;
+    document.getElementById('doc-titulo').textContent = `TERMO DE COMPROMISSO DE ${(tipoLabels[t.tipo] || t.tipo).toUpperCase()}`;
+    document.getElementById('doc-numero').textContent = `Nº ${t._id.substring(0,8).toUpperCase()} · Criado em ${new Date(t.criado_em).toLocaleDateString('pt-BR')}`;
+    document.getElementById('subtitulo-termo').textContent = `Colaborador: ${t.colaborador_nome}`;
+    document.title = `TermoEP — ${t.colaborador_nome} (${tipoLabels[t.tipo] || t.tipo})`;
+
+    // Status badge
+    const badge = document.getElementById('status-badge');
+    if (t.status === 'assinado' && t.devolvido) {
+      badge.className = 'badge badge-assinado';
+      badge.style.background = 'rgba(16,185,129,0.15)';
+      badge.style.color = '#10b981';
+      badge.textContent = '📦 Devolvido';
+    } else if (t.status === 'assinado') {
+      badge.className = 'badge badge-assinado';
+      badge.style.background = '';
+      badge.style.color = '';
+      badge.textContent = '✅ Assinado';
+    } else {
+      badge.className = 'badge badge-pendente';
+      badge.style.background = '';
+      badge.style.color = '';
+      badge.textContent = '⏳ Pendente';
+    }
+
+    // Dados da Empresa
+    const empresaRazao = t.empresa_razao_social || t.empresa_nome || '';
+    if (empresaRazao || t.empresa_cnpj) {
+      document.getElementById('v-empresa-razao').textContent = empresaRazao || '—';
+      document.getElementById('v-empresa-cnpj').textContent = t.empresa_cnpj || '—';
+      const partesEnd = [
+        t.empresa_endereco,
+        t.empresa_bairro,
+        t.empresa_cidade ? (t.empresa_cidade + (t.empresa_uf ? ' - ' + t.empresa_uf : '')) : '',
+        t.empresa_cep ? ('CEP ' + t.empresa_cep) : ''
+      ].filter(Boolean);
+      document.getElementById('v-empresa-endereco').textContent = partesEnd.join(', ') || '—';
+      document.getElementById('v-empresa-secao').classList.remove('hidden');
+      document.getElementById('v-empresa-divider').classList.remove('hidden');
+    } else {
+      document.getElementById('v-empresa-secao').classList.add('hidden');
+      document.getElementById('v-empresa-divider').classList.add('hidden');
+    }
+
+    // Dados colaborador
+    document.getElementById('v-nome').textContent = t.colaborador_nome || '—';
+    document.getElementById('v-matricula').textContent = t.colaborador_matricula || '—';
+    document.getElementById('v-cargo').textContent = t.cargo || '—';
+    document.getElementById('v-departamento').textContent = t.departamento || '—';
+    document.getElementById('v-cidade').textContent = t.cidade || '—';
+
+    // Dados equipamento
+    document.getElementById('v-tipo-titulo').textContent = `${tipo} — Dados do Equipamento`;
+    document.getElementById('v-marca').textContent = t.equipamento_marca || '—';
+    document.getElementById('v-modelo').textContent = t.equipamento_modelo || '—';
+    document.getElementById('v-serie').textContent = t.equipamento_serie_imei || '—';
+    document.getElementById('v-patrimonio').textContent = t.numero_patrimonio || '—';
+    document.getElementById('v-numero-ti').textContent = t.numero_ti || '—';
+
+    const formatarData = d => d ? new Date(d + 'T12:00:00').toLocaleDateString('pt-BR') : '—';
+    document.getElementById('v-entrega').textContent = formatarData(t.data_entrega);
+    document.getElementById('v-devolucao').textContent = formatarData(t.data_devolucao_prevista);
+
+    if (t.foto_path) {
+      const vFoto = document.getElementById('v-foto');
+      vFoto.removeAttribute('crossorigin');
+      // Converte imagem do equipamento para data URL para garantir renderização perfeita no PDF
+      fetch(t.foto_path)
+        .then(r => r.blob())
+        .then(blob => {
+          const reader = new FileReader();
+          reader.onloadend = () => { vFoto.src = reader.result; };
+          reader.readAsDataURL(blob);
+        })
+        .catch(() => {
+          vFoto.src = t.foto_path;
+        });
+      document.getElementById('v-foto-container').classList.remove('hidden');
+    }
+
+    // Cláusulas
+    gerarClausulas(t.tipo, t);
+
+    // Assinatura
+    if (t.status === 'assinado') {
+      document.getElementById('assinatura-realizada').classList.remove('hidden');
+      document.getElementById('v-assinatura').src = t.assinatura_base64;
+      document.getElementById('v-assinado-nome').textContent = t.nome_confirmacao || t.colaborador_nome;
+      document.getElementById('v-assinado-em').textContent = new Date(t.assinado_em).toLocaleString('pt-BR');
+      document.getElementById('v-assinado-ip').textContent = t.assinado_ip || '—';
+
+      // Painel de registro de devolução: apenas para administradores
+      const isAdmin = tokenPayload && tokenPayload.role === 'admin';
+      if (isAdmin) {
+        document.getElementById('painel-devolucao').classList.remove('hidden');
+        preencherPainelDevolucao(t);
+      } else {
+        document.getElementById('painel-devolucao').classList.add('hidden');
+        if (t.devolucao_registrada_em) {
+          renderizarSecaoInfoDevolucao(t);
+        }
+      }
+    } else {
+      document.getElementById('assinatura-pendente').classList.remove('hidden');
+      document.getElementById('area-link').classList.remove('hidden');
+      const link = `${window.location.protocol}//${window.location.host}/assinar.html?token=${t.token_unico}`;
+      document.getElementById('v-link-url').textContent = link;
+      document.getElementById('v-link-url').dataset.link = link;
+    }
+  }
+
+  function gerarClausulas(tipo, t) {
+    const equip = tipo === 'notebook' ? 'notebook' : tipo === 'tablet' ? 'tablet' : 'celular';
+    const empresaTexto = t.empresa_razao_social
+      ? `<strong>${t.empresa_razao_social}</strong>${t.empresa_cnpj ? ` (CNPJ: ${t.empresa_cnpj})` : ''}`
+      : 'empresa';
+
+    const clausulas = [
+      // 1 — Recebimento
+      `O(a) Empregado(a) <strong>${t.colaborador_nome}</strong> declara ter recebido da ${empresaTexto} o equipamento <strong>${t.equipamento_marca} ${t.equipamento_modelo}</strong>${t.equipamento_serie_imei ? ` (Série/IMEI: ${t.equipamento_serie_imei})` : ''}, na data de ${t.data_entrega ? new Date(t.data_entrega + 'T12:00:00').toLocaleDateString('pt-BR') : 'entrega'}, em perfeito estado de conservação e funcionamento, obrigando-se a zelar pela sua guarda, integridade e adequada conservação, conforme as cláusulas deste Termo.`,
+
+      // 2 — Uso e conservação
+      `<strong>2. Uso e conservação</strong><br>O(a) Empregado(a) compromete-se a:<br>
+      a) utilizar os equipamentos prioritariamente para o exercício de suas atividades profissionais e em conformidade com a Política de Uso de Recursos Tecnológicos do Grupo EP e demais normas internas aplicáveis;<br>
+      b) zelar pela guarda, integridade e adequada conservação dos equipamentos e acessórios, protegendo-os contra quedas, impactos, líquidos, calor excessivo, perda, extravio e demais situações previsíveis que possam ocasionar danos;<br>
+      c) não ceder, emprestar, transferir ou permitir a utilização dos equipamentos por terceiros não autorizados;<br>
+      d) não realizar reparos, alterações de hardware, instalação de softwares ou modificações de configurações sem autorização da área de Tecnologia;<br>
+      e) seguir as orientações de segurança da informação definidas pela Empresa, inclusive quanto a senhas, autenticação, atualizações e softwares de segurança;<br>
+      f) manter os arquivos corporativos nos ambientes de armazenamento e nuvem disponibilizados pela Empresa, conforme as normas internas aplicáveis.`,
+
+      // 3 — Incidentes
+      `<strong>3. Incidentes, perda, furto, roubo ou danos</strong><br>
+      Qualquer perda, extravio, furto, roubo, dano, defeito ou incidente de segurança envolvendo os equipamentos deverá ser comunicado imediatamente à área de Tecnologia ou ao canal indicado pela Empresa.<br><br>
+      Nos casos de furto ou roubo, o(a) Empregado(a) deverá fornecer as informações e documentos relacionados à ocorrência que estejam disponíveis, inclusive boletim de ocorrência, quando aplicável.<br><br>
+      O(a) Empregado(a) não será automaticamente responsabilizado(a) pela simples ocorrência de defeito, dano, perda, furto ou roubo. Eventual responsabilidade dependerá da apuração das circunstâncias do caso e da comprovação de conduta culposa ou dolosa que lhe seja imputável.<br><br>
+      O desgaste natural decorrente do uso regular, defeitos de fabricação, falhas técnicas ou acontecimentos não imputáveis ao(à) Empregado(a) não caracterizam, por si só, obrigação de ressarcimento.`,
+
+      // 4 — Responsabilidade
+      `<strong>4. Responsabilidade por danos e eventual ressarcimento</strong><br>
+      Para os fins do art. 462, §1º, da Consolidação das Leis do Trabalho – CLT, o(a) Empregado(a) declara ciência e concorda com a possibilidade de eventual desconto ou ressarcimento em caso de prejuízo causado aos equipamentos por conduta culposa ou dolosa que lhe seja comprovadamente imputável.<br><br>
+      A existência desta autorização não implica desconto automático. Antes de qualquer desconto ou cobrança, a Empresa deverá apurar as circunstâncias da ocorrência, a responsabilidade do(a) Empregado(a) e o prejuízo efetivamente suportado, considerando, conforme aplicável, documentação patrimonial, estado de conservação, tempo de uso, depreciação, valor residual, custo de reparo e/ou laudo técnico.<br><br>
+      O(a) Empregado(a) será informado(a) da ocorrência e poderá apresentar os esclarecimentos e documentos pertinentes.<br><br>
+      Eventual desconto salarial deverá observar os requisitos e limites previstos na legislação trabalhista, não podendo ser utilizado para transferir ao(à) Empregado(a) riscos inerentes à atividade empresarial.`,
+
+      // 5 — Dados e informações
+      `<strong>5. Dados e informações</strong><br>
+      O(a) Empregado(a) declara estar ciente de que os equipamentos corporativos são recursos de propriedade da Empresa e deverão ser utilizados em conformidade com suas políticas de Segurança da Informação e de Uso de Recursos Tecnológicos.<br><br>
+      Os arquivos e documentos corporativos deverão ser mantidos nos ambientes de armazenamento indicados pela Empresa.<br><br>
+      Caso o equipamento seja utilizado para armazenamento eventual de arquivos pessoais, caberá ao(à) Empregado(a) manter cópia própria desses dados, respeitadas as políticas internas, não sendo a Empresa responsável por sua preservação após a devolução, substituição ou formatação do equipamento.`,
+
+      // 6 — Substituição
+      `<strong>6. Substituição ou disponibilização de novos equipamentos</strong><br>
+      Na hipótese de substituição, inclusão ou retirada de equipamentos e acessórios durante o contrato de trabalho, a movimentação poderá ser registrada pela Empresa mediante protocolo, inventário ou sistema eletrônico vinculado ao(à) Empregado(a).<br><br>
+      Os equipamentos posteriormente disponibilizados permanecerão sujeitos às obrigações previstas neste Termo enquanto estiverem sob sua posse, desde que devidamente identificados e que o respectivo recebimento seja registrado pela Empresa.`,
+
+      // 7 — Devolução
+      `<strong>7. Obrigação de devolução</strong><br>
+      O(a) Empregado(a) compromete-se a devolver os equipamentos e todos os respectivos acessórios sempre que solicitado pela Empresa, quando deixarem de ser necessários ao exercício de suas atividades ou por ocasião do término do contrato de trabalho.<br><br>
+      A devolução deverá ocorrer, em regra, no momento indicado pela Empresa e os bens serão conferidos pela área de Tecnologia.<br><br>
+      Caso, no momento do desligamento, não seja possível a devolução imediata de algum equipamento ou acessório, o(a) Empregado(a) deverá observar o procedimento interno específico de devolução e, quando solicitado, assinar o Termo de Responsabilidade e Compromisso de Devolução de Equipamentos Corporativos, comprometendo-se a restituir os bens no prazo ali estabelecido.<br><br>
+      A eventual ausência de devolução será apurada pela Empresa e estará sujeita às consequências previstas neste Termo, na Política de Uso de Recursos Tecnológicos e na legislação aplicável, sem que haja desconto automático.`,
+
+      // 8 — Ciência e vigência
+      `<strong>8. Ciência e vigência</strong><br>
+      O(a) Empregado(a) declara ter recebido acesso à Política de Uso de Recursos Tecnológicos do Grupo EP, comprometendo-se a observar suas disposições enquanto utilizar ou mantiver sob sua posse recursos tecnológicos da Empresa.<br><br>
+      Este Termo permanecerá aplicável durante todo o período em que o(a) Empregado(a) estiver na posse dos equipamentos nele identificados ou posteriormente vinculados ao seu registro, extinguindo-se as obrigações de guarda após a efetiva restituição, sem prejuízo da apuração de fatos ocorridos durante o período de utilização.`
+    ];
+
+    document.getElementById('v-clausulas').innerHTML = clausulas.map((c, i) => `
+      <div class="clause">
+        <div class="clause-num">${i + 1}</div>
+        <div class="clause-text">${c}</div>
+      </div>
+    `).join('');
+  }
+
+  // ─── DEVOLUÇÃO ───────────────────────────────────────────────────
+
+  // Fotos novas a serem enviadas (File objects)
+  let fotosDevolucaoNovas = [];
+
+  function preencherPainelDevolucao(t) {
+    // Preenche campos com dados já salvos
+    if (t.devolvido !== undefined && t.devolvido !== null) {
+      document.getElementById(t.devolvido ? 'radio-devolvido-sim' : 'radio-devolvido-nao').checked = true;
+      onToggleDevolucao();
+    }
+    if (t.data_devolucao_real) {
+      document.getElementById('input-data-devolucao-real').value = t.data_devolucao_real;
+    }
+    if (t.observacao_devolucao) {
+      document.getElementById('input-observacao-devolucao').value = t.observacao_devolucao;
+    }
+
+    // Renderiza fotos já salvas no painel (para remoção)
+    renderizarFotosNovas();
+    renderizarFotosSalvas(t.fotos_devolucao || []);
+
+    // Exibe seção informativa no documento se há dados
+    if (t.devolucao_registrada_em) {
+      renderizarSecaoInfoDevolucao(t);
+    }
+  }
+
+  function renderizarSecaoInfoDevolucao(t) {
+    const secao = document.getElementById('secao-devolucao-info');
+    const divider = document.getElementById('divider-devolucao');
+    const fields = document.getElementById('devolucao-info-fields');
+    const fotosDiv = document.getElementById('fotos-devolucao-salvas');
+
+    const fmt = d => d ? new Date(d + 'T12:00:00').toLocaleDateString('pt-BR') : '—';
+    const fmtDt = d => d ? new Date(d).toLocaleString('pt-BR') : '—';
+
+    fields.innerHTML = `
+      <div class="term-field">
+        <div class="term-field-label">Status</div>
+        <div class="term-field-value">${t.devolvido ? '✅ Devolvido' : '❌ Não Devolvido'}</div>
+      </div>
+      ${t.data_devolucao_real ? `
+      <div class="term-field">
+        <div class="term-field-label">Data da Devolução</div>
+        <div class="term-field-value">${fmt(t.data_devolucao_real)}</div>
+      </div>` : ''}
+      ${t.observacao_devolucao ? `
+      <div class="term-field" style="grid-column: span 2;">
+        <div class="term-field-label">Observações</div>
+        <div class="term-field-value">${t.observacao_devolucao}</div>
+      </div>` : ''}
+      <div class="term-field">
+        <div class="term-field-label">Registrado por</div>
+        <div class="term-field-value">${t.devolucao_registrada_por || '—'}</div>
+      </div>
+      <div class="term-field">
+        <div class="term-field-label">Registrado em</div>
+        <div class="term-field-value">${fmtDt(t.devolucao_registrada_em)}</div>
+      </div>
+    `;
+
+    // Fotos salvas (modo visualização no documento)
+    const fotos = t.fotos_devolucao || [];
+    if (fotos.length > 0) {
+      fotosDiv.innerHTML = `
+        <div class="term-field-label" style="margin-bottom: 8px;">Fotos da Devolução</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+          ${fotos.map(fp => `
+            <a href="${fp}" target="_blank" rel="noopener">
+              <img src="${fp}" alt="Foto devolução" style="width: 100px; height: 80px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--border); cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+            </a>`).join('')}
+        </div>
+      `;
+    } else {
+      fotosDiv.innerHTML = '';
+    }
+
+    secao.classList.remove('hidden');
+    divider.classList.remove('hidden');
+  }
+
+  function onToggleDevolucao() {
+    const sim = document.getElementById('radio-devolvido-sim').checked;
+    const nao = document.getElementById('radio-devolvido-nao').checked;
+    const campData = document.getElementById('campo-data-devolucao');
+    const labelSim = document.getElementById('label-dev-sim');
+    const labelNao = document.getElementById('label-dev-nao');
+
+    campData.classList.toggle('hidden', !sim);
+    labelSim.style.borderColor = sim ? 'var(--success)' : 'var(--border)';
+    labelSim.style.background = sim ? 'rgba(16,185,129,0.08)' : '';
+    labelNao.style.borderColor = nao ? 'var(--danger)' : 'var(--border)';
+    labelNao.style.background = nao ? 'rgba(239,68,68,0.08)' : '';
+  }
+
+  function adicionarFotosDevolucao(event) {
+    const files = Array.from(event.target.files || []);
+    // Limite total entre novas + já salvas
+    const jasSalvas = (termoData && termoData.fotos_devolucao) ? termoData.fotos_devolucao.length : 0;
+    const limite = 4 - jasSalvas;
+    const restante = limite - fotosDevolucaoNovas.length;
+
+    if (restante <= 0) {
+      toast('Limite de 4 fotos atingido. Remova uma foto antes de adicionar outra.', 'error');
+      event.target.value = '';
+      return;
+    }
+
+    const novas = files.slice(0, restante);
+    fotosDevolucaoNovas = [...fotosDevolucaoNovas, ...novas];
+    event.target.value = '';
+    renderizarFotosNovas();
+  }
+
+  function renderizarFotosNovas() {
+    const container = document.getElementById('fotos-devolucao-preview');
+    container.innerHTML = fotosDevolucaoNovas.map((f, i) => {
+      const url = URL.createObjectURL(f);
+      return `
+        <div style="position: relative; display: inline-block;">
+          <img src="${url}" alt="Nova foto" style="width: 90px; height: 72px; object-fit: cover; border-radius: var(--radius-sm); border: 2px solid var(--primary); display: block;">
+          <span style="position: absolute; top: -6px; right: -6px; background: var(--danger); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; cursor: pointer; font-weight: bold; box-shadow: 0 1px 4px rgba(0,0,0,0.4);" onclick="removerFotoNova(${i})" title="Remover">✕</span>
+          <div style="font-size: 10px; color: var(--text-3); text-align: center; margin-top: 2px; max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${f.name}</div>
+        </div>`;
+    }).join('');
+
+    // Renderiza fotos já salvas no servidor (com botão de remover)
+    renderizarFotosSalvas((termoData && termoData.fotos_devolucao) || []);
+  }
+
+  function removerFotoNova(idx) {
+    fotosDevolucaoNovas.splice(idx, 1);
+    renderizarFotosNovas();
+  }
+
+  function renderizarFotosSalvas(fotos) {
+    // Renderiza no painel (com remoção individual)
+    const container = document.getElementById('fotos-devolucao-preview');
+    // Limpa fotos salvas antigas do preview (mantém as novas já renderizadas)
+    const fotosNovasHtml = container.innerHTML;
+
+    const fotasSalvasHtml = fotos.map((fp, i) => `
+      <div style="position: relative; display: inline-block;">
+        <img src="${fp}" alt="Foto salva" style="width: 90px; height: 72px; object-fit: cover; border-radius: var(--radius-sm); border: 2px solid var(--success); display: block;">
+        <span style="position: absolute; top: -6px; right: -6px; background: var(--danger); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; cursor: pointer; font-weight: bold; box-shadow: 0 1px 4px rgba(0,0,0,0.4);" onclick="removerFotoSalva(${i})" title="Remover do servidor">✕</span>
+        <div style="font-size: 10px; color: var(--success); text-align: center; margin-top: 2px;">salva</div>
+      </div>`).join('');
+
+    container.innerHTML = fotasSalvasHtml + fotosNovasHtml;
+  }
+
+  async function removerFotoSalva(idx) {
+    if (!confirm('Remover esta foto permanentemente?')) return;
+    try {
+      const res = await fetch(`/api/termos/${id}/devolucao/foto/${idx}`, {
+        method: 'DELETE',
+        headers: headers()
+      });
+      const data = await res.json();
+      if (!res.ok) { toast(data.erro || 'Erro ao remover foto', 'error'); return; }
+      termoData.fotos_devolucao = data.fotos_devolucao;
+      renderizarFotosNovas();
+      renderizarSecaoInfoDevolucao(termoData);
+      toast('Foto removida!', 'success');
+    } catch {
+      toast('Erro ao remover foto', 'error');
+    }
+  }
+
+  async function salvarDevolucao() {
+    const btn = document.getElementById('btn-salvar-devolucao');
+    const errDiv = document.getElementById('devolucao-error');
+    errDiv.classList.add('hidden');
+
+    const sim = document.getElementById('radio-devolvido-sim').checked;
+    const nao = document.getElementById('radio-devolvido-nao').checked;
+
+    if (!sim && !nao) {
+      errDiv.textContent = 'Selecione se o equipamento foi devolvido ou não.';
+      errDiv.classList.remove('hidden');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = '⏳ Salvando...';
+
+    try {
+      const formData = new FormData();
+      formData.append('devolvido', sim ? 'true' : 'false');
+
+      const dataReal = document.getElementById('input-data-devolucao-real').value;
+      if (dataReal) formData.append('data_devolucao_real', dataReal);
+
+      const obs = document.getElementById('input-observacao-devolucao').value.trim();
+      if (obs) formData.append('observacao_devolucao', obs);
+
+      // Zera fotos salvas no termo para não duplicar (reenvia campo vazio; server mescla com existentes)
+      // As fotos novas são enviadas via multipart
+      fotosDevolucaoNovas.forEach(f => formData.append('fotos_devolucao', f));
+
+      const res = await fetch(`/api/termos/${id}/devolucao`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }, // SEM Content-Type (multipart)
+        body: formData
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        errDiv.textContent = data.erro || 'Erro ao salvar devolução.';
+        errDiv.classList.remove('hidden');
+        return;
+      }
+
+      // Atualiza dados locais
+      termoData = data.termo;
+      fotosDevolucaoNovas = [];
+      preencherPainelDevolucao(termoData);
+
+      // Atualiza badge de status
+      const badge = document.getElementById('status-badge');
+      if (termoData.devolvido) {
+        badge.style.background = 'rgba(16,185,129,0.15)';
+        badge.style.color = '#10b981';
+        badge.textContent = '📦 Devolvido';
+      } else {
+        badge.style.background = '';
+        badge.style.color = '';
+        badge.textContent = '✅ Assinado';
+      }
+
+      toast('Devolução registrada com sucesso!', 'success');
+    } catch (err) {
+      errDiv.textContent = 'Erro de conexão. Tente novamente.';
+      errDiv.classList.remove('hidden');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '💾 Salvar Registro de Devolução';
+    }
+  }
+
+  // ────────────────────────────────────────────────────────────────
+
+  function copiarLink() {
+    const url = document.getElementById('v-link-url').dataset.link;
+    navigator.clipboard.writeText(url).then(() => toast('Link copiado!', 'success'));
+  }
+
+  async function gerarPDF() {
+    const btn = document.getElementById('btn-pdf');
+    btn.disabled = true;
+    btn.textContent = '⏳ Gerando PDF...';
+
+    const doc = document.getElementById('documento-pdf');
+
+    try {
+      const { jsPDF } = window.jspdf;
+
+      // Ativa o estilo de fundo branco exclusivamente para a captura do PDF
+      doc.classList.add('pdf-export');
+      void doc.offsetHeight; // Força reflow do layout com o fundo branco
+
+      // Remove preventivamente qualquer atributo crossorigin que atrapalhe o html2canvas em data URLs
+      doc.querySelectorAll('img').forEach(img => {
+        img.removeAttribute('crossorigin');
+      });
+
+      // Aguarda o carregamento de todas as imagens presentes no documento
+      const imgs = Array.from(doc.querySelectorAll('img')).filter(img => img.src && !img.src.endsWith('#'));
+      await Promise.all(imgs.map(img => {
+        if (img.complete) return Promise.resolve();
+        return new Promise(resolve => {
+          img.onload = resolve;
+          img.onerror = resolve;
+        });
+      }));
+
+      // Rola ao topo para evitar deslocamentos de coordenadas no html2canvas
+      const scrollAnterior = window.scrollY;
+      window.scrollTo(0, 0);
+
+      const canvas = await html2canvas(doc, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        logging: false,
+        scrollX: 0,
+        scrollY: 0,
+        onclone: (clonedDoc) => {
+          // Garante que imagens e assinaturas mantenham contexto de empilhamento correto no clone
+          const sig = clonedDoc.getElementById('v-assinatura');
+          if (sig) {
+            sig.style.position = 'relative';
+            sig.style.zIndex = '2';
+          }
+          const box = clonedDoc.getElementById('box-assinatura-digital');
+          if (box) {
+            box.style.backgroundColor = '#ffffff';
+          }
+          const foto = clonedDoc.getElementById('v-foto');
+          if (foto) {
+            foto.style.position = 'relative';
+            foto.style.zIndex = '2';
+          }
+        }
+      });
+
+      window.scrollTo(0, scrollAnterior);
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 10;
+      const printableWidth = pageWidth - (margin * 2);
+      const printableHeight = pageHeight - (margin * 2);
+
+      const imgHeight = (canvas.height * printableWidth) / canvas.width;
+
+      // Se o documento cabe em 1 página A4 (ou tem pequeno excesso de até 15%),
+      // ajusta a escala para encaixar perfeitamente em 1 única folha sem cortes
+      if (imgHeight <= printableHeight || (imgHeight / printableHeight) <= 1.15) {
+        const finalScale = Math.min(1, printableHeight / imgHeight);
+        const finalWidth = printableWidth * finalScale;
+        const finalHeight = imgHeight * finalScale;
+        const xPos = (pageWidth - finalWidth) / 2;
+        pdf.addImage(imgData, 'PNG', xPos, margin, finalWidth, finalHeight);
+      } else {
+        // Para documentos com múltiplas páginas, fatia o canvas sem repetição nem sobreposição
+        const pxPerPage = Math.floor((canvas.width * printableHeight) / printableWidth);
+        let yPx = 0;
+        let pageNum = 0;
+
+        while (yPx < canvas.height) {
+          if (pageNum > 0) pdf.addPage();
+
+          const sliceHeight = Math.min(pxPerPage, canvas.height - yPx);
+          const pageCanvas = document.createElement('canvas');
+          pageCanvas.width = canvas.width;
+          pageCanvas.height = sliceHeight;
+          const pCtx = pageCanvas.getContext('2d');
+          pCtx.fillStyle = '#ffffff';
+          pCtx.fillRect(0, 0, canvas.width, sliceHeight);
+          pCtx.drawImage(canvas, 0, yPx, canvas.width, sliceHeight, 0, 0, canvas.width, sliceHeight);
+
+          const sliceData = pageCanvas.toDataURL('image/png');
+          const sliceMmHeight = (sliceHeight * printableWidth) / canvas.width;
+          pdf.addImage(sliceData, 'PNG', margin, margin, printableWidth, sliceMmHeight);
+
+          yPx += sliceHeight;
+          pageNum++;
+        }
+      }
+
+      const nomeArquivo = `termo_${termoData.colaborador_nome.replace(/\s+/g, '_')}_${termoData.tipo}.pdf`;
+      pdf.save(nomeArquivo);
+      toast('PDF gerado com sucesso!', 'success');
+    } catch (err) {
+      console.error(err);
+      toast('Erro ao gerar PDF. Tente usar Imprimir.', 'error');
+    } finally {
+      // Retorna imediatamente para a visualização com fundo escuro original
+      doc.classList.remove('pdf-export');
+      btn.disabled = false;
+      btn.textContent = '📥 Baixar PDF';
+    }
+  }
+
+  function logout() {
+    localStorage.removeItem('assdoc_token');
+    localStorage.removeItem('assdoc_usuario');
+    window.location.href = '/index.html';
+  }
+
+  function toast(msg, tipo = 'info') {
+    const c = document.getElementById('toast-container');
+    const t = document.createElement('div');
+    t.className = `toast toast-${tipo}`;
+    t.innerHTML = `<span>${tipo === 'success' ? '✅' : tipo === 'error' ? '❌' : 'ℹ️'}</span> ${msg}`;
+    c.appendChild(t);
+    setTimeout(() => { t.style.animation = 'fadeOut 0.3s ease forwards'; setTimeout(() => t.remove(), 300); }, 3500);
+  }
+
+  carregarTermo();
+</script>
+</body>
+</html>
+
+

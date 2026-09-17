@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TermoEP — Assinar Termo</title>
+  <meta name="description" content="Assine o termo de compromisso de equipamento corporativo">
+  <link rel="stylesheet" href="/css/style.css">
+  <!-- SignaturePad -->
+  <script src="/js/signature_pad.umd.min.js?v=2"></script>
+  <!-- QRCode -->
+  <script src="/js/qrcode.min.js"></script>
+  <style>
+    body { background: var(--bg); }
+    .sign-progress {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), #ec4899);
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+
+<div class="sign-progress"></div>
+
+<div class="sign-page">
+
+  <!-- Header -->
+  <div class="sign-header">
+    <div class="sign-logo">📋</div>
+    <h1 style="font-size: 22px; font-weight: 800; margin-bottom: 6px;">Termo de Compromisso</h1>
+    <p style="color: var(--text-2); font-size: 14px;">Leia o documento abaixo e assine digitalmente para confirmar o recebimento do equipamento.</p>
+  </div>
+
+  <!-- Estado de carregamento -->
+  <div id="loading" class="loading-screen">
+    <div class="spinner"></div>
+    <span>Carregando documento...</span>
+  </div>
+
+  <!-- Erro -->
+  <div id="estado-erro" class="hidden" style="text-align: center; padding: 64px 0;">
+    <div style="font-size: 56px; margin-bottom: 16px;">❌</div>
+    <h2 style="margin-bottom: 8px;" id="erro-titulo">Link inválido</h2>
+    <p style="color: var(--text-2);" id="erro-msg">Este link de assinatura não foi encontrado ou é inválido.</p>
+  </div>
+
+  <!-- Já assinado -->
+  <div id="estado-assinado" class="hidden" style="text-align: center; padding: 64px 0;">
+    <div style="font-size: 56px; margin-bottom: 16px;">✅</div>
+    <h2 style="color: var(--success); margin-bottom: 8px;">Documento já assinado!</h2>
+    <p style="color: var(--text-2);">Este termo já foi assinado anteriormente. Não é possível assinar novamente.</p>
+    <p style="color: var(--text-3); font-size: 13px; margin-top: 8px;" id="assinado-em"></p>
+  </div>
+
+  <!-- Conteúdo do termo -->
+  <div id="conteudo" class="hidden">
+
+    <!-- Documento -->
+    <div class="term-document" id="documento-termo">
+
+      <!-- Seção: Dados da Empresa Emissora -->
+      <div class="term-section hidden" id="secao-empresa">
+        <div class="term-section-title">🏢 Empresa Emissora</div>
+        <div class="term-fields">
+          <div class="term-field" style="grid-column: span 2;">
+            <div class="term-field-label">Razão Social</div>
+            <div class="term-field-value" id="f-empresa-razao">—</div>
+          </div>
+          <div class="term-field">
+            <div class="term-field-label">CNPJ</div>
+            <div class="term-field-value" id="f-empresa-cnpj" style="font-family: monospace;">—</div>
+          </div>
+          <div class="term-field" style="grid-column: span 3;">
+            <div class="term-field-label">Endereço</div>
+            <div class="term-field-value" id="f-empresa-endereco">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider hidden" id="divider-empresa"></div>
+
+      <!-- Seção: Dados do Colaborador -->
+      <div class="term-section">
+        <div class="term-section-title">👤 Dados do Colaborador</div>
+        <div class="term-fields">
+          <div class="term-field">
+            <div class="term-field-label">Nome Completo</div>
+            <div class="term-field-value" id="f-nome">—</div>
+          </div>
+          <div class="term-field">
+            <div class="term-field-label">Matrícula</div>
+            <div class="term-field-value" id="f-matricula">—</div>
+          </div>
+          <div class="term-field">
+            <div class="term-field-label">Cargo</div>
+            <div class="term-field-value" id="f-cargo">—</div>
+          </div>
+          <div class="term-field">
+            <div class="term-field-label">Departamento</div>
+            <div class="term-field-value" id="f-departamento">—</div>
+          </div>
+          <div class="term-field">
+            <div class="term-field-label">Cidade</div>
+            <div class="term-field-value" id="f-cidade">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Seção: Dados do Equipamento -->
+      <div class="term-section">
+        <div class="term-section-title" id="tipo-titulo">📱 Dados do Equipamento</div>
+        <div class="term-fields">
+          <div class="term-field">
+            <div class="term-field-label">Marca</div>
+            <div class="term-field-value" id="f-marca">—</div>
+          </div>
+          <div class="term-field">
+            <div class="term-field-label">Modelo</div>
+            <div class="term-field-value" id="f-modelo">—</div>
+          </div>
+          <div class="term-field">
+            <div class="term-field-label">Nº de Série / IMEI</div>
+            <div class="term-field-value" id="f-serie">—</div>
+          </div>
+          <div class="term-field">
+            <div class="term-field-label">Número de Patrimônio</div>
+            <div class="term-field-value" id="f-patrimonio">—</div>
+          </div>
+          <div class="term-field">
+            <div class="term-field-label">Número da T.I</div>
+            <div class="term-field-value" id="f-numero-ti">—</div>
+          </div>
+          <div class="term-field">
+            <div class="term-field-label">Data de Entrega</div>
+            <div class="term-field-value" id="f-entrega">—</div>
+          </div>
+          <div class="term-field">
+            <div class="term-field-label">Devolução Prevista</div>
+            <div class="term-field-value" id="f-devolucao">—</div>
+          </div>
+        </div>
+        <div id="foto-container" class="hidden" style="margin-top: 16px;">
+          <div class="term-field-label" style="margin-bottom: 8px;">Foto do Equipamento</div>
+          <img id="foto-equip" class="equip-photo" alt="Foto do equipamento">
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Cláusulas -->
+      <div class="term-section">
+        <div class="term-section-title">📜 Cláusulas e Condições</div>
+        <div class="term-clauses" id="clausulas-container">
+          <!-- Geradas dinamicamente -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Assinatura -->
+    <div class="card" style="margin-bottom: 24px;">
+      <h3 style="margin-bottom: 6px;">✍️ Assinatura Digital</h3>
+      <p style="font-size: 14px; color: var(--text-2); margin-bottom: 16px;">
+        Selecione o método de assinatura desejado:
+      </p>
+
+      <div class="tabs" style="display: flex; gap: 8px; margin-bottom: 16px;">
+        <button class="btn btn-sm btn-primary tab-btn" id="tab-desenhar" onclick="mudarMetodo('desenhar')" type="button">✍️ Desenhar Assinatura</button>
+        <button class="btn btn-sm btn-secondary tab-btn" id="tab-foto" onclick="mudarMetodo('foto')" type="button">📸 Tirar Foto</button>
+      </div>
+
+      <!-- Assinatura Clássica (Desenho) -->
+      <div id="area-desenho">
+        <div class="signature-container">
+          <canvas id="canvas-assinatura" class="signature-canvas"></canvas>
+          <div class="signature-hint" id="hint-assinatura">Assine aqui</div>
+        </div>
+
+        <div class="signature-actions mt-2" style="margin-bottom: 16px;">
+          <span class="text-sm text-muted">Pressione e arraste para assinar</span>
+          <button class="btn btn-ghost btn-sm" onclick="limparAssinatura()" type="button">🗑️ Limpar</button>
+        </div>
+      </div>
+
+      <!-- Assinatura por Foto / Câmera -->
+      <div id="area-foto" class="hidden">
+        <div class="camera-container" style="border: 2px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--bg-3); position: relative; min-height: 220px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px;">
+          <!-- Feed de vídeo -->
+          <video id="video-feed" autoplay playsinline style="width: 100%; max-height: 240px; border-radius: var(--radius-sm); object-fit: cover; display: none;"></video>
+          <!-- Imagem capturada -->
+          <img id="img-capturada" style="width: 100%; max-height: 240px; border-radius: var(--radius-sm); object-fit: contain; display: none;" alt="Foto capturada">
+          <!-- Canvas oculto para captura -->
+          <canvas id="canvas-captura" style="display: none;"></canvas>
+          
+          <!-- Fallback / Ajuda de câmera -->
+          <div id="fallback-camera" style="text-align: center; padding: 16px; width: 100%;">
+            <div id="msg-erro-camera" style="margin-bottom: 14px; font-size: 13px; color: var(--text-2);">Não foi possível acessar a câmera.</div>
+
+            <!-- Painel de ajuda -->
+            <div id="painel-ajuda" style="display:none; text-align:left; background:rgba(0,212,255,0.06); border:1px solid rgba(0,212,255,0.2); border-radius:var(--radius); padding:16px; margin-bottom:14px; font-size:13px;">
+              <div style="font-weight:700; color:var(--primary-light); margin-bottom:10px;">&#x1F527; Como liberar a câmera:</div>
+              <ol style="padding-left:20px; line-height:2; color:var(--text-2);">
+                <li><strong style="color:var(--text);">Windows:</strong> Configurações &gt; Privacidade &gt; Câmera &gt; <em>Permitir que os aplicativos acessem sua câmera</em> ✅</li>
+                <li><strong style="color:var(--text);">Navegador (barra de endereços):</strong> Clique no ícone 🔒 ou 📷 ao lado da URL &gt; <em>Permissões do site</em> &gt; Câmera &gt; <em>Permitir</em></li>
+                <li><strong style="color:var(--text);">Feche</strong> Teams, Zoom, Skype, Meet ou qualquer app usando a câmera</li>
+                <li>Clique em <strong style="color:var(--primary);">🔄 Tentar câmera novamente</strong> abaixo</li>
+              </ol>
+              <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+                <a href="ms-settings:privacy-webcam" class="btn btn-sm btn-secondary" style="font-size:12px;">&#x1F4F7; Abrir Configurações de Câmera (Windows)</a>
+              </div>
+            </div>
+
+            <!-- Seletor de câmera (quando há múltiplas) -->
+            <div id="camera-selector-wrap" style="display:none; margin-bottom:12px;">
+              <label style="font-size:12px; color:var(--text-2); display:block; margin-bottom:4px;">Selecionar câmera:</label>
+              <select id="camera-selector" class="input" style="font-size:13px; padding:6px 10px;" onchange="trocarCamera(this.value)"></select>
+            </div>
+
+            <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:16px;">
+              <button id="btn-retentar-camera" class="btn btn-sm btn-primary" type="button" onclick="resetarEstadoCamera()">
+                &#x1F504; Tentar câmera novamente
+              </button>
+              <button class="btn btn-sm btn-secondary" type="button" onclick="document.getElementById('painel-ajuda').style.display = document.getElementById('painel-ajuda').style.display==='none' ? 'block' : 'none'">
+                &#x2753; Como resolver?
+              </button>
+            </div>
+
+            <!-- QR Code Fallback para Assinatura por Celular -->
+            <div id="qr-container" style="display: none; flex-direction: column; align-items: center; gap: 8px; margin-top: 8px; margin-bottom: 16px;">
+              <p class="text-sm" style="color: var(--primary-light); font-weight: 600; margin-bottom: 2px;">&#x1F4F1; Assinar pelo Celular (Recomendado)</p>
+              <p class="text-xs text-muted" style="max-width: 320px; margin: 0 auto 10px auto; line-height: 1.5;">Aponte a câmera do seu celular para o QR Code abaixo para abrir este documento no celular e bater a foto com facilidade!</p>
+              <div id="qrcode-box" style="padding: 10px; background: white; border-radius: var(--radius-sm); display: inline-block;"></div>
+            </div>
+
+            <label class="btn btn-secondary btn-sm" style="cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+              &#x1F4F7; Carregar Foto do Computador
+              <input type="file" id="input-foto-celular" accept="image/*" style="display: none;" onchange="carregarFotoCelular(event)">
+            </label>
+          </div>
+        </div>
+
+        <div class="camera-actions mt-2" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <span class="text-sm text-muted" id="camera-status">Carregando câmera...</span>
+          <div class="flex gap-2">
+            <button class="btn btn-secondary btn-sm hidden" id="btn-retake" onclick="resetarCamera()" type="button">🔄 Tirar Outra</button>
+            <button class="btn btn-primary btn-sm hidden" id="btn-capture" onclick="capturarFoto()" type="button">📸 Capturar Foto</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Confirmação de nome -->
+      <div class="form-group">
+        <label for="nome-confirmacao">Confirme seu nome completo *</label>
+        <input id="nome-confirmacao" type="text" class="input" placeholder="Digite seu nome exatamente como no documento">
+      </div>
+
+      <div id="assinar-error" class="alert alert-error hidden mt-4">
+        <span>⚠️</span>
+        <span id="assinar-error-msg"></span>
+      </div>
+
+      <button id="btn-assinar" class="btn btn-success btn-lg" onclick="enviarAssinatura()" style="width: 100%; margin-top: 16px;">
+        ✅ Confirmar e Assinar o Documento
+      </button>
+
+      <p class="text-xs text-muted text-center" style="margin-top: 12px;">
+        Ao assinar, você confirma que recebeu o equipamento nas condições descritas e concorda com todas as cláusulas deste termo.
+      </p>
+    </div>
+  </div>
+
+  <!-- Confirmação de assinatura bem-sucedida -->
+  <div id="estado-concluido" class="hidden" style="text-align: center; padding: 64px 0;">
+    <div style="font-size: 72px; margin-bottom: 20px; animation: pulse 2s ease infinite;">✅</div>
+    <h2 style="color: var(--success); font-size: 28px; margin-bottom: 12px;">Documento Assinado!</h2>
+    <p style="color: var(--text-2); font-size: 16px; max-width: 420px; margin: 0 auto; line-height: 1.7;">
+      Sua assinatura foi registrada com sucesso. O administrador foi notificado e poderá acessar o documento assinado.
+    </p>
+    <div class="card card-sm" style="margin: 24px auto; max-width: 360px; text-align: left;">
+      <div class="term-field" style="margin-bottom: 8px;">
+        <div class="term-field-label">Assinado em</div>
+        <div class="term-field-value" id="concluido-data">—</div>
+      </div>
+      <div class="term-field">
+        <div class="term-field-label">Documento</div>
+        <div class="term-field-value" id="concluido-doc">Termo de Compromisso</div>
+      </div>
+    </div>
+    <p class="text-sm text-muted">Você já pode fechar esta janela.</p>
+  </div>
+
+  <!-- Footer -->
+  <div style="text-align: center; padding: 32px 0 16px; color: var(--text-3); font-size: 12px;">
+    TermoEP — Sistema de Termos de Compromisso
+  </div>
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('token');
+  let termoData = null;
+  let signaturePad = null;
+
+  async function carregarTermo() {
+    if (!token) {
+      mostrarErro('Link inválido', 'Este link não contém um token de assinatura válido.');
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/assinar/${token}`);
+      const data = await res.json();
+
+      if (!res.ok) {
+        mostrarErro('Termo não encontrado', data.erro || 'Este link de assinatura não é válido.');
+        return;
+      }
+
+      document.getElementById('loading').classList.add('hidden');
+
+      if (data.ja_assinado) {
+        const dt = data.assinado_em ? new Date(data.assinado_em).toLocaleString('pt-BR') : '';
+        document.getElementById('assinado-em').textContent = `Assinado em: ${dt}`;
+        document.getElementById('estado-assinado').classList.remove('hidden');
+        return;
+      }
+
+      termoData = data;
+      preencherDocumento(data);
+      document.getElementById('conteudo').classList.remove('hidden');
+      inicializarCanvas();
+
+    } catch (err) {
+      mostrarErro('Erro de conexão', 'Não foi possível carregar o documento. Verifique sua conexão e tente novamente.');
+    }
+  }
+
+  function preencherDocumento(t) {
+    // Dados da Empresa
+    const empresaRazao = t.empresa_razao_social || t.empresa_nome || '';
+    if (empresaRazao || t.empresa_cnpj) {
+      document.getElementById('f-empresa-razao').textContent = empresaRazao || '—';
+      document.getElementById('f-empresa-cnpj').textContent = t.empresa_cnpj || '—';
+      const partesEnd = [
+        t.empresa_endereco,
+        t.empresa_bairro,
+        t.empresa_cidade ? (t.empresa_cidade + (t.empresa_uf ? ' - ' + t.empresa_uf : '')) : '',
+        t.empresa_cep ? ('CEP ' + t.empresa_cep) : ''
+      ].filter(Boolean);
+      document.getElementById('f-empresa-endereco').textContent = partesEnd.join(', ') || '—';
+      document.getElementById('secao-empresa').classList.remove('hidden');
+      document.getElementById('divider-empresa').classList.remove('hidden');
+    } else {
+      document.getElementById('secao-empresa').classList.add('hidden');
+      document.getElementById('divider-empresa').classList.add('hidden');
+    }
+
+    document.getElementById('f-nome').textContent = t.colaborador_nome || '—';
+    document.getElementById('f-matricula').textContent = t.colaborador_matricula || '—';
+    document.getElementById('f-cargo').textContent = t.cargo || '—';
+    document.getElementById('f-departamento').textContent = t.departamento || '—';
+    document.getElementById('f-cidade').textContent = t.cidade || '—';
+    document.getElementById('f-marca').textContent = t.equipamento_marca || '—';
+    document.getElementById('f-modelo').textContent = t.equipamento_modelo || '—';
+    document.getElementById('f-serie').textContent = t.equipamento_serie_imei || '—';
+    document.getElementById('f-patrimonio').textContent = t.numero_patrimonio || '—';
+    document.getElementById('f-numero-ti').textContent = t.numero_ti || '—';
+
+    const formatarData = d => d ? new Date(d + 'T12:00:00').toLocaleDateString('pt-BR') : '—';
+    document.getElementById('f-entrega').textContent = formatarData(t.data_entrega);
+    document.getElementById('f-devolucao').textContent = formatarData(t.data_devolucao_prevista);
+
+    const tipoIcons = { celular: '📱', tablet: '📲', notebook: '💻' };
+    const tipoLabels = { celular: 'Celular', tablet: 'Tablet', notebook: 'Notebook' };
+    const tipoLabel = `${tipoIcons[t.tipo] || '📱'} ${tipoLabels[t.tipo] || t.tipo}`;
+    document.getElementById('tipo-titulo').textContent = `${tipoLabel} — Dados do Equipamento`;
+    document.title = `TermoEP — Assinar Termo (${t.colaborador_nome})`;
+
+    if (t.foto_path) {
+      document.getElementById('foto-equip').src = t.foto_path;
+      document.getElementById('foto-container').classList.remove('hidden');
+    }
+
+    gerarClausulas(t.tipo, t);
+  }
+
+  function gerarClausulas(tipo, t) {
+    const equip = tipo === 'notebook' ? 'notebook' : tipo === 'tablet' ? 'tablet' : 'celular';
+    const empresaTexto = t.empresa_razao_social
+      ? `<strong>${t.empresa_razao_social}</strong>${t.empresa_cnpj ? ` (CNPJ: ${t.empresa_cnpj})` : ''}`
+      : 'empresa';
+
+    const clausulas = [
+      // 1 — Recebimento
+      `O(a) Empregado(a) <strong>${t.colaborador_nome}</strong> declara ter recebido da ${empresaTexto} o equipamento <strong>${t.equipamento_marca} ${t.equipamento_modelo}</strong>${t.equipamento_serie_imei ? ` (Série/IMEI: ${t.equipamento_serie_imei})` : ''}, na data de ${t.data_entrega ? new Date(t.data_entrega + 'T12:00:00').toLocaleDateString('pt-BR') : 'entrega'}, em perfeito estado de conservação e funcionamento, obrigando-se a zelar pela sua guarda, integridade e adequada conservação, conforme as cláusulas deste Termo.`,
+
+      // 2 — Uso e conservação
+      `<strong>2. Uso e conservação</strong><br>O(a) Empregado(a) compromete-se a:<br>
+      a) utilizar os equipamentos prioritariamente para o exercício de suas atividades profissionais e em conformidade com a Política de Uso de Recursos Tecnológicos do Grupo EP e demais normas internas aplicáveis;<br>
+      b) zelar pela guarda, integridade e adequada conservação dos equipamentos e acessórios, protegendo-os contra quedas, impactos, líquidos, calor excessivo, perda, extravio e demais situações previsíveis que possam ocasionar danos;<br>
+      c) não ceder, emprestar, transferir ou permitir a utilização dos equipamentos por terceiros não autorizados;<br>
+      d) não realizar reparos, alterações de hardware, instalação de softwares ou modificações de configurações sem autorização da área de Tecnologia;<br>
+      e) seguir as orientações de segurança da informação definidas pela Empresa, inclusive quanto a senhas, autenticação, atualizações e softwares de segurança;<br>
+      f) manter os arquivos corporativos nos ambientes de armazenamento e nuvem disponibilizados pela Empresa, conforme as normas internas aplicáveis.`,
+
+      // 3 — Incidentes
+      `<strong>3. Incidentes, perda, furto, roubo ou danos</strong><br>
+      Qualquer perda, extravio, furto, roubo, dano, defeito ou incidente de segurança envolvendo os equipamentos deverá ser comunicado imediatamente à área de Tecnologia ou ao canal indicado pela Empresa.<br><br>
+      Nos casos de furto ou roubo, o(a) Empregado(a) deverá fornecer as informações e documentos relacionados à ocorrência que estejam disponíveis, inclusive boletim de ocorrência, quando aplicável.<br><br>
+      O(a) Empregado(a) não será automaticamente responsabilizado(a) pela simples ocorrência de defeito, dano, perda, furto ou roubo. Eventual responsabilidade dependerá da apuração das circunstâncias do caso e da comprovação de conduta culposa ou dolosa que lhe seja imputável.<br><br>
+      O desgaste natural decorrente do uso regular, defeitos de fabricação, falhas técnicas ou acontecimentos não imputáveis ao(à) Empregado(a) não caracterizam, por si só, obrigação de ressarcimento.`,
+
+      // 4 — Responsabilidade
+      `<strong>4. Responsabilidade por danos e eventual ressarcimento</strong><br>
+      Para os fins do art. 462, §1º, da Consolidação das Leis do Trabalho – CLT, o(a) Empregado(a) declara ciência e concorda com a possibilidade de eventual desconto ou ressarcimento em caso de prejuízo causado aos equipamentos por conduta culposa ou dolosa que lhe seja comprovadamente imputável.<br><br>
+      A existência desta autorização não implica desconto automático. Antes de qualquer desconto ou cobrança, a Empresa deverá apurar as circunstâncias da ocorrência, a responsabilidade do(a) Empregado(a) e o prejuízo efetivamente suportado, considerando, conforme aplicável, documentação patrimonial, estado de conservação, tempo de uso, depreciação, valor residual, custo de reparo e/ou laudo técnico.<br><br>
+      O(a) Empregado(a) será informado(a) da ocorrência e poderá apresentar os esclarecimentos e documentos pertinentes.<br><br>
+      Eventual desconto salarial deverá observar os requisitos e limites previstos na legislação trabalhista, não podendo ser utilizado para transferir ao(à) Empregado(a) riscos inerentes à atividade empresarial.`,
+
+      // 5 — Dados e informações
+      `<strong>5. Dados e informações</strong><br>
+      O(a) Empregado(a) declara estar ciente de que os equipamentos corporativos são recursos de propriedade da Empresa e deverão ser utilizados em conformidade com suas políticas de Segurança da Informação e de Uso de Recursos Tecnológicos.<br><br>
+      Os arquivos e documentos corporativos deverão ser mantidos nos ambientes de armazenamento indicados pela Empresa.<br><br>
+      Caso o equipamento seja utilizado para armazenamento eventual de arquivos pessoais, caberá ao(à) Empregado(a) manter cópia própria desses dados, respeitadas as políticas internas, não sendo a Empresa responsável por sua preservação após a devolução, substituição ou formatação do equipamento.`,
+
+      // 6 — Substituição
+      `<strong>6. Substituição ou disponibilização de novos equipamentos</strong><br>
+      Na hipótese de substituição, inclusão ou retirada de equipamentos e acessórios durante o contrato de trabalho, a movimentação poderá ser registrada pela Empresa mediante protocolo, inventário ou sistema eletrônico vinculado ao(à) Empregado(a).<br><br>
+      Os equipamentos posteriormente disponibilizados permanecerão sujeitos às obrigações previstas neste Termo enquanto estiverem sob sua posse, desde que devidamente identificados e que o respectivo recebimento seja registrado pela Empresa.`,
+
+      // 7 — Devolução
+      `<strong>7. Obrigação de devolução</strong><br>
+      O(a) Empregado(a) compromete-se a devolver os equipamentos e todos os respectivos acessórios sempre que solicitado pela Empresa, quando deixarem de ser necessários ao exercício de suas atividades ou por ocasião do término do contrato de trabalho.<br><br>
+      A devolução deverá ocorrer, em regra, no momento indicado pela Empresa e os bens serão conferidos pela área de Tecnologia.<br><br>
+      Caso, no momento do desligamento, não seja possível a devolução imediata de algum equipamento ou acessório, o(a) Empregado(a) deverá observar o procedimento interno específico de devolução e, quando solicitado, assinar o Termo de Responsabilidade e Compromisso de Devolução de Equipamentos Corporativos, comprometendo-se a restituir os bens no prazo ali estabelecido.<br><br>
+      A eventual ausência de devolução será apurada pela Empresa e estará sujeita às consequências previstas neste Termo, na Política de Uso de Recursos Tecnológicos e na legislação aplicável, sem que haja desconto automático.`,
+
+      // 8 — Ciência e vigência
+      `<strong>8. Ciência e vigência</strong><br>
+      O(a) Empregado(a) declara ter recebido acesso à Política de Uso de Recursos Tecnológicos do Grupo EP, comprometendo-se a observar suas disposições enquanto utilizar ou mantiver sob sua posse recursos tecnológicos da Empresa.<br><br>
+      Este Termo permanecerá aplicável durante todo o período em que o(a) Empregado(a) estiver na posse dos equipamentos nele identificados ou posteriormente vinculados ao seu registro, extinguindo-se as obrigações de guarda após a efetiva restituição, sem prejuízo da apuração de fatos ocorridos durante o período de utilização.`
+    ];
+
+    const container = document.getElementById('clausulas-container');
+    container.innerHTML = clausulas.map((c, i) => `
+      <div class="clause">
+        <div class="clause-num">${i + 1}</div>
+        <div class="clause-text">${c}</div>
+      </div>
+    `).join('');
+  }
+
+  function inicializarCanvas() {
+    const canvas = document.getElementById('canvas-assinatura');
+    // Ajusta tamanho real do canvas
+    const ratio = window.devicePixelRatio || 1;
+    const rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = rect.width * ratio;
+    canvas.height = 200 * ratio;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(ratio, ratio);
+
+    signaturePad = new SignaturePad(canvas, {
+      backgroundColor: 'rgba(0,0,0,0)',
+      penColor: '#f1f1f8',
+      minWidth: 1.5,
+      maxWidth: 3
+    });
+
+    signaturePad.addEventListener('beginStroke', () => {
+      document.getElementById('hint-assinatura').style.opacity = '0';
+    });
+  }
+
+  let streamCandidato = null;
+  let fotoBase64 = null;
+  let metodoAssinatura = 'desenhar'; // 'desenhar' ou 'foto'
+
+  async function mudarMetodo(metodo) {
+    metodoAssinatura = metodo;
+    
+    const tabDesenhar = document.getElementById('tab-desenhar');
+    const tabFoto = document.getElementById('tab-foto');
+    const areaDesenho = document.getElementById('area-desenho');
+    const areaFoto = document.getElementById('area-foto');
+
+    if (metodo === 'desenhar') {
+      tabDesenhar.className = 'btn btn-sm btn-primary tab-btn';
+      tabFoto.className = 'btn btn-sm btn-secondary tab-btn';
+      areaDesenho.classList.remove('hidden');
+      areaFoto.classList.add('hidden');
+      pararCamera();
+    } else {
+      tabDesenhar.className = 'btn btn-sm btn-secondary tab-btn';
+      tabFoto.className = 'btn btn-sm btn-primary tab-btn';
+      areaDesenho.classList.add('hidden');
+      areaFoto.classList.remove('hidden');
+      await iniciarCamera();
+    }
+  }
+
+  function diagnosticarErroCamera(err) {
+    const name = err?.name || '';
+    const message = err?.message || '';
+    
+    if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
+      return '<strong>Acesso bloqueado pelo navegador.</strong> Por favor, clique no ícone de câmera/cadeado na barra de endereços do seu navegador (ao lado da URL) e mude a permissão para <strong>"Permitir"</strong>.';
+    }
+    if (name === 'NotReadableError' || name === 'TrackStartError') {
+      return '<strong>Câmera bloqueada ou em uso.</strong> Outro aplicativo (como Microsoft Teams, Zoom, Skype, Meet) ou outra aba está utilizando a câmera neste momento. Feche os outros aplicativos e recarregue a página.';
+    }
+    if (name === 'NotFoundError' || name === 'DevicesNotFoundError') {
+      return '<strong>Câmera física não encontrada.</strong> Não detectamos nenhuma câmera integrada ou externa conectada a este computador.';
+    }
+    if (name === 'OverconstrainedError' || name === 'ConstraintNotSatisfiedError') {
+      return '<strong>Configurações de câmera incompatíveis.</strong> As especificações da sua câmera não são suportadas pelas políticas do navegador.';
+    }
+    if (message.includes('undefined') || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      return '<strong>Conexão insegura (HTTP).</strong> O navegador bloqueia o uso de câmeras em conexões que não sejam seguras (HTTPS). Para testar no notebook, acesse usando <strong>localhost</strong> ou configure HTTPS no servidor.';
+    }
+    return `<strong>Erro de câmera:</strong> ${name} (${message || 'falha de inicialização'})`;
+  }
+
+  function mostrarQRCode() {
+    const qrContainer = document.getElementById('qr-container');
+    const qrcodeBox = document.getElementById('qrcode-box');
+    if (qrContainer && qrcodeBox && qrcodeBox.children.length === 0) {
+      try {
+        new QRCode(qrcodeBox, {
+          text: window.location.href,
+          width: 140,
+          height: 140,
+          colorDark : "#0a0a0f",
+          colorLight : "#ffffff",
+          correctLevel : QRCode.CorrectLevel.M
+        });
+        qrContainer.style.display = 'flex';
+      } catch (e) {
+        console.warn('Erro ao gerar QR Code:', e);
+      }
+    } else if (qrContainer) {
+      qrContainer.style.display = 'flex';
+    }
+  }
+
+  let cameraFisicaDisponivel = true;
+  let dispositivosCameras = [];
+  let deviceIdSelecionado = null;
+
+  async function listarCameras() {
+    try {
+      // Primeiro pede permissão genérica para desbloquear enumeração de labels
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const cameras = devices.filter(d => d.kind === 'videoinput');
+      dispositivosCameras = cameras;
+      console.log('Câmeras encontradas:', cameras.map(c => c.label || c.deviceId));
+      return cameras;
+    } catch (e) {
+      console.warn('enumerateDevices falhou:', e);
+      return [];
+    }
+  }
+
+  function atualizarSeletorCamera(cameras) {
+    const wrap = document.getElementById('camera-selector-wrap');
+    const sel = document.getElementById('camera-selector');
+    if (cameras.length <= 1) { wrap.style.display = 'none'; return; }
+    sel.innerHTML = cameras.map((c, i) =>
+      `<option value="${c.deviceId}">${c.label || 'Câmera ' + (i + 1)}</option>`
+    ).join('');
+    if (deviceIdSelecionado) sel.value = deviceIdSelecionado;
+    wrap.style.display = 'block';
+  }
+
+  function trocarCamera(deviceId) {
+    deviceIdSelecionado = deviceId;
+    cameraFisicaDisponivel = true;
+    iniciarCamera();
+  }
+
+  async function iniciarCamera() {
+    pararCamera();
+    const video = document.getElementById('video-feed');
+    const status = document.getElementById('camera-status');
+    const btnCapture = document.getElementById('btn-capture');
+    const btnRetake = document.getElementById('btn-retake');
+    const imgCapturada = document.getElementById('img-capturada');
+    const fallback = document.getElementById('fallback-camera');
+
+    video.style.display = 'none';
+    imgCapturada.style.display = 'none';
+    fallback.style.display = 'none';
+    document.getElementById('painel-ajuda').style.display = 'none';
+    btnCapture.classList.add('hidden');
+    btnRetake.classList.add('hidden');
+    status.textContent = 'Solicitando acesso à câmera...';
+
+    if (fotoBase64) {
+      imgCapturada.src = fotoBase64;
+      imgCapturada.style.display = 'block';
+      btnRetake.classList.remove('hidden');
+      status.textContent = 'Foto capturada';
+      return;
+    }
+
+    if (!cameraFisicaDisponivel) {
+      fallback.style.display = 'block';
+      mostrarQRCode();
+      status.textContent = 'Câmera indisponível';
+      return;
+    }
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      mostrarErroCameraFallback({ name: 'TypeError', message: 'sem mediaDevices' }, fallback, status);
+      return;
+    }
+
+    try {
+      // Tentativa 1: facingMode frontal (funciona em mobile e maioria dos notebooks)
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+        audio: false
+      });
+      streamCandidato = stream;
+      video.srcObject = stream;
+      video.onloadedmetadata = () => video.play().catch(() => {});
+      video.style.display = 'block';
+      btnCapture.classList.remove('hidden');
+      status.textContent = 'Câmera ativa';
+      cameraFisicaDisponivel = true;
+      listarCameras().then(cams => atualizarSeletorCamera(cams));
+    } catch (err) {
+      console.warn('Tentativa 1 falhou, tentando modo genérico:', err);
+      try {
+        // Tentativa 2: sem constraints — essencial para webcams com drivers rígidos
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        streamCandidato = stream;
+        video.srcObject = stream;
+        video.onloadedmetadata = () => video.play().catch(() => {});
+        video.style.display = 'block';
+        btnCapture.classList.remove('hidden');
+        status.textContent = 'Câmera ativa';
+        cameraFisicaDisponivel = true;
+        listarCameras().then(cams => atualizarSeletorCamera(cams));
+      } catch (err2) {
+        console.error('Ambas tentativas falharam:', err2);
+        mostrarErroCameraFallback(err2 || err, fallback, status);
+      }
+    }
+  }
+
+
+
+  function mostrarErroCameraFallback(err, fallback, status) {
+    const name = err?.name || '';
+    let msg = '';
+    let mostrarAjuda = true;
+
+    if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
+      msg = '<strong style="color:#f59e0b;">⚠️ Permissão negada.</strong> O navegador bloqueou o acesso à câmera. Clique em <strong>❓ Como resolver?</strong> abaixo.';
+    } else if (name === 'NotReadableError' || name === 'TrackStartError' || name === 'AbortError') {
+      msg = `<strong style="color:#f59e0b;">⚠️ Câmera bloqueada pelo Microsoft Teams.</strong><br>
+             <span style="font-size:12px; line-height:1.8; display:block; margin-top:6px; color:var(--text-2);">
+               O Teams mantém a câmera reservada em segundo plano mesmo sem estar em reunião.<br>
+               <strong style="color:var(--text);">Solução:</strong>
+               <ol style="padding-left:18px; margin-top:4px;">
+                 <li>Clique com botão direito no ícone do <strong>Teams</strong> na barra de tarefas</li>
+                 <li>Selecione <strong>"Sair"</strong> ou <strong>"Quit"</strong></li>
+                 <li>Clique em <strong>🔄 Tentar câmera novamente</strong></li>
+               </ol>
+             </span>`;
+      mostrarAjuda = false; // mensagem inline já é suficiente
+    } else if (name === 'NotFoundError' || name === 'DevicesNotFoundError') {
+      msg = '<strong style="color:#ef4444;">❌ Nenhuma câmera encontrada.</strong> Este computador não possui câmera ou o driver não está instalado.';
+      mostrarAjuda = false;
+    } else if (name === 'OverconstrainedError') {
+      msg = '<strong style="color:#f59e0b;">⚠️ Câmera incompatível.</strong> Tentando modo de compatibilidade...';
+      deviceIdSelecionado = null;
+    } else {
+      msg = `<strong style="color:#f59e0b;">⚠️ Erro ao acessar câmera:</strong> ${name || 'desconhecido'}. Clique em 🔄 Tentar novamente.`;
+    }
+
+    document.getElementById('msg-erro-camera').innerHTML = msg;
+    if (mostrarAjuda) document.getElementById('painel-ajuda').style.display = 'block';
+    if (fallback) fallback.style.display = 'block';
+    if (status) status.textContent = 'Câmera indisponível';
+    mostrarQRCode();
+    cameraFisicaDisponivel = false;
+  }
+
+  function pararCamera() {
+    if (streamCandidato) {
+      streamCandidato.getTracks().forEach(track => track.stop());
+      streamCandidato = null;
+    }
+  }
+
+  function capturarFoto() {
+    const video = document.getElementById('video-feed');
+    const canvas = document.getElementById('canvas-captura');
+    const imgCapturada = document.getElementById('img-capturada');
+    const btnCapture = document.getElementById('btn-capture');
+    const btnRetake = document.getElementById('btn-retake');
+    const status = document.getElementById('camera-status');
+
+    if (!video || !streamCandidato) return;
+
+    canvas.width = video.videoWidth || 640;
+    canvas.height = video.videoHeight || 480;
+
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    fotoBase64 = canvas.toDataURL('image/jpeg', 0.85);
+
+    video.style.display = 'none';
+    imgCapturada.src = fotoBase64;
+    imgCapturada.style.display = 'block';
+    btnCapture.classList.add('hidden');
+    btnRetake.classList.remove('hidden');
+    status.textContent = 'Foto capturada';
+
+    pararCamera();
+  }
+
+  function limparAssinatura() {
+    if (signaturePad) {
+      signaturePad.clear();
+      document.getElementById('hint-assinatura').style.opacity = '1';
+    }
+  }
+
+  function resetarEstadoCamera() {
+    // Reseta o estado de bloqueio e retenta a câmera
+    cameraFisicaDisponivel = true;
+    fotoBase64 = null;
+    document.getElementById('input-foto-celular').value = '';
+    const imgCapturada = document.getElementById('img-capturada');
+    imgCapturada.src = '';
+    imgCapturada.style.display = 'none';
+    document.getElementById('fallback-camera').style.display = 'none';
+    document.getElementById('camera-status').textContent = 'Retentando acesso à câmera...';
+    iniciarCamera();
+  }
+
+  function resetarCamera() {
+    fotoBase64 = null;
+    document.getElementById('input-foto-celular').value = '';
+    const imgCapturada = document.getElementById('img-capturada');
+    imgCapturada.src = '';
+    imgCapturada.style.display = 'none';
+    iniciarCamera();
+  }
+
+  function carregarFotoCelular(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      fotoBase64 = e.target.result;
+      
+      const imgCapturada = document.getElementById('img-capturada');
+      const fallback = document.getElementById('fallback-camera');
+      const btnRetake = document.getElementById('btn-retake');
+      const status = document.getElementById('camera-status');
+
+      fallback.style.display = 'none';
+      imgCapturada.src = fotoBase64;
+      imgCapturada.style.display = 'block';
+      btnRetake.classList.remove('hidden');
+      status.textContent = 'Foto do arquivo carregada';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  async function enviarAssinatura() {
+    const nomeConfirmacao = document.getElementById('nome-confirmacao').value.trim();
+    const erroDiv = document.getElementById('assinar-error');
+    const erroMsg = document.getElementById('assinar-error-msg');
+    const btn = document.getElementById('btn-assinar');
+
+    erroDiv.classList.add('hidden');
+
+    let assinatura_base64 = '';
+
+    if (metodoAssinatura === 'desenhar') {
+      if (!signaturePad || signaturePad.isEmpty()) {
+        erroMsg.textContent = 'Por favor, assine no campo de assinatura antes de continuar.';
+        erroDiv.classList.remove('hidden');
+        return;
+      }
+      assinatura_base64 = signaturePad.toDataURL('image/png');
+    } else {
+      // Se a webcam estiver rodando mas o usuário não clicou no botão para bater a foto, captura automaticamente
+      if (!fotoBase64 && streamCandidato) {
+        capturarFoto();
+      }
+      
+      if (!fotoBase64) {
+        erroMsg.textContent = 'Por favor, tire uma foto para realizar a assinatura.';
+        erroDiv.classList.remove('hidden');
+        return;
+      }
+      assinatura_base64 = fotoBase64;
+    }
+
+    if (!nomeConfirmacao) {
+      erroMsg.textContent = 'Por favor, confirme seu nome completo.';
+      erroDiv.classList.remove('hidden');
+      return;
+    }
+
+    if (nomeConfirmacao.toLowerCase() !== termoData.colaborador_nome.toLowerCase()) {
+      erroMsg.textContent = `O nome digitado não confere. Digite exatamente: "${termoData.colaborador_nome}"`;
+      erroDiv.classList.remove('hidden');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+
+    // Para a câmera preventivamente se estivesse ativa
+    pararCamera();
+
+    try {
+      const res = await fetch(`/api/assinar/${token}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ assinatura_base64, nome_confirmacao: nomeConfirmacao })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        erroMsg.textContent = data.erro || 'Erro ao registrar assinatura.';
+        erroDiv.classList.remove('hidden');
+        return;
+      }
+
+      // Sucesso!
+      document.getElementById('conteudo').classList.add('hidden');
+      document.getElementById('concluido-data').textContent = new Date().toLocaleString('pt-BR');
+      
+      const tipoLabels = { celular: '📱 Celular', tablet: '📲 Tablet', notebook: '💻 Notebook' };
+      const tipoLabel = tipoLabels[termoData.tipo] || termoData.tipo;
+      document.getElementById('concluido-doc').textContent = `Termo de Compromisso — ${tipoLabel}`;
+      
+      document.getElementById('estado-concluido').classList.remove('hidden');
+
+    } catch (err) {
+      erroMsg.textContent = 'Erro de conexão. Tente novamente.';
+      erroDiv.classList.remove('hidden');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '✅ Confirmar e Assinar o Documento';
+    }
+  }
+
+  function mostrarErro(titulo, msg) {
+    document.getElementById('loading').classList.add('hidden');
+    document.getElementById('erro-titulo').textContent = titulo;
+    document.getElementById('erro-msg').textContent = msg;
+    document.getElementById('estado-erro').classList.remove('hidden');
+  }
+
+  // Adiciona estilo de pulse para o ícone de sucesso
+  const style = document.createElement('style');
+  style.textContent = `@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }`;
+  document.head.appendChild(style);
+
+  carregarTermo();
+</script>
+</body>
+</html>
+
+

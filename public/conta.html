@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TermoEP — Minha Conta</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .profile-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+    
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .profile-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+    }
+    
+    .profile-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    
+    .profile-subtitle {
+      font-size: 13px;
+      color: var(--text-3);
+      margin-top: 2px;
+    }
+
+    .form-group-read {
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      color: var(--text-2);
+      font-size: 14px;
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+    }
+    
+    /* Strength indicator */
+    .senha-strength {
+      height: 4px;
+      border-radius: 99px;
+      background: var(--bg-3);
+      margin-top: 6px;
+      overflow: hidden;
+    }
+    .senha-strength-bar {
+      height: 100%;
+      border-radius: 99px;
+      width: 0%;
+      transition: width 0.3s ease, background 0.3s ease;
+    }
+    .senha-strength-label { font-size: 11px; color: var(--text-3); margin-top: 4px; }
+
+    .badge-provider {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .badge-local {
+      background: rgba(99, 102, 241, 0.12);
+      color: var(--primary-light);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+    }
+    .badge-microsoft {
+      background: rgba(43, 108, 176, 0.15);
+      color: #63b3ed;
+      border: 1px solid rgba(66, 153, 225, 0.2);
+    }
+  </style>
+</head>
+<body>
+<div id="toast-container"></div>
+
+<div class="page-wrapper">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon"><img src="/termoep_logo.jpg" alt="TermoEP"></div>
+      <div class="sidebar-logo-text"><span style="color:#00D4FF">Termo</span><span style="color:white;font-weight:900">EP</span></div>
+    </div>
+    <nav class="sidebar-nav" id="sidebar-nav">
+      <!-- Links renderizados via JS conforme o role -->
+      <a href="/conta.html" class="nav-item active" id="nav-conta-placeholder" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Minha Conta
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="user-initials">U</div>
+        <div>
+          <div class="user-name" id="user-name">Usuário</div>
+          <div class="user-role" id="sidebar-role-label">Usuário</div>
+        </div>
+      </div>
+      <button class="nav-item" onclick="logout()" style="margin-top:4px; color: var(--danger);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sair
+      </button>
+    </div>
+  </aside>
+
+  <!-- Conteúdo -->
+  <main class="main-content">
+    <div class="page-title">Minha Conta</div>
+    <div class="page-subtitle">Visualize seus dados cadastrados e gerencie suas credenciais de segurança</div>
+
+    <!-- Seção de Dados do Usuário -->
+    <div class="profile-card">
+      <div class="profile-header">
+        <div class="profile-avatar" id="p-avatar">U</div>
+        <div>
+          <div class="profile-title" id="p-nome">Carregando...</div>
+          <div class="profile-subtitle" id="p-role">Carregando...</div>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Nome Completo</label>
+          <div class="form-group-read" id="d-nome">—</div>
+        </div>
+        <div class="form-group">
+          <label>E-mail de Acesso</label>
+          <div class="form-group-read" id="d-email">—</div>
+        </div>
+        <div class="form-group">
+          <label>Tipo de Autenticação</label>
+          <div>
+            <span id="d-provedor" class="badge-provider badge-local">Local</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Conta Criada Em</label>
+          <div class="form-group-read" id="d-criado-em">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Seção de Alterar Senha (Usuário Local) -->
+    <div id="secao-alterar-senha" class="profile-card hidden">
+      <h3 style="margin-bottom: 6px;">🔒 Alterar Senha de Acesso</h3>
+      <p class="text-sm text-muted" style="margin-bottom: 24px;">Recomendamos utilizar uma senha forte contendo letras, números e caracteres especiais.</p>
+
+      <form id="form-senha" onsubmit="atualizarSenha(event)">
+        <div class="form-grid" style="margin-bottom: 20px;">
+          <div class="form-group">
+            <label for="senha-atual">Senha Atual *</label>
+            <input id="senha-atual" type="password" class="input" placeholder="Digite sua senha atual" required>
+          </div>
+          <div class="form-group">
+            <label for="senha-nova">Nova Senha *</label>
+            <input id="senha-nova" type="password" class="input" placeholder="Mínimo 6 caracteres" oninput="avaliarSenha()" required>
+            <div class="senha-strength">
+              <div id="strength-bar" class="senha-strength-bar"></div>
+            </div>
+            <div id="strength-label" class="senha-strength-label">Força da senha</div>
+          </div>
+          <div class="form-group">
+            <label for="senha-confirmar">Confirmar Nova Senha *</label>
+            <input id="senha-confirmar" type="password" class="input" placeholder="Digite a nova senha novamente" required>
+          </div>
+        </div>
+
+        <div id="senha-error" class="alert alert-danger hidden" style="margin-bottom: 20px;">
+          <span id="senha-error-msg">Erro ao alterar senha.</span>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="btn-salvar-senha">Alterar Senha</button>
+      </form>
+    </div>
+
+    <!-- Seção Informativa Microsoft (Usuário OAuth) -->
+    <div id="secao-microsoft-info" class="profile-card hidden" style="border-left: 4px solid #3182ce;">
+      <div style="display: flex; gap: 16px; align-items: flex-start;">
+        <span style="font-size: 24px; line-height: 1;">🌐</span>
+        <div>
+          <h3 style="margin-bottom: 6px; color: #63b3ed;">Autenticação Integrada Ativa</h3>
+          <p class="text-sm text-muted" style="line-height: 1.6;">
+            Sua conta está associada ao **Microsoft Outlook / Azure Active Directory**. 
+            A alteração de senha e demais dados de perfil devem ser realizados diretamente no portal corporativo da Microsoft ou junto ao setor de TI da sua empresa.
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  // Proteção de rota do lado do cliente
+  const token = localStorage.getItem('assdoc_token');
+  if (!token) {
+    window.location.href = '/index.html';
+  }
+
+  // Detecta role do token
+  let tokenPayload = null;
+  try { tokenPayload = JSON.parse(atob(token.split('.')[1])); } catch {}
+  const isSupervisor = tokenPayload && tokenPayload.role === 'supervisor';
+
+  // Renderiza sidebar correto conforme o role
+  (function renderSidebar() {
+    const nav = document.getElementById('sidebar-nav');
+    const svgConta = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l-.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`;
+    if (isSupervisor) {
+      nav.innerHTML = `
+        <a href="/supervisor.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          Meus Termos
+        </a>
+        <a href="/conta.html" class="nav-item active">${svgConta} Minha Conta</a>
+      `;
+      document.getElementById('sidebar-role-label').textContent = 'Supervisor de Departamento';
+      document.getElementById('user-avatar') && (document.getElementById('user-avatar').style.background = 'linear-gradient(135deg,#f59e0b,#d97706)');
+      document.getElementById('user-initials').style.background = 'linear-gradient(135deg,#f59e0b,#d97706)';
+    } else {
+      nav.innerHTML = `
+        <a href="/dashboard.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </a>
+        <a href="/criar.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Novo Termo
+        </a>
+        <a href="/cidades.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Por Cidade
+        </a>
+        <a href="/usuarios.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Usuários
+        </a>
+        <a href="/configuracoes.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Configurações
+        </a>
+        <a href="/conta.html" class="nav-item active">${svgConta} Minha Conta</a>
+      `;
+      document.getElementById('sidebar-role-label').textContent = 'Administrador';
+    }
+  })();
+
+  // Preenche dados rápidos do localStorage no sidebar e no perfil
+  const user = JSON.parse(localStorage.getItem('assdoc_usuario') || '{}');
+  const nomeUser = user.nome || 'Usuário';
+  document.getElementById('user-name').textContent = nomeUser;
+  document.getElementById('p-nome').textContent = nomeUser;
+
+  const iniciais = nomeUser.split(' ').map(n => n[0]).slice(0,2).join('').toUpperCase();
+  document.getElementById('user-initials').textContent = iniciais;
+  document.getElementById('p-avatar').textContent = iniciais;
+
+  async function carregarDadosCompletos() {
+    try {
+      const res = await fetch('/api/auth/me', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        // Token inválido, desloga
+        logout();
+        return;
+      }
+
+      const u = data.usuario;
+
+      // Atualiza campos
+      document.getElementById('p-nome').textContent = u.nome;
+      document.getElementById('d-nome').textContent = u.nome;
+      document.getElementById('d-email').textContent = u.email;
+
+      // Atualiza label de role no perfil
+      const roleLabel = u.role === 'supervisor' ? 'Supervisor de Departamento' : 'Administrador do Sistema';
+      document.getElementById('p-role').textContent = roleLabel;
+
+      // Cor do avatar de supervisor
+      if (u.role === 'supervisor') {
+        document.getElementById('p-avatar').style.background = 'linear-gradient(135deg,#f59e0b,#d97706)';
+        document.getElementById('p-avatar').style.boxShadow = '0 4px 12px rgba(245,158,11,0.35)';
+      }
+
+      const iniciaisCompletas = u.nome.split(' ').map(n => n[0]).slice(0,2).join('').toUpperCase();
+      document.getElementById('p-avatar').textContent = iniciaisCompletas;
+      document.getElementById('user-initials').textContent = iniciaisCompletas;
+      document.getElementById('user-name').textContent = u.nome;
+      
+      const dataCriado = new Date(u.criado_em).toLocaleDateString('pt-BR', {
+        day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+      });
+      document.getElementById('d-criado-em').textContent = dataCriado;
+
+      // Exibe painel adequado baseado na senha_hash (se existe ou não)
+      const badgeProvedor = document.getElementById('d-provedor');
+      if (u.senha_hash === '' || u.criado_por === 'microsoft_oauth') {
+        badgeProvedor.textContent = 'Microsoft Outlook';
+        badgeProvedor.className = 'badge-provider badge-microsoft';
+        document.getElementById('secao-microsoft-info').classList.remove('hidden');
+      } else {
+        badgeProvedor.textContent = 'Acesso Local';
+        badgeProvedor.className = 'badge-provider badge-local';
+        document.getElementById('secao-alterar-senha').classList.remove('hidden');
+      }
+
+    } catch (err) {
+      console.error(err);
+      toast('Erro ao buscar dados do perfil', 'error');
+    }
+  }
+
+  function avaliarSenha() {
+    const senha = document.getElementById('senha-nova').value;
+    const bar = document.getElementById('strength-bar');
+    const label = document.getElementById('strength-label');
+    
+    if (!senha) {
+      bar.style.width = '0%';
+      label.textContent = 'Força da senha';
+      return;
+    }
+
+    let score = 0;
+    if (senha.length >= 6) score++;
+    if (senha.length >= 10) score++;
+    if (/[A-Z]/.test(senha)) score++;
+    if (/[0-9]/.test(senha)) score++;
+    if (/[^A-Za-z0-9]/.test(senha)) score++;
+
+    let pct = (score / 5) * 100;
+    bar.style.width = `${pct}%`;
+
+    if (score <= 2) {
+      bar.style.backgroundColor = 'var(--danger)';
+      label.textContent = 'Senha Fraca (adicione letras maiúsculas, números ou símbolos)';
+      label.style.color = 'var(--danger)';
+    } else if (score <= 4) {
+      bar.style.backgroundColor = 'var(--warning)';
+      label.textContent = 'Senha Média (bom, mas pode ser melhor)';
+      label.style.color = 'var(--warning)';
+    } else {
+      bar.style.backgroundColor = 'var(--success)';
+      label.textContent = 'Senha Forte! Perfeito';
+      label.style.color = 'var(--success)';
+    }
+  }
+
+  async function atualizarSenha(event) {
+    event.preventDefault();
+
+    const senhaAtual = document.getElementById('senha-atual').value;
+    const senhaNova = document.getElementById('senha-nova').value;
+    const senhaConfirmar = document.getElementById('senha-confirmar').value;
+
+    const errorDiv = document.getElementById('senha-error');
+    const errorMsg = document.getElementById('senha-error-msg');
+    const btn = document.getElementById('btn-salvar-senha');
+
+    errorDiv.classList.add('hidden');
+
+    if (senhaNova !== senhaConfirmar) {
+      errorMsg.textContent = 'A confirmação da nova senha não confere.';
+      errorDiv.classList.remove('hidden');
+      return;
+    }
+
+    if (senhaNova.length < 6) {
+      errorMsg.textContent = 'A nova senha deve ter no mínimo 6 caracteres.';
+      errorDiv.classList.remove('hidden');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Alterando...';
+
+    try {
+      const res = await fetch('/api/usuarios/me/senha', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ senha_atual: senhaAtual, senha_nova: senhaNova })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        errorMsg.textContent = data.erro || 'Falha ao alterar senha.';
+        errorDiv.classList.remove('hidden');
+        return;
+      }
+
+      toast('Senha alterada com sucesso!', 'success');
+      document.getElementById('form-senha').reset();
+      avaliarSenha();
+
+    } catch (err) {
+      console.error(err);
+      errorMsg.textContent = 'Erro de conexão com o servidor.';
+      errorDiv.classList.remove('hidden');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Alterar Senha';
+    }
+  }
+
+  function logout() {
+    localStorage.removeItem('assdoc_token');
+    localStorage.removeItem('assdoc_usuario');
+    window.location.href = '/index.html';
+  }
+
+  function toast(msg, tipo = 'info') {
+    const c = document.getElementById('toast-container');
+    const t = document.createElement('div');
+    t.className = `toast toast-${tipo}`;
+    t.innerHTML = `<span>${tipo === 'success' ? '✅' : tipo === 'error' ? '❌' : 'ℹ️'}</span> ${msg}`;
+    c.appendChild(t);
+    setTimeout(() => {
+      t.style.animation = 'fadeOut 0.3s ease forwards';
+      setTimeout(() => t.remove(), 300);
+    }, 3000);
+  }
+
+  // Inicializa dados completos
+  carregarDadosCompletos();
+</script>
+</body>
+</html>
+
+

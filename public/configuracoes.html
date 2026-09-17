@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TermoEP — Configurações</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    /* ── Tabs ── */
+    .tabs-nav {
+      display: flex;
+      gap: 4px;
+      background: var(--surface-1);
+      border-radius: 14px;
+      padding: 6px;
+      margin-bottom: 28px;
+      width: fit-content;
+    }
+    .tab-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--text-3);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .tab-btn:hover { background: var(--surface-2); color: var(--text-1); }
+    .tab-btn.active { background: var(--primary); color: #fff; }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+
+    /* ── List items ── */
+    .config-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .config-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      transition: border-color 0.2s;
+    }
+    .config-item:hover { border-color: var(--primary); }
+    .config-item-info { flex: 1; min-width: 0; }
+    .config-item-title { font-weight: 600; color: var(--text-1); font-size: 15px; }
+    .config-item-sub { font-size: 12px; color: var(--text-3); margin-top: 3px; }
+    .config-item-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+    /* ── Add bar ── */
+    .add-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      align-items: flex-end;
+    }
+    .add-bar input, .add-bar select { flex: 1; }
+    .add-bar .btn { flex-shrink: 0; }
+
+    /* ── Modal empresa ── */
+    .empresa-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .empresa-form-grid .full { grid-column: 1 / -1; }
+
+    /* ── Empty ── */
+    .config-empty {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-3);
+      font-size: 14px;
+    }
+    .config-empty-icon { font-size: 36px; margin-bottom: 10px; }
+
+    /* ── Counters ── */
+    .count-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 22px;
+      height: 22px;
+      padding: 0 6px;
+      border-radius: 20px;
+      background: rgba(99,102,241,0.15);
+      color: var(--primary-light);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .tab-btn.active .count-badge {
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+<div id="toast-container"></div>
+
+<div class="page-wrapper">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon"><img src="/termoep_logo.jpg" alt="TermoEP"></div>
+      <div class="sidebar-logo-text"><span style="color:#00D4FF">Termo</span><span style="color:white;font-weight:900">EP</span></div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="/dashboard.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a href="/criar.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Novo Termo
+      </a>
+      <a href="/cidades.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Por Cidade
+      </a>
+      <a href="/usuarios.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Usuários
+      </a>
+      <a href="/configuracoes.html" class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Configurações
+      </a>
+      <a href="/conta.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a7 7 0 0 1 13 0"/></svg>
+        Minha Conta
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="user-initials">A</div>
+        <div>
+          <div class="user-name" id="user-name">Admin</div>
+          <div class="user-role">Administrador</div>
+        </div>
+      </div>
+      <button class="nav-item" onclick="logout()" style="margin-top:4px; color: var(--danger);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sair
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main-content">
+    <div class="page-title">⚙️ Configurações</div>
+    <div class="page-subtitle">Gerencie as empresas, departamentos e cidades do sistema.</div>
+
+    <!-- Tabs nav -->
+    <div class="tabs-nav">
+      <button class="tab-btn active" id="tab-btn-empresas" onclick="mudarTab('empresas')">
+        🏢 Empresas <span class="count-badge" id="count-empresas">0</span>
+      </button>
+      <button class="tab-btn" id="tab-btn-departamentos" onclick="mudarTab('departamentos')">
+        🏷️ Departamentos <span class="count-badge" id="count-departamentos">0</span>
+      </button>
+      <button class="tab-btn" id="tab-btn-cidades" onclick="mudarTab('cidades')">
+        📍 Cidades <span class="count-badge" id="count-cidades">0</span>
+      </button>
+    </div>
+
+    <!-- ── ABA: EMPRESAS ── -->
+    <div id="tab-empresas" class="tab-pane active">
+      <div class="card">
+        <div class="section-header" style="margin-bottom:20px;">
+          <div>
+            <h3 style="margin:0;">Empresas Cadastradas</h3>
+            <p style="margin:4px 0 0;font-size:13px;color:var(--text-3);">
+              Essas empresas aparecem no seletor ao criar um novo termo, com preenchimento automático dos dados.
+            </p>
+          </div>
+          <button class="btn btn-primary" onclick="abrirModalEmpresa()">
+            + Nova Empresa
+          </button>
+        </div>
+
+        <div id="loading-empresas" style="text-align:center;padding:30px;color:var(--text-3);">Carregando...</div>
+        <div id="lista-empresas" class="config-list" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- ── ABA: DEPARTAMENTOS ── -->
+    <div id="tab-departamentos" class="tab-pane">
+      <div class="card">
+        <h3 style="margin-bottom:6px;">Departamentos</h3>
+        <p style="font-size:13px;color:var(--text-3);margin-bottom:20px;">
+          Aparecem no formulário de criação de termos. Supervisores são vinculados a departamentos específicos.
+        </p>
+
+        <div class="add-bar">
+          <input id="input-dep" type="text" class="input" placeholder="Nome do departamento (ex: Jurídico)" onkeydown="if(event.key==='Enter'){event.preventDefault();addDepartamento();}">
+          <button class="btn btn-primary" onclick="addDepartamento()">+ Adicionar</button>
+        </div>
+
+        <div id="loading-deps" style="text-align:center;padding:30px;color:var(--text-3);">Carregando...</div>
+        <div id="lista-deps" class="config-list" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- ── ABA: CIDADES ── -->
+    <div id="tab-cidades" class="tab-pane">
+      <div class="card">
+        <h3 style="margin-bottom:6px;">Cidades</h3>
+        <p style="font-size:13px;color:var(--text-3);margin-bottom:20px;">
+          Aparecem no filtro do dashboard e no campo de cidade do colaborador ao criar termos.
+        </p>
+
+        <div class="add-bar">
+          <input id="input-cidade" type="text" class="input" placeholder="Nome da cidade (ex: Bauru)" onkeydown="if(event.key==='Enter'){event.preventDefault();addCidade();}">
+          <button class="btn btn-primary" onclick="addCidade()">+ Adicionar</button>
+        </div>
+
+        <div id="loading-cidades" style="text-align:center;padding:30px;color:var(--text-3);">Carregando...</div>
+        <div id="lista-cidades" class="config-list" style="display:none;"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ── Modal: Nova / Editar Empresa ── -->
+<div id="modal-empresa" class="modal-overlay">
+  <div class="modal" style="max-width:620px;">
+    <div class="modal-title" id="modal-empresa-title">🏢 Nova Empresa</div>
+    <div class="modal-subtitle" id="modal-empresa-subtitle">Preencha os dados da empresa emissora.</div>
+
+    <div class="empresa-form-grid" style="margin-top:20px;">
+      <div class="form-group full">
+        <label for="e-nome">Nome de Exibição *</label>
+        <input id="e-nome" type="text" class="input" placeholder="Ex: EPTV São José (Matriz)">
+      </div>
+      <div class="form-group full">
+        <label for="e-razao">Razão Social *</label>
+        <input id="e-razao" type="text" class="input" placeholder="Ex: Empresa Paulista de Televisão S/A">
+      </div>
+      <div class="form-group">
+        <label for="e-cnpj">CNPJ *</label>
+        <input id="e-cnpj" type="text" class="input" placeholder="00.000.000/0000-00">
+      </div>
+      <div class="form-group">
+        <label for="e-cep">CEP</label>
+        <input id="e-cep" type="text" class="input" placeholder="00000-000">
+      </div>
+      <div class="form-group full">
+        <label for="e-endereco">Endereço (Logradouro e Número)</label>
+        <input id="e-endereco" type="text" class="input" placeholder="Rua / Avenida, Número">
+      </div>
+      <div class="form-group">
+        <label for="e-bairro">Bairro</label>
+        <input id="e-bairro" type="text" class="input" placeholder="Bairro">
+      </div>
+      <div class="form-group" style="display:flex;gap:8px;flex-direction:column;">
+        <label>Cidade / UF</label>
+        <div style="display:flex;gap:8px;">
+          <input id="e-cidade" type="text" class="input" style="flex:2;" placeholder="Cidade">
+          <input id="e-uf" type="text" class="input" style="flex:1;" placeholder="UF" maxlength="2">
+        </div>
+      </div>
+    </div>
+
+    <div id="modal-empresa-erro" class="alert alert-error hidden" style="margin-top:14px;">
+      <span>⚠️</span> <span id="modal-empresa-erro-msg"></span>
+    </div>
+
+    <div class="modal-actions" style="margin-top:20px;">
+      <button class="btn btn-secondary" onclick="fecharModal('modal-empresa')">Cancelar</button>
+      <button class="btn btn-primary" id="btn-salvar-empresa" onclick="salvarEmpresa()">💾 Salvar Empresa</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Modal: Confirmar exclusão genérico ── -->
+<div id="modal-excluir" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-title">🗑️ Confirmar Exclusão</div>
+    <div class="modal-subtitle" id="modal-excluir-msg">Tem certeza?</div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="fecharModal('modal-excluir')">Cancelar</button>
+      <button class="btn btn-danger" id="btn-confirmar-excluir">Excluir</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const token = localStorage.getItem('assdoc_token');
+  if (!token) window.location.href = '/index.html';
+  try {
+    const p = JSON.parse(atob(token.split('.')[1]));
+    if (p.role === 'supervisor') window.location.href = '/supervisor.html';
+  } catch {}
+
+  const usuario = JSON.parse(localStorage.getItem('assdoc_usuario') || '{}');
+  if (usuario.nome) {
+    document.getElementById('user-name').textContent = usuario.nome;
+    document.getElementById('user-initials').textContent = usuario.nome.charAt(0).toUpperCase();
+  }
+
+  function h() { return { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }; }
+
+  // ────────── TABS ──────────
+  function mudarTab(nome) {
+    ['empresas', 'departamentos', 'cidades'].forEach(t => {
+      document.getElementById(`tab-${t}`).classList.toggle('active', t === nome);
+      document.getElementById(`tab-btn-${t}`).classList.toggle('active', t === nome);
+    });
+  }
+
+  // ────────── EMPRESAS ──────────
+  let empresas = [];
+  let empresaEditandoId = null;
+
+  async function carregarEmpresas() {
+    document.getElementById('loading-empresas').style.display = 'block';
+    document.getElementById('lista-empresas').style.display = 'none';
+    try {
+      const r = await fetch('/api/config/empresas', { headers: h() });
+      empresas = await r.json();
+      document.getElementById('count-empresas').textContent = empresas.length;
+      renderEmpresas();
+    } catch { toast('Erro ao carregar empresas', 'error'); }
+    document.getElementById('loading-empresas').style.display = 'none';
+    document.getElementById('lista-empresas').style.display = 'flex';
+  }
+
+  function renderEmpresas() {
+    const el = document.getElementById('lista-empresas');
+    if (empresas.length === 0) {
+      el.innerHTML = `<div class="config-empty"><div class="config-empty-icon">🏢</div><p>Nenhuma empresa cadastrada ainda.<br>Clique em <strong>+ Nova Empresa</strong> para começar.</p></div>`;
+      return;
+    }
+    el.innerHTML = empresas.map(e => `
+      <div class="config-item">
+        <div class="config-item-info">
+          <div class="config-item-title">${e.nome}</div>
+          <div class="config-item-sub">
+            ${e.razao_social} · CNPJ: ${e.cnpj}
+            ${e.endereco ? ` · ${e.endereco}, ${e.bairro || ''} — ${e.cidade || ''}/${e.uf || ''}` : ''}
+          </div>
+        </div>
+        <div class="config-item-actions">
+          <button class="btn btn-sm btn-secondary" onclick="editarEmpresa('${e.id}')">✏️ Editar</button>
+          <button class="btn btn-sm btn-danger" onclick="confirmarExcluirEmpresa('${e.id}', '${e.nome.replace(/'/g, "\\'")}')">🗑️</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function abrirModalEmpresa() {
+    empresaEditandoId = null;
+    document.getElementById('modal-empresa-title').textContent = '🏢 Nova Empresa';
+    document.getElementById('modal-empresa-subtitle').textContent = 'Preencha os dados da empresa emissora.';
+    document.getElementById('btn-salvar-empresa').textContent = '💾 Salvar Empresa';
+    ['e-nome','e-razao','e-cnpj','e-cep','e-endereco','e-bairro','e-cidade','e-uf'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('modal-empresa-erro').classList.add('hidden');
+    document.getElementById('modal-empresa').classList.add('open');
+    document.getElementById('e-nome').focus();
+  }
+
+  function editarEmpresa(id) {
+    const emp = empresas.find(e => e.id === id);
+    if (!emp) return;
+    empresaEditandoId = id;
+    document.getElementById('modal-empresa-title').textContent = '✏️ Editar Empresa';
+    document.getElementById('modal-empresa-subtitle').textContent = 'Atualize os dados da empresa.';
+    document.getElementById('btn-salvar-empresa').textContent = '💾 Atualizar Empresa';
+    document.getElementById('e-nome').value = emp.nome || '';
+    document.getElementById('e-razao').value = emp.razao_social || '';
+    document.getElementById('e-cnpj').value = emp.cnpj || '';
+    document.getElementById('e-cep').value = emp.cep || '';
+    document.getElementById('e-endereco').value = emp.endereco || '';
+    document.getElementById('e-bairro').value = emp.bairro || '';
+    document.getElementById('e-cidade').value = emp.cidade || '';
+    document.getElementById('e-uf').value = emp.uf || '';
+    document.getElementById('modal-empresa-erro').classList.add('hidden');
+    document.getElementById('modal-empresa').classList.add('open');
+  }
+
+  async function salvarEmpresa() {
+    const payload = {
+      nome: document.getElementById('e-nome').value.trim(),
+      razao_social: document.getElementById('e-razao').value.trim(),
+      cnpj: document.getElementById('e-cnpj').value.trim(),
+      cep: document.getElementById('e-cep').value.trim(),
+      endereco: document.getElementById('e-endereco').value.trim(),
+      bairro: document.getElementById('e-bairro').value.trim(),
+      cidade: document.getElementById('e-cidade').value.trim(),
+      uf: document.getElementById('e-uf').value.trim().toUpperCase(),
+    };
+    if (!payload.nome || !payload.razao_social || !payload.cnpj) {
+      document.getElementById('modal-empresa-erro-msg').textContent = 'Nome, Razão Social e CNPJ são obrigatórios.';
+      document.getElementById('modal-empresa-erro').classList.remove('hidden');
+      return;
+    }
+    const btn = document.getElementById('btn-salvar-empresa');
+    btn.disabled = true; btn.textContent = 'Salvando...';
+    try {
+      const url = empresaEditandoId ? `/api/config/empresas/${empresaEditandoId}` : '/api/config/empresas';
+      const method = empresaEditandoId ? 'PUT' : 'POST';
+      const r = await fetch(url, { method, headers: h(), body: JSON.stringify(payload) });
+      const data = await r.json();
+      if (!r.ok) {
+        document.getElementById('modal-empresa-erro-msg').textContent = data.erro || 'Erro ao salvar empresa.';
+        document.getElementById('modal-empresa-erro').classList.remove('hidden');
+        return;
+      }
+      fecharModal('modal-empresa');
+      toast(empresaEditandoId ? 'Empresa atualizada com sucesso!' : 'Empresa adicionada com sucesso!', 'success');
+      await carregarEmpresas();
+    } catch { toast('Erro de conexão', 'error'); }
+    finally { btn.disabled = false; btn.textContent = '💾 Salvar Empresa'; }
+  }
+
+  function confirmarExcluirEmpresa(id, nome) {
+    document.getElementById('modal-excluir-msg').textContent = `Tem certeza que deseja excluir a empresa "${nome}"? Esta ação não pode ser desfeita.`;
+    document.getElementById('modal-excluir').classList.add('open');
+    document.getElementById('btn-confirmar-excluir').onclick = async () => {
+      await fetch(`/api/config/empresas/${id}`, { method: 'DELETE', headers: h() });
+      fecharModal('modal-excluir');
+      toast('Empresa removida!', 'success');
+      await carregarEmpresas();
+    };
+  }
+
+  // ────────── DEPARTAMENTOS ──────────
+  let departamentos = [];
+
+  async function carregarDepartamentos() {
+    document.getElementById('loading-deps').style.display = 'block';
+    document.getElementById('lista-deps').style.display = 'none';
+    try {
+      const r = await fetch('/api/config/departamentos', { headers: h() });
+      departamentos = await r.json();
+      document.getElementById('count-departamentos').textContent = departamentos.length;
+      renderDepartamentos();
+    } catch { toast('Erro ao carregar departamentos', 'error'); }
+    document.getElementById('loading-deps').style.display = 'none';
+    document.getElementById('lista-deps').style.display = 'flex';
+  }
+
+  function renderDepartamentos() {
+    const el = document.getElementById('lista-deps');
+    if (departamentos.length === 0) {
+      el.innerHTML = `<div class="config-empty"><div class="config-empty-icon">🏷️</div><p>Nenhum departamento cadastrado ainda.</p></div>`;
+      return;
+    }
+    el.innerHTML = departamentos.sort().map(d => `
+      <div class="config-item">
+        <div class="config-item-info">
+          <div class="config-item-title">🏷️ ${d}</div>
+        </div>
+        <div class="config-item-actions">
+          <button class="btn btn-sm btn-danger" onclick="confirmarExcluirDep('${d.replace(/'/g, "\\'")}')">🗑️ Excluir</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function addDepartamento() {
+    const input = document.getElementById('input-dep');
+    const nome = input.value.trim();
+    if (!nome) { toast('Digite o nome do departamento', 'error'); return; }
+    try {
+      const r = await fetch('/api/config/departamentos', { method: 'POST', headers: h(), body: JSON.stringify({ nome }) });
+      const data = await r.json();
+      if (!r.ok) { toast(data.erro || 'Erro ao adicionar', 'error'); return; }
+      input.value = '';
+      toast('Departamento adicionado!', 'success');
+      await carregarDepartamentos();
+    } catch { toast('Erro de conexão', 'error'); }
+  }
+
+  function confirmarExcluirDep(nome) {
+    document.getElementById('modal-excluir-msg').textContent = `Tem certeza que deseja excluir o departamento "${nome}"?`;
+    document.getElementById('modal-excluir').classList.add('open');
+    document.getElementById('btn-confirmar-excluir').onclick = async () => {
+      await fetch(`/api/config/departamentos/${encodeURIComponent(nome)}`, { method: 'DELETE', headers: h() });
+      fecharModal('modal-excluir');
+      toast('Departamento removido!', 'success');
+      await carregarDepartamentos();
+    };
+  }
+
+  // ────────── CIDADES ──────────
+  let cidades = [];
+
+  async function carregarCidades() {
+    document.getElementById('loading-cidades').style.display = 'block';
+    document.getElementById('lista-cidades').style.display = 'none';
+    try {
+      const r = await fetch('/api/config/cidades', { headers: h() });
+      cidades = await r.json();
+      document.getElementById('count-cidades').textContent = cidades.length;
+      renderCidades();
+    } catch { toast('Erro ao carregar cidades', 'error'); }
+    document.getElementById('loading-cidades').style.display = 'none';
+    document.getElementById('lista-cidades').style.display = 'flex';
+  }
+
+  function renderCidades() {
+    const el = document.getElementById('lista-cidades');
+    if (cidades.length === 0) {
+      el.innerHTML = `<div class="config-empty"><div class="config-empty-icon">📍</div><p>Nenhuma cidade cadastrada ainda.</p></div>`;
+      return;
+    }
+    el.innerHTML = cidades.sort().map(c => `
+      <div class="config-item">
+        <div class="config-item-info">
+          <div class="config-item-title">📍 ${c}</div>
+        </div>
+        <div class="config-item-actions">
+          <button class="btn btn-sm btn-danger" onclick="confirmarExcluirCidade('${c.replace(/'/g, "\\'")}')">🗑️ Excluir</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function addCidade() {
+    const input = document.getElementById('input-cidade');
+    const nome = input.value.trim();
+    if (!nome) { toast('Digite o nome da cidade', 'error'); return; }
+    try {
+      const r = await fetch('/api/config/cidades', { method: 'POST', headers: h(), body: JSON.stringify({ nome }) });
+      const data = await r.json();
+      if (!r.ok) { toast(data.erro || 'Erro ao adicionar', 'error'); return; }
+      input.value = '';
+      toast('Cidade adicionada!', 'success');
+      await carregarCidades();
+    } catch { toast('Erro de conexão', 'error'); }
+  }
+
+  function confirmarExcluirCidade(nome) {
+    document.getElementById('modal-excluir-msg').textContent = `Tem certeza que deseja excluir a cidade "${nome}"?`;
+    document.getElementById('modal-excluir').classList.add('open');
+    document.getElementById('btn-confirmar-excluir').onclick = async () => {
+      await fetch(`/api/config/cidades/${encodeURIComponent(nome)}`, { method: 'DELETE', headers: h() });
+      fecharModal('modal-excluir');
+      toast('Cidade removida!', 'success');
+      await carregarCidades();
+    };
+  }
+
+  // ────────── UTILS ──────────
+  function fecharModal(id) { document.getElementById(id).classList.remove('open'); }
+
+  document.querySelectorAll('.modal-overlay').forEach(m => {
+    m.addEventListener('click', e => { if (e.target === m) fecharModal(m.id); });
+  });
+
+  function logout() {
+    localStorage.removeItem('assdoc_token');
+    localStorage.removeItem('assdoc_usuario');
+    window.location.href = '/index.html';
+  }
+
+  function toast(msg, tipo = 'info') {
+    const c = document.getElementById('toast-container');
+    const t = document.createElement('div');
+    t.className = `toast toast-${tipo}`;
+    t.innerHTML = `<span>${tipo === 'success' ? '✅' : tipo === 'error' ? '❌' : 'ℹ️'}</span> ${msg}`;
+    c.appendChild(t);
+    setTimeout(() => { t.style.animation = 'fadeOut 0.3s ease forwards'; setTimeout(() => t.remove(), 300); }, 3500);
+  }
+
+  // Inicializa
+  carregarEmpresas();
+  carregarDepartamentos();
+  carregarCidades();
+</script>
+</body>
+</html>

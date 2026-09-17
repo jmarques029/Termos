@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TermoEP — Usuários</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .user-card {background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px 24px;display:flex;align-items:center;gap:16px;transition:all var(--transition);}
+    .user-card:hover{border-color:rgba(255,255,255,0.12);background:var(--surface-hover);}
+    .user-card-avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--primary-dark));display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;flex-shrink:0;}
+    .user-card-avatar.supervisor-avatar{background:linear-gradient(135deg,#f59e0b,#d97706);}
+    .user-card-info{flex:1;min-width:0;}
+    .user-card-name{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .user-card-email{font-size:13px;color:var(--text-2);}
+    .user-card-meta{font-size:11px;color:var(--text-3);margin-top:2px;}
+    .user-card-actions{display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
+    .user-grid{display:flex;flex-direction:column;gap:12px;}
+    .badge-voce{display:inline-flex;align-items:center;padding:2px 8px;background:rgba(99,102,241,0.15);color:var(--primary-light);border-radius:99px;font-size:11px;font-weight:700;margin-left:8px;}
+    .badge-supervisor{display:inline-flex;align-items:center;padding:2px 8px;background:rgba(245,158,11,0.15);color:#f59e0b;border-radius:99px;font-size:11px;font-weight:700;margin-left:8px;}
+    .badge-admin{display:inline-flex;align-items:center;padding:2px 8px;background:rgba(99,102,241,0.15);color:var(--primary-light);border-radius:99px;font-size:11px;font-weight:700;margin-left:8px;}
+    .modal-form{display:flex;flex-direction:column;gap:14px;margin-top:4px;}
+    .senha-strength{height:4px;border-radius:99px;background:var(--bg-3);margin-top:6px;overflow:hidden;}
+    .senha-strength-bar{height:100%;border-radius:99px;width:0%;transition:width 0.3s ease,background 0.3s ease;}
+    .senha-strength-label{font-size:11px;color:var(--text-3);margin-top:4px;}
+    .role-selector{display:flex;gap:10px;}
+    .role-option{flex:1;border:2px solid var(--border);border-radius:var(--radius);padding:12px 14px;cursor:pointer;transition:all var(--transition);text-align:center;}
+    .role-option:hover{border-color:rgba(255,255,255,0.2);}
+    .role-option.selected-admin{border-color:var(--primary);background:rgba(99,102,241,0.1);}
+    .role-option.selected-supervisor{border-color:#f59e0b;background:rgba(245,158,11,0.1);}
+    .role-option-icon{font-size:24px;margin-bottom:6px;}
+    .role-option-label{font-size:13px;font-weight:600;}
+    .role-option-desc{font-size:11px;color:var(--text-3);margin-top:2px;}
+    .dept-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:260px;overflow-y:auto;padding-right:4px;}
+    .dept-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all var(--transition);font-size:13px;}
+    .dept-item:hover{border-color:rgba(255,255,255,0.15);background:var(--surface-hover);}
+    .dept-item.checked{border-color:#f59e0b;background:rgba(245,158,11,0.08);}
+    .dept-item input[type="checkbox"]{accent-color:#f59e0b;width:15px;height:15px;flex-shrink:0;}
+    .section-divider{margin:28px 0 20px;}
+    .section-divider h3{font-size:15px;font-weight:700;color:var(--text-1);display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+    .section-divider-line{height:1px;background:var(--border);flex:1;}
+    .dept-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;}
+    .dept-chip{padding:2px 8px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);color:#f59e0b;border-radius:99px;font-size:10px;font-weight:600;}
+    .dept-chip-none{font-size:11px;color:var(--text-3);font-style:italic;}
+  </style>
+</head>
+<body>
+<div id="toast-container"></div>
+<div class="page-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon"><img src="/termoep_logo.jpg" alt="TermoEP"></div>
+      <div class="sidebar-logo-text"><span style="color:#00D4FF">Termo</span><span style="color:white;font-weight:900">EP</span></div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="/dashboard.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a href="/criar.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Novo Termo
+      </a>
+      <a href="/cidades.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Por Cidade
+      </a>
+      <a href="/usuarios.html" class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Usuários
+      </a>
+      <a href="/configuracoes.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Configurações
+      </a>
+      <a href="/conta.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Minha Conta
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="user-initials">A</div>
+        <div>
+          <div class="user-name" id="user-name">Admin</div>
+          <div class="user-role">Administrador</div>
+        </div>
+      </div>
+      <button class="nav-item" onclick="logout()" style="margin-top:4px;color:var(--danger);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sair
+      </button>
+    </div>
+  </aside>
+  <main class="main-content">
+    <div class="page-title">Gerenciar Usuários</div>
+    <div class="page-subtitle">Administradores e supervisores com acesso ao sistema TermoEP</div>
+    <div class="stats-grid" style="margin-bottom:28px;">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(99,102,241,0.12);font-size:22px;">🛡️</div>
+        <div class="stat-value" id="stat-total-admins" style="color:var(--primary-light)">0</div>
+        <div class="stat-label">Administradores</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(245,158,11,0.12);font-size:22px;">👁️</div>
+        <div class="stat-value" id="stat-total-supervisors" style="color:#f59e0b">0</div>
+        <div class="stat-label">Supervisores</div>
+      </div>
+    </div>
+    <div class="section-header" style="margin-bottom:16px;">
+      <h2>Usuários do Sistema</h2>
+      <button class="btn btn-primary btn-sm" onclick="abrirModalCriar()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Novo Usuário
+      </button>
+    </div>
+    <div id="loading" class="loading-screen">
+      <div class="spinner"></div>
+      <span>Carregando usuários...</span>
+    </div>
+    <div id="section-admins" class="hidden">
+      <div class="section-divider">
+        <h3><span>🛡️ Administradores</span><div class="section-divider-line"></div></h3>
+      </div>
+      <div id="grid-admins" class="user-grid"></div>
+    </div>
+    <div id="section-supervisors" class="hidden">
+      <div class="section-divider">
+        <h3><span>👁️ Supervisores de Departamento</span><div class="section-divider-line"></div></h3>
+      </div>
+      <div id="grid-supervisors" class="user-grid"></div>
+    </div>
+    <div id="empty-state" class="empty-state hidden">
+      <div class="empty-state-icon">👥</div>
+      <h3>Nenhum usuário encontrado</h3>
+      <p>Clique em "Novo Usuário" para adicionar um administrador ou supervisor.</p>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL: Criar Usuário -->
+<div id="modal-criar" class="modal-overlay">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-title">👤 Novo Usuário</div>
+    <div class="modal-subtitle">Escolha o tipo de acesso e preencha os dados.</div>
+    <div class="modal-form">
+      <div class="form-group">
+        <label>Tipo de Acesso *</label>
+        <div class="role-selector">
+          <div class="role-option selected-admin" id="opt-admin" onclick="selecionarRole('admin')">
+            <div class="role-option-icon">🛡️</div>
+            <div class="role-option-label">Administrador</div>
+            <div class="role-option-desc">Acesso total ao sistema</div>
+          </div>
+          <div class="role-option" id="opt-supervisor" onclick="selecionarRole('supervisor')">
+            <div class="role-option-icon">👁️</div>
+            <div class="role-option-label">Supervisor</div>
+            <div class="role-option-desc">Visualiza termos do departamento</div>
+          </div>
+        </div>
+        <input type="hidden" id="novo-role" value="admin">
+      </div>
+      <div class="form-group">
+        <label for="novo-nome">Nome Completo *</label>
+        <input id="novo-nome" type="text" class="input" placeholder="Ex: Maria Oliveira">
+      </div>
+      <div class="form-group">
+        <label for="novo-email">E-mail *</label>
+        <input id="novo-email" type="email" class="input" placeholder="Ex: maria@empresa.com">
+      </div>
+      <div class="form-group">
+        <label for="novo-senha">Senha *</label>
+        <input id="novo-senha" type="password" class="input" placeholder="Mínimo 6 caracteres" oninput="avaliarSenha(this.value)">
+        <div class="senha-strength"><div class="senha-strength-bar" id="senha-bar"></div></div>
+        <div class="senha-strength-label" id="senha-label"></div>
+      </div>
+      <div class="form-group" id="grupo-departamentos" style="display:none;">
+        <label>Departamentos Permitidos</label>
+        <div style="font-size:12px;color:var(--text-3);margin-bottom:8px;">Selecione quais departamentos este supervisor poderá visualizar:</div>
+        <div class="dept-grid" id="dept-grid-criar"></div>
+      </div>
+    </div>
+    <div id="criar-error" class="alert alert-error hidden" style="margin-top:16px;">
+      <span>⚠️</span><span id="criar-error-msg"></span>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="fecharModal('modal-criar')">Cancelar</button>
+      <button id="btn-salvar-criar" class="btn btn-primary" onclick="criarUsuario()">Criar Usuário</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Editar Usuário -->
+<div id="modal-editar" class="modal-overlay">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-title">✏️ Editar Usuário</div>
+    <div class="modal-subtitle" id="editar-subtitle">Altere o nome ou redefina a senha.</div>
+    <input type="hidden" id="editar-id">
+    <div class="modal-form">
+      <div class="form-group">
+        <label for="editar-nome">Nome Completo</label>
+        <input id="editar-nome" type="text" class="input" placeholder="Nome do usuário">
+      </div>
+      <div class="divider"></div>
+      <div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:-4px;">Redefinir Senha (opcional)</div>
+      <div class="form-group">
+        <label for="editar-senha">Nova Senha</label>
+        <input id="editar-senha" type="password" class="input" placeholder="Deixe em branco para não alterar" oninput="avaliarSenhaEditar(this.value)">
+        <div class="senha-strength"><div class="senha-strength-bar" id="editar-senha-bar"></div></div>
+        <div class="senha-strength-label" id="editar-senha-label"></div>
+      </div>
+    </div>
+    <div id="editar-error" class="alert alert-error hidden" style="margin-top:16px;">
+      <span>⚠️</span><span id="editar-error-msg"></span>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="fecharModal('modal-editar')">Cancelar</button>
+      <button id="btn-salvar-editar" class="btn btn-primary" onclick="salvarEdicao()">Salvar Alterações</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Permissões Supervisor -->
+<div id="modal-permissoes" class="modal-overlay">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-title">🏢 Permissões do Supervisor</div>
+    <div class="modal-subtitle" id="permissoes-subtitle">Selecione os departamentos que este supervisor pode visualizar.</div>
+    <input type="hidden" id="permissoes-id">
+    <div style="margin-top:16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <label style="font-size:13px;font-weight:600;color:var(--text-2);">Departamentos disponíveis</label>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-sm btn-secondary" onclick="marcarTodos(true)">Marcar todos</button>
+          <button class="btn btn-sm btn-secondary" onclick="marcarTodos(false)">Desmarcar todos</button>
+        </div>
+      </div>
+      <div class="dept-grid" id="dept-grid-permissoes"></div>
+    </div>
+    <div id="permissoes-error" class="alert alert-error hidden" style="margin-top:16px;">
+      <span>⚠️</span><span id="permissoes-error-msg"></span>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="fecharModal('modal-permissoes')">Cancelar</button>
+      <button id="btn-salvar-permissoes" class="btn btn-primary" onclick="salvarPermissoes()">💾 Salvar Permissões</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Excluir Usuário -->
+<div id="modal-excluir" class="modal-overlay">
+  <div class="modal" style="max-width:420px;">
+    <div style="text-align:center;margin-bottom:20px;">
+      <div style="font-size:48px;margin-bottom:12px;">🗑️</div>
+      <div class="modal-title">Excluir Usuário</div>
+    </div>
+    <div class="modal-subtitle" id="excluir-nome-confirm" style="text-align:center;"></div>
+    <div class="alert alert-error" style="margin-top:16px;">⚠️ Esta ação não pode ser desfeita. O usuário perderá o acesso imediatamente.</div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="fecharModal('modal-excluir')">Cancelar</button>
+      <button id="btn-confirmar-excluir" class="btn btn-danger">Excluir</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const token = localStorage.getItem('assdoc_token');
+  if (!token) window.location.href = '/index.html';
+
+  const usuarioLogado = JSON.parse(localStorage.getItem('assdoc_usuario') || '{}');
+  if (usuarioLogado.nome) {
+    document.getElementById('user-name').textContent = usuarioLogado.nome;
+    document.getElementById('user-initials').textContent = usuarioLogado.nome.charAt(0).toUpperCase();
+  }
+
+  const tokenPayload = JSON.parse(atob(token.split('.')[1]));
+  if (tokenPayload.role === 'supervisor') window.location.href = '/supervisor.html';
+
+  let listaUsuarios = [];
+  let idParaExcluir = null;
+  const DEPARTAMENTOS = ['Jornalismo','Comercial','TI','Engenharia','Produção','Administrativo','Financeiro','RH','Marketing','Operações','Diretoria','Tecnologia'];
+
+  function headers() { return { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }; }
+
+  async function carregarUsuarios() {
+    try {
+      const res = await fetch('/api/usuarios', { headers: headers() });
+      if (res.status === 401) { logout(); return; }
+      listaUsuarios = await res.json();
+      renderUsuarios();
+      document.getElementById('loading').classList.add('hidden');
+    } catch { toast('Erro ao carregar usuários', 'error'); }
+  }
+
+  function renderUsuarios() {
+    const admins = listaUsuarios.filter(u => !u.role || u.role === 'admin');
+    const supervisores = listaUsuarios.filter(u => u.role === 'supervisor');
+    document.getElementById('stat-total-admins').textContent = admins.length;
+    document.getElementById('stat-total-supervisors').textContent = supervisores.length;
+    const meuId = tokenPayload.id;
+    if (listaUsuarios.length === 0) {
+      document.getElementById('empty-state').classList.remove('hidden');
+      document.getElementById('section-admins').classList.add('hidden');
+      document.getElementById('section-supervisors').classList.add('hidden');
+      return;
+    }
+    document.getElementById('empty-state').classList.add('hidden');
+    if (admins.length > 0) {
+      document.getElementById('section-admins').classList.remove('hidden');
+      document.getElementById('grid-admins').innerHTML = admins.map(u => renderCardAdmin(u, meuId)).join('');
+    } else { document.getElementById('section-admins').classList.add('hidden'); }
+    if (supervisores.length > 0) {
+      document.getElementById('section-supervisors').classList.remove('hidden');
+      document.getElementById('grid-supervisors').innerHTML = supervisores.map(u => renderCardSupervisor(u, meuId)).join('');
+    } else { document.getElementById('section-supervisors').classList.add('hidden'); }
+  }
+
+  function renderCardAdmin(u, meuId) {
+    const inicial = u.nome.charAt(0).toUpperCase();
+    const ehVoce = u._id === meuId;
+    const criadoEm = new Date(u.criado_em).toLocaleDateString('pt-BR');
+    const criadoPor = u.criado_por_nome ? `Criado por ${u.criado_por_nome}` : 'Administrador inicial';
+    return `<div class="user-card" id="user-card-${u._id}">
+      <div class="user-card-avatar">${inicial}</div>
+      <div class="user-card-info">
+        <div class="user-card-name">${u.nome}${ehVoce ? '<span class="badge-voce">Você</span>' : ''}<span class="badge-admin">Admin</span></div>
+        <div class="user-card-email">${u.email}</div>
+        <div class="user-card-meta">${criadoPor} · ${criadoEm}</div>
+      </div>
+      <div class="user-card-actions">
+        <button class="btn btn-sm btn-secondary" onclick="abrirModalEditar('${u._id}','${u.nome.replace(/'/g,"\\'")}','${u.email}')">✏️ Editar</button>
+        ${!ehVoce ? `<button class="btn btn-sm btn-danger" onclick="confirmarExcluir('${u._id}','${u.nome.replace(/'/g,"\\'")}')">🗑️</button>` : ''}
+      </div>
+    </div>`;
+  }
+
+  function renderCardSupervisor(u, meuId) {
+    const inicial = u.nome.charAt(0).toUpperCase();
+    const criadoEm = new Date(u.criado_em).toLocaleDateString('pt-BR');
+    const criadoPor = u.criado_por_nome ? `Criado por ${u.criado_por_nome}` : 'Administrador inicial';
+    const deps = u.departamentos_permitidos || [];
+    const depsHtml = deps.length > 0 ? deps.map(d => `<span class="dept-chip">${d}</span>`).join('') : '<span class="dept-chip-none">Nenhum departamento atribuído</span>';
+    const depsJson = JSON.stringify(deps).replace(/"/g,'&quot;');
+    return `<div class="user-card" id="user-card-${u._id}">
+      <div class="user-card-avatar supervisor-avatar">${inicial}</div>
+      <div class="user-card-info">
+        <div class="user-card-name">${u.nome}<span class="badge-supervisor">Supervisor</span></div>
+        <div class="user-card-email">${u.email}</div>
+        <div class="user-card-meta">${criadoPor} · ${criadoEm}</div>
+        <div class="dept-chips">${depsHtml}</div>
+      </div>
+      <div class="user-card-actions">
+        <button class="btn btn-sm" style="background:rgba(245,158,11,0.12);color:#f59e0b;border:1px solid rgba(245,158,11,0.3);" onclick="abrirModalPermissoes('${u._id}','${u.nome.replace(/'/g,"\\'")}','${depsJson}')">🏢 Permissões</button>
+        <button class="btn btn-sm btn-secondary" onclick="abrirModalEditar('${u._id}','${u.nome.replace(/'/g,"\\'")}','${u.email}')">✏️ Editar</button>
+        <button class="btn btn-sm btn-danger" onclick="confirmarExcluir('${u._id}','${u.nome.replace(/'/g,"\\'")}')">🗑️</button>
+      </div>
+    </div>`;
+  }
+
+  let roleSelecionado = 'admin';
+  function selecionarRole(role) {
+    roleSelecionado = role;
+    document.getElementById('novo-role').value = role;
+    document.getElementById('opt-admin').className = 'role-option' + (role === 'admin' ? ' selected-admin' : '');
+    document.getElementById('opt-supervisor').className = 'role-option' + (role === 'supervisor' ? ' selected-supervisor' : '');
+    document.getElementById('grupo-departamentos').style.display = role === 'supervisor' ? 'block' : 'none';
+  }
+
+  function abrirModalCriar() {
+    document.getElementById('novo-nome').value = '';
+    document.getElementById('novo-email').value = '';
+    document.getElementById('novo-senha').value = '';
+    document.getElementById('criar-error').classList.add('hidden');
+    document.getElementById('senha-bar').style.width = '0%';
+    document.getElementById('senha-label').textContent = '';
+    selecionarRole('admin');
+    renderDeptGrid('dept-grid-criar', []);
+    document.getElementById('modal-criar').classList.add('open');
+    setTimeout(() => document.getElementById('novo-nome').focus(), 150);
+  }
+
+  function renderDeptGrid(containerId, selecionados) {
+    document.getElementById(containerId).innerHTML = DEPARTAMENTOS.map(dep => {
+      const checked = selecionados.includes(dep);
+      return `<label class="dept-item${checked ? ' checked' : ''}"><input type="checkbox" value="${dep}" ${checked ? 'checked' : ''} onchange="toggleDeptItem(this)">${dep}</label>`;
+    }).join('');
+  }
+
+  function toggleDeptItem(checkbox) {
+    checkbox.closest('.dept-item').classList.toggle('checked', checkbox.checked);
+  }
+
+  function getDeptsSelecionados(containerId) {
+    return [...document.getElementById(containerId).querySelectorAll('input[type="checkbox"]:checked')].map(cb => cb.value);
+  }
+
+  async function criarUsuario() {
+    const nome = document.getElementById('novo-nome').value.trim();
+    const email = document.getElementById('novo-email').value.trim();
+    const senha = document.getElementById('novo-senha').value;
+    const role = document.getElementById('novo-role').value;
+    const btn = document.getElementById('btn-salvar-criar');
+    const erroDiv = document.getElementById('criar-error');
+    const erroMsg = document.getElementById('criar-error-msg');
+    erroDiv.classList.add('hidden');
+    if (!nome || !email || !senha) { erroMsg.textContent = 'Preencha todos os campos obrigatórios.'; erroDiv.classList.remove('hidden'); return; }
+    const departamentos_permitidos = role === 'supervisor' ? getDeptsSelecionados('dept-grid-criar') : [];
+    btn.disabled = true; btn.textContent = 'Criando...';
+    try {
+      const res = await fetch('/api/usuarios', { method: 'POST', headers: headers(), body: JSON.stringify({ nome, email, senha, role, departamentos_permitidos }) });
+      const data = await res.json();
+      if (!res.ok) { erroMsg.textContent = data.erro || 'Erro ao criar usuário.'; erroDiv.classList.remove('hidden'); return; }
+      fecharModal('modal-criar');
+      toast(`Usuário "${nome}" criado com sucesso!`, 'success');
+      await carregarUsuarios();
+    } catch { erroMsg.textContent = 'Erro de conexão.'; erroDiv.classList.remove('hidden'); }
+    finally { btn.disabled = false; btn.textContent = 'Criar Usuário'; }
+  }
+
+  function abrirModalEditar(id, nome, email) {
+    document.getElementById('editar-id').value = id;
+    document.getElementById('editar-nome').value = nome;
+    document.getElementById('editar-senha').value = '';
+    document.getElementById('editar-subtitle').textContent = `Editando: ${email}`;
+    document.getElementById('editar-error').classList.add('hidden');
+    document.getElementById('editar-senha-bar').style.width = '0%';
+    document.getElementById('editar-senha-label').textContent = '';
+    document.getElementById('modal-editar').classList.add('open');
+    setTimeout(() => document.getElementById('editar-nome').focus(), 150);
+  }
+
+  async function salvarEdicao() {
+    const id = document.getElementById('editar-id').value;
+    const nome = document.getElementById('editar-nome').value.trim();
+    const senha = document.getElementById('editar-senha').value;
+    const btn = document.getElementById('btn-salvar-editar');
+    const erroDiv = document.getElementById('editar-error');
+    const erroMsg = document.getElementById('editar-error-msg');
+    erroDiv.classList.add('hidden');
+    if (!nome) { erroMsg.textContent = 'O nome não pode estar vazio.'; erroDiv.classList.remove('hidden'); return; }
+    btn.disabled = true; btn.textContent = 'Salvando...';
+    try {
+      const body = { nome }; if (senha) body.senha = senha;
+      const res = await fetch(`/api/usuarios/${id}`, { method: 'PUT', headers: headers(), body: JSON.stringify(body) });
+      const data = await res.json();
+      if (!res.ok) { erroMsg.textContent = data.erro || 'Erro ao atualizar.'; erroDiv.classList.remove('hidden'); return; }
+      fecharModal('modal-editar'); toast('Usuário atualizado com sucesso!', 'success'); await carregarUsuarios();
+    } catch { erroMsg.textContent = 'Erro de conexão.'; erroDiv.classList.remove('hidden'); }
+    finally { btn.disabled = false; btn.textContent = 'Salvar Alterações'; }
+  }
+
+  function abrirModalPermissoes(id, nome, depsRaw) {
+    let deps = [];
+    try { deps = JSON.parse(depsRaw.replace(/&quot;/g,'"')); } catch {}
+    document.getElementById('permissoes-id').value = id;
+    document.getElementById('permissoes-subtitle').textContent = `Supervisor: ${nome}`;
+    document.getElementById('permissoes-error').classList.add('hidden');
+    renderDeptGrid('dept-grid-permissoes', deps);
+    document.getElementById('modal-permissoes').classList.add('open');
+  }
+
+  function marcarTodos(marcar) {
+    document.getElementById('dept-grid-permissoes').querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      cb.checked = marcar; cb.closest('.dept-item').classList.toggle('checked', marcar);
+    });
+  }
+
+  async function salvarPermissoes() {
+    const id = document.getElementById('permissoes-id').value;
+    const departamentos_permitidos = getDeptsSelecionados('dept-grid-permissoes');
+    const btn = document.getElementById('btn-salvar-permissoes');
+    const erroDiv = document.getElementById('permissoes-error');
+    const erroMsg = document.getElementById('permissoes-error-msg');
+    erroDiv.classList.add('hidden'); btn.disabled = true; btn.textContent = 'Salvando...';
+    try {
+      const res = await fetch(`/api/usuarios/${id}/departamentos`, { method: 'PUT', headers: headers(), body: JSON.stringify({ departamentos_permitidos }) });
+      const data = await res.json();
+      if (!res.ok) { erroMsg.textContent = data.erro || 'Erro ao salvar permissões.'; erroDiv.classList.remove('hidden'); return; }
+      fecharModal('modal-permissoes'); toast('Permissões atualizadas com sucesso!', 'success'); await carregarUsuarios();
+    } catch { erroMsg.textContent = 'Erro de conexão.'; erroDiv.classList.remove('hidden'); }
+    finally { btn.disabled = false; btn.textContent = '💾 Salvar Permissões'; }
+  }
+
+  function confirmarExcluir(id, nome) {
+    idParaExcluir = id;
+    document.getElementById('excluir-nome-confirm').textContent = `Tem certeza que deseja excluir "${nome}"?`;
+    document.getElementById('btn-confirmar-excluir').onclick = excluirUsuario;
+    document.getElementById('modal-excluir').classList.add('open');
+  }
+
+  async function excluirUsuario() {
+    try {
+      const res = await fetch(`/api/usuarios/${idParaExcluir}`, { method: 'DELETE', headers: headers() });
+      const data = await res.json();
+      if (!res.ok) { fecharModal('modal-excluir'); toast(data.erro || 'Erro ao excluir.', 'error'); return; }
+      fecharModal('modal-excluir'); toast('Usuário excluído com sucesso.', 'success'); await carregarUsuarios();
+    } catch { toast('Erro de conexão.', 'error'); }
+  }
+
+  function avaliarSenha(senha) {
+    const { largura, cor, texto } = calcularForca(senha);
+    document.getElementById('senha-bar').style.width = largura;
+    document.getElementById('senha-bar').style.background = cor;
+    document.getElementById('senha-label').textContent = texto;
+    document.getElementById('senha-label').style.color = cor;
+  }
+
+  function avaliarSenhaEditar(senha) {
+    if (!senha) { document.getElementById('editar-senha-bar').style.width = '0%'; document.getElementById('editar-senha-label').textContent = ''; return; }
+    const { largura, cor, texto } = calcularForca(senha);
+    document.getElementById('editar-senha-bar').style.width = largura;
+    document.getElementById('editar-senha-bar').style.background = cor;
+    document.getElementById('editar-senha-label').textContent = texto;
+    document.getElementById('editar-senha-label').style.color = cor;
+  }
+
+  function calcularForca(senha) {
+    let score = 0;
+    if (senha.length >= 6) score++;
+    if (senha.length >= 10) score++;
+    if (/[A-Z]/.test(senha)) score++;
+    if (/[0-9]/.test(senha)) score++;
+    if (/[^A-Za-z0-9]/.test(senha)) score++;
+    if (score <= 1) return { largura: '20%', cor: '#ef4444', texto: 'Fraca' };
+    if (score === 2) return { largura: '40%', cor: '#f59e0b', texto: 'Razoável' };
+    if (score === 3) return { largura: '60%', cor: '#eab308', texto: 'Boa' };
+    if (score === 4) return { largura: '80%', cor: '#10b981', texto: 'Forte' };
+    return { largura: '100%', cor: '#6366f1', texto: 'Muito forte' };
+  }
+
+  function fecharModal(id) { document.getElementById(id).classList.remove('open'); }
+  function logout() { localStorage.removeItem('assdoc_token'); localStorage.removeItem('assdoc_usuario'); window.location.href = '/index.html'; }
+  function toast(msg, tipo = 'info') {
+    const c = document.getElementById('toast-container');
+    const t = document.createElement('div');
+    t.className = `toast toast-${tipo}`;
+    t.innerHTML = `<span>${tipo === 'success' ? '✅' : tipo === 'error' ? '❌' : 'ℹ️'}</span> ${msg}`;
+    c.appendChild(t);
+    setTimeout(() => { t.style.animation = 'fadeOut 0.3s ease forwards'; setTimeout(() => t.remove(), 300); }, 4000);
+  }
+  document.querySelectorAll('.modal-overlay').forEach(m => { m.addEventListener('click', e => { if (e.target === m) fecharModal(m.id); }); });
+  ['novo-nome','novo-email','novo-senha'].forEach(id => { document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') criarUsuario(); }); });
+  carregarUsuarios();
+</script>
+</body>
+</html>
+
+

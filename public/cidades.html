@@ -1,0 +1,278 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TermoEP — Por Cidade</title>
+  <meta name="description" content="Visualize os termos de compromisso agrupados por cidade">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .city-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 28px; overflow: hidden; }
+    .city-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; background: linear-gradient(90deg, rgba(0,212,255,0.06), transparent); border-bottom: 1px solid var(--border); cursor: pointer; user-select: none; transition: background 0.2s; }
+    .city-header:hover { background: linear-gradient(90deg, rgba(0,212,255,0.10), transparent); }
+    .city-header-left { display: flex; align-items: center; gap: 12px; }
+    .city-icon { width: 38px; height: 38px; border-radius: var(--radius-sm); background: linear-gradient(135deg, rgba(0,212,255,0.15), rgba(99,102,241,0.15)); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .city-name { font-size: 17px; font-weight: 700; }
+    .city-meta { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+    .city-badges { display: flex; gap: 8px; align-items: center; }
+    .city-chevron { font-size: 14px; color: var(--text-3); transition: transform 0.25s; }
+    .city-chevron.open { transform: rotate(180deg); }
+    .city-body { display: none; }
+    .city-body.open { display: block; }
+    .city-stats-bar { display: flex; border-bottom: 1px solid var(--border); }
+    .city-stat { flex: 1; padding: 10px 16px; border-right: 1px solid var(--border); position: relative; overflow: hidden; }
+    .city-stat:last-child { border-right: none; }
+    .city-stat-accent { position: absolute; bottom: 0; left: 0; right: 0; height: 2px; }
+    .city-stat-label { font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing:.4px; margin-bottom: 2px; }
+    .city-stat-value { font-size: 18px; font-weight: 800; line-height: 1; }
+  </style>
+</head>
+<body>
+<div id="toast-container"></div>
+<div class="page-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon"><img src="/termoep_logo.jpg" alt="TermoEP"></div>
+      <div class="sidebar-logo-text"><span style="color:#00D4FF">Termo</span><span style="color:white;font-weight:900">EP</span></div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="/dashboard.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a href="/criar.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Novo Termo
+      </a>
+      <a href="/cidades.html" class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Por Cidade
+      </a>
+      <a href="/usuarios.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Usuarios
+      </a>
+      <a href="/configuracoes.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l-.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Configuracoes
+      </a>
+      <a href="/conta.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l-.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Minha Conta
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="user-initials">A</div>
+        <div>
+          <div class="user-name" id="user-name">Admin</div>
+          <div class="user-role">Administrador</div>
+        </div>
+      </div>
+      <button class="nav-item" onclick="logout()" style="margin-top:4px; color: var(--danger);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sair
+      </button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-title">📍 Termos por Cidade</div>
+    <div class="page-subtitle">Visualize e filtre os termos agrupados por localidade</div>
+
+    <div style="display:flex; gap:10px; margin-bottom:20px; align-items:center; flex-wrap:wrap;">
+      <input id="busca-cidade" type="text" class="input" placeholder="🔍 Filtrar por cidade ou colaborador..." style="max-width:320px;" oninput="renderCidades()">
+      <select id="filtro-status-cidade" class="select" style="width:auto;" onchange="renderCidades()">
+        <option value="">Todos os status</option>
+        <option value="pendente">⏳ Pendentes</option>
+        <option value="assinado">✅ Assinados</option>
+        <option value="devolvido">📦 Devolvidos</option>
+      </select>
+      <span id="resumo-geral" style="font-size:13px; color:var(--text-3); margin-left:auto;"></span>
+    </div>
+
+    <div id="loading" class="loading-screen">
+      <div class="spinner"></div>
+      <span>Carregando termos...</span>
+    </div>
+
+    <div id="conteudo" class="hidden">
+      <div id="cidades-container"></div>
+      <div id="empty-state" class="empty-state hidden">
+        <div class="empty-state-icon">📭</div>
+        <h3>Nenhum termo encontrado</h3>
+        <p>Ajuste os filtros ou crie novos termos.</p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  const token = localStorage.getItem('assdoc_token');
+  if (!token) window.location.href = '/index.html';
+  else {
+    try {
+      const _p = JSON.parse(atob(token.split('.')[1]));
+      if (_p.role === 'supervisor') window.location.href = '/supervisor.html';
+    } catch {}
+  }
+
+  const usuario = JSON.parse(localStorage.getItem('assdoc_usuario') || '{}');
+  if (usuario.nome) {
+    document.getElementById('user-name').textContent = usuario.nome;
+    document.getElementById('user-initials').textContent = usuario.nome.charAt(0).toUpperCase();
+  }
+
+  let todosTermos = [];
+
+  function headers() {
+    return { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' };
+  }
+
+  async function carregar() {
+    try {
+      const res = await fetch('/api/termos', { headers: headers() });
+      if (res.status === 401) { logout(); return; }
+      todosTermos = await res.json();
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('conteudo').classList.remove('hidden');
+      renderCidades();
+    } catch {
+      toast('Erro ao carregar termos', 'error');
+    }
+  }
+
+  function renderCidades() {
+    const busca  = document.getElementById('busca-cidade').value.toLowerCase();
+    const status = document.getElementById('filtro-status-cidade').value;
+
+    const termosFiltrados = todosTermos.filter(t => {
+      if (status === 'devolvido' && !t.devolvido) return false;
+      if (status === 'assinado'  && (t.status !== 'assinado' || t.devolvido)) return false;
+      if (status === 'pendente'  && t.status !== 'pendente') return false;
+      if (busca) {
+        const mC = (t.cidade || '').toLowerCase().includes(busca);
+        const mN = (t.colaborador_nome || '').toLowerCase().includes(busca);
+        const mE = (t.equipamento_marca + ' ' + t.equipamento_modelo).toLowerCase().includes(busca);
+        if (!mC && !mN && !mE) return false;
+      }
+      return true;
+    });
+
+    const grupos = {};
+    termosFiltrados.forEach(t => {
+      const cidade = t.cidade || 'Sem cidade';
+      if (!grupos[cidade]) grupos[cidade] = [];
+      grupos[cidade].push(t);
+    });
+
+    const cidades = Object.keys(grupos).sort();
+    const container = document.getElementById('cidades-container');
+    const empty = document.getElementById('empty-state');
+
+    document.getElementById('resumo-geral').textContent =
+      termosFiltrados.length + ' termo' + (termosFiltrados.length !== 1 ? 's' : '') +
+      ' em ' + cidades.length + ' cidade' + (cidades.length !== 1 ? 's' : '');
+
+    if (cidades.length === 0) {
+      container.innerHTML = '';
+      empty.classList.remove('hidden');
+      return;
+    }
+    empty.classList.add('hidden');
+
+    container.innerHTML = cidades.map(cidade => {
+      const lista     = grupos[cidade];
+      const total     = lista.length;
+      const pendentes = lista.filter(t => t.status === 'pendente').length;
+      const assinados = lista.filter(t => t.status === 'assinado' && !t.devolvido).length;
+      const devolvidos= lista.filter(t => t.devolvido).length;
+      const key       = cidade.replace(/\W+/g,'_');
+
+      const linhas = lista.map(t => {
+        const tipoEmoji = { celular: '📱', tablet: '📲', notebook: '💻' }[t.tipo] || '📱';
+        const assinadoEm = t.assinado_em ? new Date(t.assinado_em).toLocaleDateString('pt-BR') : '—';
+        let badge;
+        if (t.devolvido) {
+          badge = '<span class="badge badge-assinado" style="background:rgba(16,185,129,0.15);color:#10b981;">📦 Devolvido</span>';
+        } else if (t.status === 'assinado') {
+          badge = '<span class="badge badge-assinado">✅ Assinado</span>';
+        } else {
+          badge = '<span class="badge badge-pendente">⏳ Pendente</span>';
+        }
+        return '<tr>' +
+          '<td><div style="font-weight:600;">' + t.colaborador_nome + '</div>' +
+          '<div style="font-size:12px;color:var(--text-3);">' + (t.cargo||'—') + ' · ' + (t.departamento||'—') + '</div></td>' +
+          '<td><div>' + tipoEmoji + ' ' + t.equipamento_marca + ' ' + t.equipamento_modelo + '</div>' +
+          '<div style="font-size:12px;color:var(--text-3);">' + (t.equipamento_serie_imei||'—') + '</div></td>' +
+          '<td>' + badge + '</td>' +
+          '<td style="color:var(--text-2);font-size:13px;">' + assinadoEm + '</td>' +
+          '<td style="text-align:right;"><a href="/visualizar.html?id=' + t._id + '" class="btn btn-sm btn-secondary">👁️ Ver</a></td>' +
+          '</tr>';
+      }).join('');
+
+      return '<div class="city-card">' +
+        '<div class="city-header" onclick="toggleCidade(\'' + key + '\')">' +
+          '<div class="city-header-left">' +
+            '<div class="city-icon">📍</div>' +
+            '<div>' +
+              '<div class="city-name">' + cidade + '</div>' +
+              '<div class="city-meta">' + total + ' termo' + (total!==1?'s':'') + '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div style="display:flex;align-items:center;gap:12px;">' +
+            '<div class="city-badges">' +
+              (pendentes  ? '<span class="badge badge-pendente">⏳ ' + pendentes + '</span>' : '') +
+              (assinados  ? '<span class="badge badge-assinado">✅ ' + assinados + '</span>' : '') +
+              (devolvidos ? '<span class="badge badge-assinado" style="background:rgba(16,185,129,0.15);color:#10b981;">📦 ' + devolvidos + '</span>' : '') +
+            '</div>' +
+            '<span class="city-chevron open" id="chev-' + key + '">▼</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="city-body open" id="city-' + key + '">' +
+          '<div class="city-stats-bar">' +
+            '<div class="city-stat"><div class="city-stat-accent" style="background:linear-gradient(90deg,#6366f1,#818cf8);"></div><div class="city-stat-label">Total</div><div class="city-stat-value">' + total + '</div></div>' +
+            '<div class="city-stat"><div class="city-stat-accent" style="background:linear-gradient(90deg,#f59e0b,#fbbf24);"></div><div class="city-stat-label">Pendentes</div><div class="city-stat-value" style="color:var(--warning);">' + pendentes + '</div></div>' +
+            '<div class="city-stat"><div class="city-stat-accent" style="background:linear-gradient(90deg,#10b981,#34d399);"></div><div class="city-stat-label">Assinados</div><div class="city-stat-value" style="color:var(--success);">' + assinados + '</div></div>' +
+            '<div class="city-stat"><div class="city-stat-accent" style="background:linear-gradient(90deg,#059669,#10b981);"></div><div class="city-stat-label">Devolvidos</div><div class="city-stat-value" style="color:#10b981;">' + devolvidos + '</div></div>' +
+          '</div>' +
+          '<div class="table-wrapper" style="border-radius:0;border:none;">' +
+            '<table><thead><tr><th>Colaborador</th><th>Equipamento</th><th>Status</th><th>Assinado em</th><th style="text-align:right;">Ações</th></tr></thead>' +
+            '<tbody>' + linhas + '</tbody></table>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function toggleCidade(key) {
+    const body = document.getElementById('city-' + key);
+    const chev = document.getElementById('chev-' + key);
+    if (!body) return;
+    body.classList.toggle('open');
+    if (chev) chev.classList.toggle('open');
+  }
+
+  function logout() {
+    localStorage.removeItem('assdoc_token');
+    localStorage.removeItem('assdoc_usuario');
+    window.location.href = '/index.html';
+  }
+
+  function toast(msg, tipo) {
+    tipo = tipo || 'info';
+    const c = document.getElementById('toast-container');
+    const t = document.createElement('div');
+    t.className = 'toast toast-' + tipo;
+    t.innerHTML = '<span>' + (tipo==='success'?'✅':tipo==='error'?'❌':'ℹ️') + '</span> ' + msg;
+    c.appendChild(t);
+    setTimeout(function() {
+      t.style.animation = 'fadeOut 0.3s ease forwards';
+      setTimeout(function() { t.remove(); }, 300);
+    }, 3500);
+  }
+
+  carregar();
+</script>
+</body>
+</html>

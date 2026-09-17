@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TermoEP — Painel</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div id="toast-container"></div>
+
+<div class="page-wrapper">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon"><img src="/termoep_logo.jpg" alt="TermoEP"></div>
+      <div class="sidebar-logo-text"><span style="color:#00D4FF">Termo</span><span style="color:white;font-weight:900">EP</span></div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="/dashboard.html" class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a href="/criar.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Novo Termo
+      </a>
+      <a href="/cidades.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Por Cidade
+      </a>
+      <a href="/usuarios.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Usuários
+      </a>
+      <a href="/configuracoes.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Configurações
+      </a>
+      <a href="/conta.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Minha Conta
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="user-initials">A</div>
+        <div>
+          <div class="user-name" id="user-name">Admin</div>
+          <div class="user-role">Administrador</div>
+        </div>
+      </div>
+      <button class="nav-item" onclick="logout()" style="margin-top:4px; color: var(--danger);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sair
+      </button>
+    </div>
+  </aside>
+
+  <!-- Conteúdo principal -->
+  <main class="main-content">
+    <div class="page-title">Dashboard</div>
+    <div class="page-subtitle">Gerencie todos os termos de compromisso</div>
+
+    <!-- Stats Bar -->
+    <div style="
+      display: flex;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      margin-bottom: 24px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    ">
+      <!-- Total -->
+      <div style="flex:1; padding: 14px 16px; border-right: 1px solid var(--border); position:relative; overflow:hidden;">
+        <div style="position:absolute; bottom:0; left:0; right:0; height:3px; background: linear-gradient(90deg,#6366f1,#818cf8);"></div>
+        <div style="font-size:11px; color:var(--text-3); letter-spacing:.5px; text-transform:uppercase; margin-bottom:4px;">Total</div>
+        <div style="display:flex; align-items:center; gap:7px;">
+          <span style="font-size:13px;">📄</span>
+          <span id="stat-total" style="font-size:22px; font-weight:800; color:var(--text); line-height:1;">0</span>
+        </div>
+      </div>
+      <!-- Pendentes -->
+      <div style="flex:1; padding: 14px 16px; border-right: 1px solid var(--border); position:relative; overflow:hidden;">
+        <div style="position:absolute; bottom:0; left:0; right:0; height:3px; background: linear-gradient(90deg,#f59e0b,#fbbf24);"></div>
+        <div style="font-size:11px; color:var(--text-3); letter-spacing:.5px; text-transform:uppercase; margin-bottom:4px;">Pendentes</div>
+        <div style="display:flex; align-items:center; gap:7px;">
+          <span style="font-size:13px;">⏳</span>
+          <span id="stat-pendentes" style="font-size:22px; font-weight:800; color:var(--warning); line-height:1;">0</span>
+        </div>
+      </div>
+      <!-- Assinados -->
+      <div style="flex:1; padding: 14px 16px; border-right: 1px solid var(--border); position:relative; overflow:hidden;">
+        <div style="position:absolute; bottom:0; left:0; right:0; height:3px; background: linear-gradient(90deg,#10b981,#34d399);"></div>
+        <div style="font-size:11px; color:var(--text-3); letter-spacing:.5px; text-transform:uppercase; margin-bottom:4px;">Assinados</div>
+        <div style="display:flex; align-items:center; gap:7px;">
+          <span style="font-size:13px;">✅</span>
+          <span id="stat-assinados" style="font-size:22px; font-weight:800; color:var(--success); line-height:1;">0</span>
+        </div>
+      </div>
+      <!-- Devolvidos -->
+      <div style="flex:1; padding: 14px 16px; border-right: 1px solid var(--border); position:relative; overflow:hidden; cursor:pointer;" onclick="mudarAba('devolvido')" title="Ver devolvidos">
+        <div style="position:absolute; bottom:0; left:0; right:0; height:3px; background: linear-gradient(90deg,#059669,#10b981);"></div>
+        <div style="font-size:11px; color:var(--text-3); letter-spacing:.5px; text-transform:uppercase; margin-bottom:4px;">Devolvidos</div>
+        <div style="display:flex; align-items:center; gap:7px;">
+          <span style="font-size:13px;">📦</span>
+          <span id="stat-devolvidos" style="font-size:22px; font-weight:800; color:#10b981; line-height:1;">0</span>
+        </div>
+      </div>
+      <!-- Celulares -->
+      <div style="flex:1; padding: 14px 16px; border-right: 1px solid var(--border); position:relative; overflow:hidden;">
+        <div style="position:absolute; bottom:0; left:0; right:0; height:3px; background: linear-gradient(90deg,#00d4ff,#38bdf8);"></div>
+        <div style="font-size:11px; color:var(--text-3); letter-spacing:.5px; text-transform:uppercase; margin-bottom:4px;">Celulares</div>
+        <div style="display:flex; align-items:center; gap:7px;">
+          <span style="font-size:13px;">📱</span>
+          <span id="stat-celulares" style="font-size:22px; font-weight:800; color:var(--primary-light); line-height:1;">0</span>
+        </div>
+      </div>
+      <!-- Tablets -->
+      <div style="flex:1; padding: 14px 16px; border-right: 1px solid var(--border); position:relative; overflow:hidden;">
+        <div style="position:absolute; bottom:0; left:0; right:0; height:3px; background: linear-gradient(90deg,#14b8a6,#2dd4bf);"></div>
+        <div style="font-size:11px; color:var(--text-3); letter-spacing:.5px; text-transform:uppercase; margin-bottom:4px;">Tablets</div>
+        <div style="display:flex; align-items:center; gap:7px;">
+          <span style="font-size:13px;">📲</span>
+          <span id="stat-tablets" style="font-size:22px; font-weight:800; color:#2dd4bf; line-height:1;">0</span>
+        </div>
+      </div>
+      <!-- Notebooks -->
+      <div style="flex:1; padding: 14px 16px; position:relative; overflow:hidden;">
+        <div style="position:absolute; bottom:0; left:0; right:0; height:3px; background: linear-gradient(90deg,#ec4899,#f472b6);"></div>
+        <div style="font-size:11px; color:var(--text-3); letter-spacing:.5px; text-transform:uppercase; margin-bottom:4px;">Notebooks</div>
+        <div style="display:flex; align-items:center; gap:7px;">
+          <span style="font-size:13px;">💻</span>
+          <span id="stat-notebooks" style="font-size:22px; font-weight:800; color:#f472b6; line-height:1;">0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Abas de status -->
+    <div style="display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap;">
+      <button id="aba-todos"     class="btn btn-sm btn-primary"    onclick="mudarAba('todos')"     >📄 Todos</button>
+      <button id="aba-pendente"  class="btn btn-sm btn-secondary"  onclick="mudarAba('pendente')"  >⏳ Pendentes</button>
+      <button id="aba-assinado"  class="btn btn-sm btn-secondary"  onclick="mudarAba('assinado')"  >✅ Assinados</button>
+      <button id="aba-devolvido" class="btn btn-sm btn-secondary"  onclick="mudarAba('devolvido')" >📦 Devolvidos</button>
+    </div>
+
+    <!-- Filtros e Lista -->
+    <div class="section-header">
+      <h2 id="titulo-lista">Termos de Compromisso</h2>
+      <div class="flex gap-2">
+        <select id="filtro-tipo" class="select" style="width: auto;" onchange="filtrar()">
+          <option value="">Todos os tipos</option>
+          <option value="celular">Celular</option>
+          <option value="tablet">Tablet</option>
+          <option value="notebook">Notebook</option>
+        </select>
+        <select id="filtro-cidade" class="select" style="width: auto;" onchange="filtrar()">
+          <option value="">Todas as cidades</option>
+        </select>
+        <input id="filtro-busca" type="text" class="input" placeholder="Buscar por nome..." style="width: 200px;" oninput="filtrar()">
+        <a href="/criar.html" class="btn btn-primary btn-sm">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Novo Termo
+        </a>
+      </div>
+    </div>
+
+    <div id="loading" class="loading-screen">
+      <div class="spinner"></div>
+      <span>Carregando termos...</span>
+    </div>
+
+    <div id="termos-container" class="hidden">
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Colaborador</th>
+              <th>Equipamento</th>
+              <th>Tipo</th>
+              <th>Status</th>
+              <th>Devolução</th>
+              <th>Data Criação</th>
+              <th>Assinado em</th>
+              <th style="text-align:right;">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="termos-tbody"></tbody>
+        </table>
+      </div>
+
+      <div id="empty-state" class="empty-state hidden">
+        <div class="empty-state-icon">📭</div>
+        <h3>Nenhum termo encontrado</h3>
+        <p>Crie um novo termo ou ajuste os filtros.</p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal: Link de assinatura -->
+<div id="modal-link" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-title">🔗 Link de Assinatura</div>
+    <div class="modal-subtitle">Copie o link abaixo e envie para o colaborador via WhatsApp ou e-mail.</div>
+
+    <div class="link-box">
+      <div class="link-box-url" id="modal-link-url"></div>
+      <button class="btn btn-sm btn-primary" onclick="copiarLink()">Copiar</button>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="fecharModal('modal-link')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Confirmar exclusão -->
+<div id="modal-excluir" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-title">🗑️ Excluir Termo</div>
+    <div class="modal-subtitle">Tem certeza que deseja excluir este termo? Esta ação não pode ser desfeita.</div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="fecharModal('modal-excluir')">Cancelar</button>
+      <button id="btn-confirmar-excluir" class="btn btn-danger">Excluir</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Verifica autenticação
+  const token = localStorage.getItem('assdoc_token');
+  if (!token) window.location.href = '/index.html';
+  else {
+    try {
+      const _payload = JSON.parse(atob(token.split('.')[1]));
+      if (_payload.role === 'supervisor') window.location.href = '/supervisor.html';
+    } catch {}
+  }
+
+  const usuario = JSON.parse(localStorage.getItem('assdoc_usuario') || '{}');
+  if (usuario.nome) {
+    document.getElementById('user-name').textContent = usuario.nome;
+    document.getElementById('user-initials').textContent = usuario.nome.charAt(0).toUpperCase();
+  }
+
+  let todosTermos = [];
+  let termosExibidos = [];
+  let abaAtiva = 'todos'; // 'todos' | 'pendente' | 'assinado' | 'devolvido'
+
+  function headers() {
+    return { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
+  }
+
+  async function carregarTermos() {
+    try {
+      const res = await fetch('/api/termos', { headers: headers() });
+      if (res.status === 401) { logout(); return; }
+      todosTermos = await res.json();
+      atualizarStats();
+      filtrar();
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('termos-container').classList.remove('hidden');
+    } catch (err) {
+      toast('Erro ao carregar termos', 'error');
+    }
+
+    // Carrega cidades dinamicamente para o filtro
+    try {
+      const resCid = await fetch('/api/cidades', { headers: headers() });
+      const cidades = await resCid.json();
+      const selectCid = document.getElementById('filtro-cidade');
+      const valorAtual = selectCid.value;
+      while (selectCid.options.length > 1) selectCid.remove(1);
+      cidades.sort().forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c; opt.textContent = c;
+        selectCid.appendChild(opt);
+      });
+      if (valorAtual) selectCid.value = valorAtual;
+    } catch {}
+  }
+
+  function atualizarStats() {
+    document.getElementById('stat-total').textContent = todosTermos.length;
+    document.getElementById('stat-pendentes').textContent = todosTermos.filter(t => t.status === 'pendente').length;
+    document.getElementById('stat-assinados').textContent = todosTermos.filter(t => t.status === 'assinado').length;
+    document.getElementById('stat-devolvidos').textContent = todosTermos.filter(t => t.devolvido === true).length;
+    document.getElementById('stat-celulares').textContent = todosTermos.filter(t => t.tipo === 'celular').length;
+    document.getElementById('stat-tablets').textContent = todosTermos.filter(t => t.tipo === 'tablet').length;
+    document.getElementById('stat-notebooks').textContent = todosTermos.filter(t => t.tipo === 'notebook').length;
+  }
+
+  function mudarAba(aba) {
+    abaAtiva = aba;
+
+    // Atualiza visual dos botões
+    ['todos', 'pendente', 'assinado', 'devolvido'].forEach(a => {
+      const btn = document.getElementById(`aba-${a}`);
+      btn.className = `btn btn-sm ${a === aba ? 'btn-primary' : 'btn-secondary'}`;
+    });
+
+    // Atualiza título da lista
+    const titulos = {
+      todos:     'Termos de Compromisso',
+      pendente:  '⏳ Termos Pendentes',
+      assinado:  '✅ Termos Assinados',
+      devolvido: '📦 Equipamentos Devolvidos'
+    };
+    document.getElementById('titulo-lista').textContent = titulos[aba];
+
+    filtrar();
+  }
+
+  function filtrar() {
+    const tipo   = document.getElementById('filtro-tipo').value;
+    const cidade = document.getElementById('filtro-cidade').value;
+    const busca  = document.getElementById('filtro-busca').value.toLowerCase();
+
+    termosExibidos = todosTermos.filter(t => {
+      // Filtro de aba
+      if (abaAtiva === 'todos'    && t.devolvido) return false;
+      if (abaAtiva === 'pendente'  && t.status !== 'pendente') return false;
+      if (abaAtiva === 'assinado'  && (t.status !== 'assinado' || t.devolvido)) return false;
+      if (abaAtiva === 'devolvido' && !t.devolvido) return false;
+
+      // Filtros extras
+      if (tipo   && t.tipo   !== tipo)   return false;
+      if (cidade && t.cidade !== cidade) return false;
+      if (busca  && !t.colaborador_nome.toLowerCase().includes(busca) &&
+          !((t.cidade || '')).toLowerCase().includes(busca) &&
+          !(t.equipamento_marca + ' ' + t.equipamento_modelo).toLowerCase().includes(busca)) return false;
+
+      return true;
+    });
+
+    renderTabela();
+  }
+
+  function renderTabela() {
+    const tbody = document.getElementById('termos-tbody');
+    const emptyState = document.getElementById('empty-state');
+
+    if (termosExibidos.length === 0) {
+      tbody.innerHTML = '';
+      emptyState.classList.remove('hidden');
+      return;
+    }
+
+    emptyState.classList.add('hidden');
+
+    tbody.innerHTML = termosExibidos.map(t => {
+      const criadoEm   = new Date(t.criado_em).toLocaleDateString('pt-BR');
+      const assinadoEm = t.assinado_em ? new Date(t.assinado_em).toLocaleDateString('pt-BR') : '—';
+      const tipoEmoji  = { celular: '📱', tablet: '📲', notebook: '💻' }[t.tipo] || '📱';
+      const tipoLabel  = { celular: 'Celular', tablet: 'Tablet', notebook: 'Notebook' }[t.tipo] || t.tipo;
+      const tipoBadgeClass = { celular: 'badge-celular', tablet: 'badge-tablet', notebook: 'badge-notebook' }[t.tipo] || 'badge-celular';
+
+      // Badge de status
+      let statusBadge;
+      if (t.devolvido) {
+        statusBadge = `<span class="badge badge-assinado" style="background:rgba(16,185,129,0.15);color:#10b981;">📦 Devolvido</span>`;
+      } else if (t.status === 'assinado') {
+        statusBadge = `<span class="badge badge-assinado">✅ Assinado</span>`;
+      } else {
+        statusBadge = `<span class="badge badge-pendente">⏳ Pendente</span>`;
+      }
+
+      // Coluna devolução
+      let devCol;
+      if (t.devolvido) {
+        const dataDev = t.data_devolucao_real
+          ? new Date(t.data_devolucao_real + 'T12:00:00').toLocaleDateString('pt-BR')
+          : '—';
+        devCol = `<div style="font-size:13px;color:#10b981;font-weight:600;">✅ Devolvido</div>
+                  <div style="font-size:11px;color:var(--text-3);">${dataDev}</div>`;
+      } else if (t.status === 'assinado') {
+        devCol = `<span style="font-size:12px;color:var(--text-3);">Não devolvido</span>`;
+      } else {
+        devCol = `<span style="font-size:12px;color:var(--text-3);">—</span>`;
+      }
+
+      return `
+        <tr>
+          <td>
+            <div style="font-weight: 600">${t.colaborador_nome}</div>
+            <div style="font-size: 12px; color: var(--text-3)">${t.cargo || 'N/A'} · ${t.departamento || ''} · 📍 ${t.cidade || 'N/A'}</div>
+          </td>
+          <td>
+            <div>${t.equipamento_marca} ${t.equipamento_modelo}</div>
+            <div style="font-size: 12px; color: var(--text-3)">${t.equipamento_serie_imei || '—'}</div>
+          </td>
+          <td><span class="badge ${tipoBadgeClass}">${tipoEmoji} ${tipoLabel}</span></td>
+          <td>${statusBadge}</td>
+          <td>${devCol}</td>
+          <td style="color: var(--text-2); font-size: 13px">${criadoEm}</td>
+          <td style="color: var(--text-2); font-size: 13px">${assinadoEm}</td>
+          <td style="text-align: right;">
+            <div class="flex gap-2" style="justify-content: flex-end;">
+              <button class="btn btn-sm btn-ghost" title="Copiar link" onclick="abrirModalLink('${t.token_unico}')">🔗</button>
+              <a href="/visualizar.html?id=${t._id}" class="btn btn-sm btn-secondary" title="Visualizar">👁️</a>
+              <button class="btn btn-sm btn-danger" title="Excluir" onclick="confirmarExcluir('${t._id}')">🗑️</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function abrirModalLink(token) {
+    const link = `${window.location.protocol}//${window.location.host}/assinar.html?token=${token}`;
+    document.getElementById('modal-link-url').textContent = link;
+    document.getElementById('modal-link-url').dataset.link = link;
+    document.getElementById('modal-link').classList.add('open');
+  }
+
+  function copiarLink() {
+    const url = document.getElementById('modal-link-url').dataset.link;
+    navigator.clipboard.writeText(url).then(() => toast('Link copiado!', 'success'));
+  }
+
+  function fecharModal(id) {
+    document.getElementById(id).classList.remove('open');
+  }
+
+  let idParaExcluir = null;
+  function confirmarExcluir(id) {
+    idParaExcluir = id;
+    document.getElementById('modal-excluir').classList.add('open');
+    document.getElementById('btn-confirmar-excluir').onclick = excluir;
+  }
+
+  async function excluir() {
+    try {
+      const res = await fetch(`/api/termos/${idParaExcluir}`, { method: 'DELETE', headers: headers() });
+      if (res.ok) {
+        fecharModal('modal-excluir');
+        toast('Termo excluído com sucesso', 'success');
+        await carregarTermos();
+      } else {
+        toast('Erro ao excluir termo', 'error');
+      }
+    } catch {
+      toast('Erro de conexão', 'error');
+    }
+  }
+
+  function logout() {
+    localStorage.removeItem('assdoc_token');
+    localStorage.removeItem('assdoc_usuario');
+    window.location.href = '/index.html';
+  }
+
+  function toast(msg, tipo = 'info') {
+    const c = document.getElementById('toast-container');
+    const t = document.createElement('div');
+    t.className = `toast toast-${tipo}`;
+    t.innerHTML = `<span>${tipo === 'success' ? '✅' : tipo === 'error' ? '❌' : 'ℹ️'}</span> ${msg}`;
+    c.appendChild(t);
+    setTimeout(() => {
+      t.style.animation = 'fadeOut 0.3s ease forwards';
+      setTimeout(() => t.remove(), 300);
+    }, 3500);
+  }
+
+  // Fechar modal ao clicar fora
+  document.querySelectorAll('.modal-overlay').forEach(m => {
+    m.addEventListener('click', e => { if (e.target === m) fecharModal(m.id); });
+  });
+
+  carregarTermos();
+</script>
+</body>
+</html>

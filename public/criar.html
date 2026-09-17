@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TermoEP — Criar Termo</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="toast-container"></div>
+
+  <div class="page-wrapper">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-icon"><img src="/termoep_logo.jpg" alt="TermoEP"></div>
+        <div class="sidebar-logo-text"><span style="color:#00D4FF">Termo</span><span style="color:white;font-weight:900">EP</span></div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="/dashboard.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7" />
+            <rect x="14" y="3" width="7" height="7" />
+            <rect x="3" y="14" width="7" height="7" />
+            <rect x="14" y="14" width="7" height="7" />
+          </svg>
+          Dashboard
+        </a>
+        <a href="/criar.html" class="nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          Novo Termo
+        </a>
+        <a href="/cidades.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Por Cidade
+        </a>
+        <a href="/usuarios.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Usuários
+        </a>
+        <a href="/configuracoes.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Configurações
+        </a>
+        <a href="/conta.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Minha Conta
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <div class="user-avatar" id="user-initials">A</div>
+          <div>
+            <div class="user-name" id="user-name">Admin</div>
+            <div class="user-role">Administrador</div>
+          </div>
+        </div>
+        <button class="nav-item" onclick="logout()" style="margin-top:4px; color: var(--danger);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+          Sair
+        </button>
+      </div>
+    </aside>
+
+    <!-- Conteúdo -->
+    <main class="main-content">
+      <div class="flex items-center gap-3 mb-4">
+        <a href="/dashboard.html" class="btn btn-ghost btn-sm">← Voltar</a>
+      </div>
+      <div class="page-title">Novo Termo de Compromisso</div>
+      <div class="page-subtitle">Preencha todos os campos para gerar o termo e o link de assinatura.</div>
+
+      <form id="form-termo" onsubmit="criarTermo(event)" enctype="multipart/form-data">
+
+        <!-- STEP 1: Tipo do equipamento -->
+        <div class="card" style="margin-bottom: 20px;">
+          <h3 style="margin-bottom: 16px;">1. Tipo de Equipamento</h3>
+          <div class="tipo-selector" style="grid-template-columns: repeat(3, 1fr);">
+            <div class="tipo-option selected" id="tipo-celular" onclick="selecionarTipo('celular')">
+              <div class="tipo-option-icon">📱</div>
+              <div class="tipo-option-label">Celular</div>
+              <div class="tipo-option-desc">Smartphone corporativo</div>
+            </div>
+            <div class="tipo-option" id="tipo-tablet" onclick="selecionarTipo('tablet')">
+              <div class="tipo-option-icon">📲</div>
+              <div class="tipo-option-label">Tablet</div>
+              <div class="tipo-option-desc">Tablet corporativo</div>
+            </div>
+            <div class="tipo-option" id="tipo-notebook" onclick="selecionarTipo('notebook')">
+              <div class="tipo-option-icon">💻</div>
+              <div class="tipo-option-label">Notebook</div>
+              <div class="tipo-option-desc">Computador portátil</div>
+            </div>
+          </div>
+          <input type="hidden" id="tipo" name="tipo" value="celular">
+        </div>
+
+        <!-- STEP 2: Empresa Emissora -->
+        <div class="card" style="margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="margin: 0;">🏢 2. Empresa Emissora</h3>
+            <span class="badge badge-info" style="font-size: 11px;">⚡ Preenchimento Automático</span>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group full">
+              <label for="empresa_select">Selecione a Empresa *</label>
+              <select id="empresa_select" name="empresa_select" class="select" onchange="selecionarEmpresa(this.value)" required>
+                <option value="" disabled selected>Carregando empresas...</option>
+              </select>
+            </div>
+
+            <div class="form-group full">
+              <label for="empresa_razao_social">Razão Social *</label>
+              <input id="empresa_razao_social" name="empresa_razao_social" type="text" class="input" placeholder="Razão Social da empresa" required>
+            </div>
+
+            <div class="form-group">
+              <label for="empresa_cnpj">CNPJ *</label>
+              <input id="empresa_cnpj" name="empresa_cnpj" type="text" class="input" placeholder="00.000.000/0000-00" required>
+            </div>
+
+            <div class="form-group">
+              <label for="empresa_cep">CEP</label>
+              <input id="empresa_cep" name="empresa_cep" type="text" class="input" placeholder="00000-000">
+            </div>
+
+            <div class="form-group full">
+              <label for="empresa_endereco">Endereço (Logradouro e Número)</label>
+              <input id="empresa_endereco" name="empresa_endereco" type="text" class="input" placeholder="Rua / Avenida, Número">
+            </div>
+
+            <div class="form-group">
+              <label for="empresa_bairro">Bairro</label>
+              <input id="empresa_bairro" name="empresa_bairro" type="text" class="input" placeholder="Bairro">
+            </div>
+
+            <div class="form-group">
+              <label>Cidade / UF</label>
+              <div style="display: flex; gap: 8px;">
+                <input id="empresa_cidade" name="empresa_cidade" type="text" class="input" style="flex: 2;" placeholder="Cidade">
+                <input id="empresa_uf" name="empresa_uf" type="text" class="input" style="flex: 1;" placeholder="UF" maxlength="2">
+              </div>
+            </div>
+          </div>
+          <input type="hidden" id="empresa_id" name="empresa_id" value="">
+          <input type="hidden" id="empresa_nome" name="empresa_nome" value="">
+        </div>
+
+        <!-- STEP 3: Dados do colaborador -->
+        <div class="card" style="margin-bottom: 20px;">
+          <h3 style="margin-bottom: 16px;">👤 3. Dados do Colaborador</h3>
+          <div class="form-grid">
+            <div class="form-group full">
+              <label for="colaborador_nome">Nome Completo *</label>
+              <input id="colaborador_nome" name="colaborador_nome" type="text" class="input"
+                placeholder="Ex: João da Silva" required>
+            </div>
+            <div class="form-group full">
+              <label for="colaborador_email">E-mail do Colaborador <span style="color:var(--text-3);font-size:12px;">(para envio do link de assinatura)</span></label>
+              <input id="colaborador_email" name="colaborador_email" type="email" class="input"
+                placeholder="Ex: joao.silva@empresa.com">
+            </div>
+            <div class="form-group">
+              <label for="cidade">Cidade do Colaborador *</label>
+              <select id="cidade" name="cidade" class="select" required>
+                <option value="" disabled selected>Carregando cidades...</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="colaborador_matricula">Matrícula</label>
+              <input id="colaborador_matricula" name="colaborador_matricula" type="text" class="input"
+                placeholder="Ex: 00123">
+            </div>
+            <div class="form-group">
+              <label for="cargo">Cargo</label>
+              <input id="cargo" name="cargo" type="text" class="input" placeholder="Ex: Analista de TI">
+            </div>
+            <div class="form-group">
+              <label for="departamento">Departamento</label>
+              <select id="departamento" name="departamento" class="select">
+                <option value="">Carregando departamentos...</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 4: Dados do equipamento -->
+        <div class="card" style="margin-bottom: 20px;">
+          <h3 style="margin-bottom: 16px;">💻 4. Dados do Equipamento</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="equipamento_marca">Marca *</label>
+              <input id="equipamento_marca" name="equipamento_marca" type="text" class="input"
+                placeholder="Ex: Samsung / Apple / Dell" required>
+            </div>
+            <div class="form-group">
+              <label for="equipamento_modelo">Modelo *</label>
+              <input id="equipamento_modelo" name="equipamento_modelo" type="text" class="input"
+                placeholder="Ex: Galaxy S24 / iPhone 15" required>
+            </div>
+            <div class="form-group">
+              <label for="equipamento_serie_imei">Nº de Série / IMEI</label>
+              <input id="equipamento_serie_imei" name="equipamento_serie_imei" type="text" class="input"
+                placeholder="Ex: 356938035643809">
+            </div>
+            <div class="form-group">
+              <label for="numero_patrimonio">Número de Patrimônio</label>
+              <input id="numero_patrimonio" name="numero_patrimonio" type="text" class="input"
+                placeholder="Ex: PAT-00456">
+            </div>
+            <div class="form-group">
+              <label for="numero_ti">Número da T.I</label>
+              <input id="numero_ti" name="numero_ti" type="text" class="input" placeholder="Ex: TI-00789">
+            </div>
+            <div class="form-group">
+              <label for="data_entrega">Data de Entrega</label>
+              <input id="data_entrega" name="data_entrega" type="date" class="input">
+            </div>
+
+          </div>
+
+          <!-- Upload de foto -->
+          <div class="form-group" style="margin-top: 16px;">
+            <label>Foto do Equipamento</label>
+            <div class="upload-area" id="upload-area">
+              <input type="file" name="foto" id="foto-input" accept="image/*" onchange="previewFoto(event)">
+              <div class="upload-icon">📷</div>
+              <div class="upload-text">
+                <strong>Clique para selecionar</strong> ou arraste a foto aqui
+              </div>
+              <div class="text-sm text-muted mt-2">JPG, PNG, WEBP — máx. 5MB</div>
+              <img id="foto-preview" class="upload-preview" alt="Preview">
+            </div>
+          </div>
+        </div>
+
+        <!-- Erro geral -->
+        <div id="form-error" class="alert alert-error hidden" style="margin-bottom: 16px;">
+          <span>⚠️</span>
+          <span id="form-error-msg"></span>
+        </div>
+
+        <!-- Ações -->
+        <div class="flex gap-3" style="justify-content: flex-end;">
+          <a href="/dashboard.html" class="btn btn-secondary">Cancelar</a>
+          <button id="btn-criar" type="submit" class="btn btn-primary btn-lg">
+            📋 Criar Termo e Gerar Link
+          </button>
+        </div>
+      </form>
+    </main>
+  </div>
+
+  <!-- Modal: Sucesso + link -->
+  <div id="modal-sucesso" class="modal-overlay">
+    <div class="modal" style="max-width: 580px;">
+      <div style="text-align: center; margin-bottom: 24px;">
+        <div style="font-size: 56px; margin-bottom: 12px;">🎉</div>
+        <div class="modal-title">Termo criado com sucesso!</div>
+        <div class="modal-subtitle">Copie o link abaixo e envie para o colaborador assinar.</div>
+      </div>
+
+      <div class="alert alert-info" style="margin-bottom: 16px;">
+        ℹ️ O link é único e pode ser acessado de qualquer dispositivo (celular, tablet ou computador).
+      </div>
+
+      <div class="link-box">
+        <div class="link-box-url" id="sucesso-link-url"></div>
+        <button class="btn btn-sm btn-primary" onclick="copiarLinkSucesso()">Copiar</button>
+      </div>
+
+      <!-- Envio por email -->
+      <div id="email-section" style="margin-top:16px; display:none;">
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <input id="email-destinatario" type="email" class="input" style="flex:1; min-width:200px;"
+            placeholder="email@colaborador.com">
+          <button class="btn btn-primary" id="btn-enviar-email" onclick="enviarEmail()">
+            📧 Enviar Link por E-mail
+          </button>
+        </div>
+        <div id="email-status" style="margin-top:8px; font-size:13px;"></div>
+      </div>
+      <div id="email-nao-configurado" style="margin-top:16px; display:none;">
+        <div class="alert alert-info" style="font-size:13px;">
+          ℹ️ Para enviar por e-mail, configure as variáveis SMTP no arquivo <strong>.env</strong> e reinicie o servidor.
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <a href="/dashboard.html" class="btn btn-secondary">Ver Dashboard</a>
+        <button class="btn btn-primary" onclick="novoTermo()">Criar Outro Termo</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('assdoc_token');
+    if (!token) window.location.href = '/index.html';
+
+    // Supervisor não tem acesso a criar termos
+    try {
+      const _payload = JSON.parse(atob(token.split('.')[1]));
+      if (_payload.role === 'supervisor') window.location.href = '/supervisor.html';
+    } catch {}
+
+    const usuario = JSON.parse(localStorage.getItem('assdoc_usuario') || '{}');
+    if (usuario.nome) {
+      document.getElementById('user-name').textContent = usuario.nome;
+      document.getElementById('user-initials').textContent = usuario.nome.charAt(0).toUpperCase();
+    }
+
+    // Define data de hoje como padrão
+    const hoje = new Date().toISOString().split('T')[0];
+    document.getElementById('data_entrega').value = hoje;
+
+    // ─── Carregar dados dinâmicos da API ─────────────────────────
+    let dadosEmpresas = {};
+
+    async function carregarDadosDinamicos() {
+      try {
+        // Empresas
+        const resEmp = await fetch('/api/empresas', { headers: { 'Authorization': `Bearer ${token}` } });
+        const empresas = await resEmp.json();
+        dadosEmpresas = {};
+        const selectEmp = document.getElementById('empresa_select');
+        selectEmp.innerHTML = '<option value="" disabled selected>Selecione a Empresa</option>';
+        empresas.forEach(e => {
+          dadosEmpresas[e.id] = { ...e, cidade_colaborador: e.cidade };
+          const opt = document.createElement('option');
+          opt.value = e.id;
+          opt.textContent = e.nome;
+          selectEmp.appendChild(opt);
+        });
+        const optOutra = document.createElement('option');
+        optOutra.value = 'outra';
+        optOutra.textContent = 'Outra / Personalizada';
+        selectEmp.appendChild(optOutra);
+      } catch (err) { console.warn('Erro ao carregar empresas:', err); }
+
+      try {
+        // Departamentos
+        const resDep = await fetch('/api/departamentos', { headers: { 'Authorization': `Bearer ${token}` } });
+        const deps = await resDep.json();
+        const selectDep = document.getElementById('departamento');
+        selectDep.innerHTML = '<option value="">Selecione o Departamento</option>';
+        deps.sort().forEach(d => {
+          const opt = document.createElement('option');
+          opt.value = d; opt.textContent = d;
+          selectDep.appendChild(opt);
+        });
+      } catch (err) { console.warn('Erro ao carregar departamentos:', err); }
+
+      try {
+        // Cidades
+        const resCid = await fetch('/api/cidades', { headers: { 'Authorization': `Bearer ${token}` } });
+        const cidades = await resCid.json();
+        const selectCid = document.getElementById('cidade');
+        selectCid.innerHTML = '<option value="" disabled selected>Selecione a Cidade</option>';
+        cidades.sort().forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c; opt.textContent = c;
+          selectCid.appendChild(opt);
+        });
+      } catch (err) { console.warn('Erro ao carregar cidades:', err); }
+    }
+
+    carregarDadosDinamicos();
+
+    function selecionarEmpresa(val) {
+      const emp = dadosEmpresas[val];
+      if (emp) {
+        document.getElementById('empresa_id').value = emp.id;
+        document.getElementById('empresa_nome').value = emp.nome;
+        document.getElementById('empresa_razao_social').value = emp.razao_social;
+        document.getElementById('empresa_cnpj').value = emp.cnpj;
+        document.getElementById('empresa_endereco').value = emp.endereco;
+        document.getElementById('empresa_bairro').value = emp.bairro;
+        document.getElementById('empresa_cidade').value = emp.cidade;
+        document.getElementById('empresa_uf').value = emp.uf;
+        document.getElementById('empresa_cep').value = emp.cep;
+
+        // Sugere automaticamente a cidade no campo do colaborador
+        const cidadeSel = document.getElementById('cidade');
+        if (cidadeSel && emp.cidade_colaborador) {
+          cidadeSel.value = emp.cidade_colaborador;
+        }
+      } else if (val === 'outra') {
+        document.getElementById('empresa_id').value = 'outra';
+        document.getElementById('empresa_nome').value = 'Outra';
+        document.getElementById('empresa_razao_social').value = '';
+        document.getElementById('empresa_cnpj').value = '';
+        document.getElementById('empresa_endereco').value = '';
+        document.getElementById('empresa_bairro').value = '';
+        document.getElementById('empresa_cidade').value = '';
+        document.getElementById('empresa_uf').value = '';
+        document.getElementById('empresa_cep').value = '';
+        document.getElementById('empresa_razao_social').focus();
+      }
+    }
+
+    function selecionarTipo(tipo) {
+      document.getElementById('tipo').value = tipo;
+      document.getElementById('tipo-celular').classList.toggle('selected', tipo === 'celular');
+      document.getElementById('tipo-tablet').classList.toggle('selected', tipo === 'tablet');
+      document.getElementById('tipo-notebook').classList.toggle('selected', tipo === 'notebook');
+    }
+
+
+    function previewFoto(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = document.getElementById('foto-preview');
+        img.src = e.target.result;
+        img.style.display = 'block';
+        document.querySelector('.upload-icon').style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Drag and drop
+    const uploadArea = document.getElementById('upload-area');
+    uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('drag-over'); });
+    uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('drag-over'));
+    uploadArea.addEventListener('drop', e => {
+      e.preventDefault();
+      uploadArea.classList.remove('drag-over');
+      const file = e.dataTransfer.files[0];
+      if (file) {
+        document.getElementById('foto-input').files = e.dataTransfer.files;
+        previewFoto({ target: { files: [file] } });
+      }
+    });
+
+    async function criarTermo(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-criar');
+      const erroDiv = document.getElementById('form-error');
+      const erroMsg = document.getElementById('form-error-msg');
+
+      btn.disabled = true;
+      btn.textContent = 'Criando...';
+      erroDiv.classList.add('hidden');
+
+      const formData = new FormData(document.getElementById('form-termo'));
+
+      try {
+        const res = await fetch('/api/termos', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` },
+          body: formData
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          erroMsg.textContent = data.erro || 'Erro ao criar termo.';
+          erroDiv.classList.remove('hidden');
+          return;
+        }
+
+        document.getElementById('sucesso-link-url').textContent = data.linkAssinatura;
+        document.getElementById('sucesso-link-url').dataset.link = data.linkAssinatura;
+        document.getElementById('sucesso-link-url').dataset.id = data.id;
+
+        // Pré-preenche email do colaborador se informado
+        const emailColaborador = document.getElementById('colaborador_email').value.trim();
+        if (emailColaborador) {
+          document.getElementById('email-destinatario').value = emailColaborador;
+        }
+
+        // Verifica se email está configurado no servidor
+        fetch('/api/email/status', { headers: { 'Authorization': `Bearer ${token}` } })
+          .then(r => r.json())
+          .then(cfg => {
+            if (cfg.configurado) {
+              document.getElementById('email-section').style.display = 'block';
+            } else {
+              document.getElementById('email-nao-configurado').style.display = 'block';
+            }
+          }).catch(() => {});
+
+        document.getElementById('modal-sucesso').classList.add('open');
+
+      } catch (err) {
+        erroMsg.textContent = 'Erro de conexão com o servidor.';
+        erroDiv.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '📋 Criar Termo e Gerar Link';
+      }
+    }
+
+    function copiarLinkSucesso() {
+      const url = document.getElementById('sucesso-link-url').dataset.link;
+      navigator.clipboard.writeText(url).then(() => toast('Link copiado!', 'success'));
+    }
+
+    async function enviarEmail() {
+      const email = document.getElementById('email-destinatario').value.trim();
+      const id = document.getElementById('sucesso-link-url').dataset.id;
+      const btn = document.getElementById('btn-enviar-email');
+      const statusEl = document.getElementById('email-status');
+
+      if (!email) { statusEl.innerHTML = '<span style="color:#f59e0b;">Por favor, informe o e-mail do destinatário.</span>'; return; }
+
+      btn.disabled = true;
+      btn.textContent = 'Enviando...';
+      statusEl.textContent = '';
+
+      try {
+        const res = await fetch(`/api/termos/${id}/enviar-email`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          statusEl.innerHTML = `<span style="color:#10b981;">✅ E-mail enviado para <strong>${email}</strong>!</span>`;
+          btn.textContent = '✅ Enviado!';
+        } else {
+          statusEl.innerHTML = `<span style="color:#ef4444;">❌ ${data.erro || 'Erro ao enviar e-mail.'}</span>`;
+          btn.disabled = false;
+          btn.textContent = '📧 Enviar Link por E-mail';
+        }
+      } catch {
+        statusEl.innerHTML = '<span style="color:#ef4444;">❌ Erro de conexão.</span>';
+        btn.disabled = false;
+        btn.textContent = '📧 Enviar Link por E-mail';
+      }
+    }
+
+    function novoTermo() {
+      document.getElementById('modal-sucesso').classList.remove('open');
+      document.getElementById('form-termo').reset();
+      selecionarTipo('celular');
+      document.getElementById('foto-preview').style.display = 'none';
+      document.querySelector('.upload-icon').style.display = 'block';
+      document.getElementById('data_entrega').value = hoje;
+    }
+
+    function logout() {
+      localStorage.removeItem('assdoc_token');
+      localStorage.removeItem('assdoc_usuario');
+      window.location.href = '/index.html';
+    }
+
+    function toast(msg, tipo = 'info') {
+      const c = document.getElementById('toast-container');
+      const t = document.createElement('div');
+      t.className = `toast toast-${tipo}`;
+      t.innerHTML = `<span>${tipo === 'success' ? '✅' : '❌'}</span> ${msg}`;
+      c.appendChild(t);
+      setTimeout(() => { t.style.animation = 'fadeOut 0.3s ease forwards'; setTimeout(() => t.remove(), 300); }, 3500);
+    }
+  </script>
+</body>
+
+</html>
+
