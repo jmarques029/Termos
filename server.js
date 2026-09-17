@@ -582,7 +582,8 @@ app.post('/api/termos', autenticar, upload.single('foto'), async (req, res) => {
       criado_em: new Date().toISOString()
     });
 
-    const linkAssinatura = `${req.protocol}://${req.get('host')}/assinar.html?token=${token_unico}`;
+    const BASE_URL = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+    const linkAssinatura = `${BASE_URL}/assinar.html?token=${token_unico}`;
 
     res.status(201).json({ termo, linkAssinatura });
   } catch (err) {
@@ -928,8 +929,9 @@ app.post('/api/termos/:id/enviar-email', autenticar, async (req, res) => {
     const termo = await termos.findOne({ _id: req.params.id });
     if (!termo) return res.status(404).json({ erro: 'Termo não encontrado.' });
 
-    const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
-    const linkAssinatura = `${BASE_URL}/assinar.html?token=${termo.token_assinatura}`;
+    const BASE_URL = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+    const token = termo.token_unico || termo.token_assinatura;
+    const linkAssinatura = `${BASE_URL}/assinar.html?token=${token}`;
 
     const html = `
 <!DOCTYPE html>

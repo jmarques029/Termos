@@ -86,6 +86,9 @@ nano .env
 Ajuste as configurações no editor:
 
 ```dotenv
+# URL base do sistema para links de assinatura e e-mails
+BASE_URL=http://10.32.83.20:3000
+
 # Caminho interno do banco de dados no container (mantenha como /app/database)
 DB_PATH=/app/database
 
@@ -93,7 +96,7 @@ DB_PATH=/app/database
 MICROSOFT_CLIENT_ID=
 MICROSOFT_CLIENT_SECRET=
 MICROSOFT_TENANT_ID=common
-MICROSOFT_REDIRECT_URI=http://192.168.X.X:3000/api/auth/microsoft/callback
+MICROSOFT_REDIRECT_URI=http://10.32.83.20:3000/api/auth/microsoft/callback
 
 # Configurações de envio de e-mail (SMTP)
 SMTP_HOST=smtp.gmail.com
@@ -137,16 +140,10 @@ sudo ufw allow 3000/tcp
 sudo ufw reload
 ```
 
-### 2. Descubra o IP local do servidor:
-```bash
-hostname -I
-```
-*(Exemplo: `192.168.1.150`)*
-
-### 3. Acesse no navegador:
+### 2. Acesse no navegador:
 Em qualquer computador da rede interna ou VPN, abra o navegador e acesse:
 ```
-http://192.168.1.150:3000
+http://10.32.83.20:3000
 ```
 * **Login inicial**: `admin@empresa.com`
 * **Senha inicial**: `admin123`
