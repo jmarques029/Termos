@@ -229,27 +229,30 @@
             </div>
 
             <!-- Botões de ação direta no Celular e PC -->
-            <div style="display: flex; flex-direction: column; gap: 10px; max-width: 340px; margin: 0 auto 14px auto;">
-              <!-- Câmera Frontal (Selfie) -->
-              <label class="btn btn-primary btn-lg" style="cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 15px; font-weight: 700; width: 100%;">
-                🤳 Tirar Foto com a Câmera
-                <input type="file" id="input-foto-user" accept="image/*" capture="user" style="position: absolute; opacity: 0; width: 0.1px; height: 0.1px; overflow: hidden;" onchange="carregarFotoCelular(event)">
-              </label>
+            <div style="display: flex; flex-direction: column; gap: 12px; max-width: 360px; margin: 0 auto 14px auto;">
+              
+              <!-- Botão 1: Câmera Nativa (Celular e Notebook) -->
+              <div style="position: relative; overflow: hidden; border-radius: var(--radius); width: 100%; box-shadow: 0 4px 14px rgba(0, 212, 255, 0.25);">
+                <button type="button" class="btn btn-primary btn-lg" style="width: 100%; pointer-events: none; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 16px; font-weight: 700; padding: 14px 18px;">
+                  📸 Tirar Foto com a Câmera
+                </button>
+                <input type="file" id="input-foto-camera" accept="image/*" capture="camera" 
+                  style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10;" 
+                  onchange="carregarFotoCelular(event)">
+              </div>
 
-              <!-- Câmera Traseira -->
-              <label class="btn btn-secondary btn-md" style="cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; font-weight: 600; width: 100%;">
-                📷 Câmera Traseira / Ambiente
-                <input type="file" id="input-foto-env" accept="image/*" capture="environment" style="position: absolute; opacity: 0; width: 0.1px; height: 0.1px; overflow: hidden;" onchange="carregarFotoCelular(event)">
-              </label>
+              <!-- Botão 2: Galeria / Arquivos -->
+              <div style="position: relative; overflow: hidden; border-radius: var(--radius); width: 100%;">
+                <button type="button" class="btn btn-secondary btn-md" style="width: 100%; pointer-events: none; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; font-weight: 600; padding: 12px 18px;">
+                  📁 Escolher Foto da Galeria / Arquivo
+                </button>
+                <input type="file" id="input-foto-galeria" accept="image/*" 
+                  style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10;" 
+                  onchange="carregarFotoCelular(event)">
+              </div>
 
-              <!-- Galeria de Fotos / Arquivo -->
-              <label class="btn btn-ghost btn-sm" style="cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px; width: 100%;">
-                📁 Escolher da Galeria / Arquivos
-                <input type="file" id="input-foto-arquivo" accept="image/*" style="position: absolute; opacity: 0; width: 0.1px; height: 0.1px; overflow: hidden;" onchange="carregarFotoCelular(event)">
-              </label>
-
-              <!-- Opção Webcam ao Vivo (PC) -->
-              <button class="btn btn-ghost btn-xs" id="btn-webcam-pc" type="button" onclick="iniciarCameraStream()" style="margin-top: 4px; color: var(--text-3); font-size: 12px;">
+              <!-- Opção Webcam ao Vivo no Computador -->
+              <button class="btn btn-ghost btn-sm" id="btn-webcam-pc" type="button" onclick="iniciarCameraStream()" style="color: var(--primary-light); font-size: 13px; padding: 8px;">
                 🎥 Abrir Webcam ao Vivo no Navegador
               </button>
             </div>
@@ -259,6 +262,7 @@
             <!-- QR Code Fallback para abrir no celular se estiver no PC -->
             <div id="qr-container" style="display: none; flex-direction: column; align-items: center; gap: 6px; margin-top: 16px; border-top: 1px solid var(--border); padding-top: 14px;">
               <p class="text-xs" style="color: var(--primary-light); font-weight: 600;">📱 Abrir direto no Celular</p>
+              <p class="text-xs text-muted" style="max-width: 300px; margin-bottom: 6px;">Aponte a câmera do seu celular para o QR Code para assinar facilmente pelo celular:</p>
               <div id="qrcode-box" style="padding: 8px; background: white; border-radius: var(--radius-sm); display: inline-block;"></div>
             </div>
           </div>
@@ -539,9 +543,12 @@
       areaDesenho.classList.add('hidden');
       areaFoto.classList.remove('hidden');
       
+      // Se não for celular (Notebook / PC):
       if (!isDispositivoMovel()) {
         mostrarQRCode();
-        if (window.location.protocol === 'http:') {
+        if (window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          iniciarCameraStream();
+        } else {
           const banner = document.getElementById('banner-https-pc');
           if (banner) banner.style.display = 'block';
         }
@@ -586,18 +593,22 @@
     const status = document.getElementById('camera-status');
     const msgErro = document.getElementById('msg-erro-camera');
 
-    msgErro.style.display = 'none';
+    if (msgErro) msgErro.style.display = 'none';
 
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      msgErro.innerHTML = `
-        <div style="font-weight:700; margin-bottom:6px;">🔒 Webcam bloqueada pelo navegador em conexões HTTP.</div>
-        <div style="font-size:12px; line-height:1.6; margin-bottom:8px;">O Chrome e o Edge exigem conexão HTTPS para transmitir a webcam ao vivo.</div>
-        <button type="button" class="btn btn-sm btn-primary" onclick="alternarParaHttps()" style="width:100%; margin-bottom:6px;">
-          🔒 Abrir em Modo HTTPS Seguro (Recomendado)
-        </button>
-        <div style="font-size:11px; color:var(--text-3);">Ou utilize os botões de foto/anexo acima.</div>
-      `;
-      msgErro.style.display = 'block';
+      if (msgErro) {
+        msgErro.innerHTML = `
+          <div style="font-weight:700; color:#f59e0b; margin-bottom:6px;">🔒 Webcam ao vivo bloqueada em conexões HTTP.</div>
+          <div style="font-size:12px; line-height:1.6; margin-bottom:10px; color:var(--text-2);">
+            O navegador exige modo seguro (HTTPS) para transmitir o vídeo da webcam ao vivo.
+          </div>
+          <button type="button" class="btn btn-sm btn-primary" onclick="alternarParaHttps()" style="width:100%; margin-bottom:8px; font-weight:700;">
+            🔒 Ativar Câmera (Abrir com HTTPS Seguro)
+          </button>
+          <div style="font-size:11px; color:var(--text-3);">Ou use a câmera do seu celular no QR Code abaixo.</div>
+        `;
+        msgErro.style.display = 'block';
+      }
       mostrarQRCode();
       return;
     }
@@ -605,7 +616,7 @@
     try {
       status.textContent = 'Solicitando acesso à webcam...';
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { width: { ideal: 1280 }, height: { ideal: 720 } },
+        video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' },
         audio: false
       });
       streamCandidato = stream;
@@ -617,9 +628,24 @@
       boxStream.style.display = 'block';
       status.textContent = 'Câmera ao vivo ativa';
     } catch (err) {
-      console.warn('Falha ao abrir stream de vídeo:', err);
-      msgErro.innerHTML = '⚠️ Não foi possível abrir a transmissão da webcam. Verifique se outro aplicativo (Teams, Meet) está usando a câmera ou utilize os botões de envio acima.';
-      msgErro.style.display = 'block';
+      console.warn('Tentativa com constraints falhou, tentando modo genérico:', err);
+      try {
+        const stream2 = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        streamCandidato = stream2;
+        video.srcObject = stream2;
+        video.onloadedmetadata = () => video.play().catch(() => {});
+        boxOptions.style.display = 'none';
+        boxPreview.style.display = 'none';
+        boxStream.style.display = 'block';
+        status.textContent = 'Câmera ao vivo ativa';
+      } catch (err2) {
+        console.error('Falha geral ao acessar webcam:', err2);
+        if (msgErro) {
+          msgErro.innerHTML = '⚠️ Não foi possível abrir a webcam. Verifique se outro aplicativo (como Microsoft Teams, Meet, Zoom) está usando a câmera ou se a permissão foi negada no navegador.';
+          msgErro.style.display = 'block';
+        }
+        status.textContent = 'Webcam indisponível';
+      }
     }
   }
 
@@ -716,18 +742,25 @@
     fotoBase64 = null;
     pararCamera();
     
-    ['input-foto-user', 'input-foto-env', 'input-foto-arquivo'].forEach(id => {
+    ['input-foto-camera', 'input-foto-galeria', 'input-foto-user', 'input-foto-env', 'input-foto-arquivo'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
 
     const imgCapturada = document.getElementById('img-capturada');
-    if (imgCapturada) imgCapturada.src = '';
+    if (imgCapturada) {
+      imgCapturada.src = '';
+      imgCapturada.style.display = 'none';
+    }
 
     document.getElementById('box-preview-foto').style.display = 'none';
     document.getElementById('box-video-stream').style.display = 'none';
     document.getElementById('painel-opcoes-foto').style.display = 'block';
     document.getElementById('camera-status').textContent = 'Pronto para capturar foto';
+
+    if (!isDispositivoMovel() && (window.location.protocol === 'https:' || window.location.hostname === 'localhost')) {
+      iniciarCameraStream();
+    }
   }
 
   function limparAssinatura() {
