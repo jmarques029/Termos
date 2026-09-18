@@ -649,7 +649,7 @@ app.get('/api/assinar/:token', async (req, res) => {
   try {
     const termo = await termos.findOne({ token_unico: req.params.token });
     if (!termo) return res.status(404).json({ erro: 'Termo não encontrado ou link inválido' });
-    if (termo.status === 'assinado') {
+    if (termo.status === 'assinado' || termo.status === 'devolvido') {
       return res.json({ ...termo, ja_assinado: true });
     }
     // Remove assinatura dos dados enviados ao colaborador
@@ -670,7 +670,7 @@ app.post('/api/assinar/:token', async (req, res) => {
 
     const termo = await termos.findOne({ token_unico: req.params.token });
     if (!termo) return res.status(404).json({ erro: 'Termo não encontrado' });
-    if (termo.status === 'assinado') {
+    if (termo.status === 'assinado' || termo.status === 'devolvido') {
       return res.status(400).json({ erro: 'Este termo já foi assinado' });
     }
 
@@ -853,7 +853,7 @@ app.post('/api/termos/:id/devolucao', autenticar, uploadDevolucao.array('fotos_d
   try {
     const termo = await termos.findOne({ _id: req.params.id });
     if (!termo) return res.status(404).json({ erro: 'Termo não encontrado' });
-    if (termo.status !== 'assinado') {
+    if (termo.status !== 'assinado' && termo.status !== 'devolvido') {
       return res.status(400).json({ erro: 'Só é possível registrar devolução de termos já assinados' });
     }
 
@@ -871,8 +871,11 @@ app.post('/api/termos/:id/devolucao', autenticar, uploadDevolucao.array('fotos_d
     const fotosExistentes = termo.fotos_devolucao || [];
     const todasFotos = [...fotosExistentes, ...novasfotos].slice(0, 4); // máximo 4
 
+    const isDevolvido = devolvido === 'true' || devolvido === true;
+
     const updates = {
-      devolvido: devolvido === 'true' || devolvido === true,
+      devolvido: isDevolvido,
+      status: isDevolvido ? 'devolvido' : 'assinado',
       data_devolucao_real: data_devolucao_real || null,
       observacao_devolucao: observacao_devolucao || '',
       fotos_devolucao: todasFotos,

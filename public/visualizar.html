@@ -370,20 +370,24 @@
 
     // Status badge
     const badge = document.getElementById('status-badge');
-    if (t.status === 'assinado' && t.devolvido) {
-      badge.className = 'badge badge-assinado';
+    const isDev = t.devolvido === true || t.devolvido === 'true' || t.status === 'devolvido';
+    if (isDev) {
+      badge.className = 'badge';
       badge.style.background = 'rgba(16,185,129,0.15)';
       badge.style.color = '#10b981';
+      badge.style.border = '1px solid rgba(16,185,129,0.3)';
       badge.textContent = '📦 Devolvido';
     } else if (t.status === 'assinado') {
       badge.className = 'badge badge-assinado';
       badge.style.background = '';
       badge.style.color = '';
+      badge.style.border = '';
       badge.textContent = '✅ Assinado';
     } else {
       badge.className = 'badge badge-pendente';
       badge.style.background = '';
       badge.style.color = '';
+      badge.style.border = '';
       badge.textContent = '⏳ Pendente';
     }
 
@@ -446,7 +450,7 @@
     gerarClausulas(t.tipo, t);
 
     // Assinatura
-    if (t.status === 'assinado') {
+    if (t.status === 'assinado' || t.status === 'devolvido' || isDev) {
       document.getElementById('assinatura-realizada').classList.remove('hidden');
       document.getElementById('v-assinatura').src = t.assinatura_base64;
       document.getElementById('v-assinado-nome').textContent = t.nome_confirmacao || t.colaborador_nome;
@@ -761,13 +765,18 @@
 
       // Atualiza badge de status
       const badge = document.getElementById('status-badge');
-      if (termoData.devolvido) {
+      const isDevAtualizado = termoData.devolvido === true || termoData.devolvido === 'true' || termoData.status === 'devolvido';
+      if (isDevAtualizado) {
+        badge.className = 'badge';
         badge.style.background = 'rgba(16,185,129,0.15)';
         badge.style.color = '#10b981';
+        badge.style.border = '1px solid rgba(16,185,129,0.3)';
         badge.textContent = '📦 Devolvido';
       } else {
+        badge.className = 'badge badge-assinado';
         badge.style.background = '';
         badge.style.color = '';
+        badge.style.border = '';
         badge.textContent = '✅ Assinado';
       }
 

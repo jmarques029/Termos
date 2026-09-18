@@ -285,11 +285,15 @@
     } catch {}
   }
 
+  function isDevolvido(t) {
+    return t.devolvido === true || t.devolvido === 'true' || t.status === 'devolvido';
+  }
+
   function atualizarStats() {
     document.getElementById('stat-total').textContent = todosTermos.length;
     document.getElementById('stat-pendentes').textContent = todosTermos.filter(t => t.status === 'pendente').length;
-    document.getElementById('stat-assinados').textContent = todosTermos.filter(t => t.status === 'assinado').length;
-    document.getElementById('stat-devolvidos').textContent = todosTermos.filter(t => t.devolvido === true).length;
+    document.getElementById('stat-assinados').textContent = todosTermos.filter(t => (t.status === 'assinado' || t.status === 'devolvido') && !isDevolvido(t)).length;
+    document.getElementById('stat-devolvidos').textContent = todosTermos.filter(t => isDevolvido(t)).length;
     document.getElementById('stat-celulares').textContent = todosTermos.filter(t => t.tipo === 'celular').length;
     document.getElementById('stat-tablets').textContent = todosTermos.filter(t => t.tipo === 'tablet').length;
     document.getElementById('stat-notebooks').textContent = todosTermos.filter(t => t.tipo === 'notebook').length;
@@ -301,17 +305,17 @@
     // Atualiza visual dos botões
     ['todos', 'pendente', 'assinado', 'devolvido'].forEach(a => {
       const btn = document.getElementById(`aba-${a}`);
-      btn.className = `btn btn-sm ${a === aba ? 'btn-primary' : 'btn-secondary'}`;
+      if (btn) btn.className = `btn btn-sm ${a === aba ? 'btn-primary' : 'btn-secondary'}`;
     });
 
     // Atualiza título da lista
     const titulos = {
       todos:     'Termos de Compromisso',
       pendente:  '⏳ Termos Pendentes',
-      assinado:  '✅ Termos Assinados',
+      assinado:  '✅ Termos Assinados (Em Posse)',
       devolvido: '📦 Equipamentos Devolvidos'
     };
-    document.getElementById('titulo-lista').textContent = titulos[aba];
+    document.getElementById('titulo-lista').textContent = titulos[aba] || 'Termos de Compromisso';
 
     filtrar();
   }
@@ -322,11 +326,13 @@
     const busca  = document.getElementById('filtro-busca').value.toLowerCase();
 
     termosExibidos = todosTermos.filter(t => {
-      // Filtro de aba
-      if (abaAtiva === 'todos'    && t.devolvido) return false;
+      const devolvido = isDevolvido(t);
+
+      // Filtro de aba:
+      // Na aba 'todos', exibe TODOS os termos sem ocultar os devolvidos!
       if (abaAtiva === 'pendente'  && t.status !== 'pendente') return false;
-      if (abaAtiva === 'assinado'  && (t.status !== 'assinado' || t.devolvido)) return false;
-      if (abaAtiva === 'devolvido' && !t.devolvido) return false;
+      if (abaAtiva === 'assinado'  && (t.status !== 'assinado' || devolvido)) return false;
+      if (abaAtiva === 'devolvido' && !devolvido) return false;
 
       // Filtros extras
       if (tipo   && t.tipo   !== tipo)   return false;
@@ -360,10 +366,12 @@
       const tipoLabel  = { celular: 'Celular', tablet: 'Tablet', notebook: 'Notebook' }[t.tipo] || t.tipo;
       const tipoBadgeClass = { celular: 'badge-celular', tablet: 'badge-tablet', notebook: 'badge-notebook' }[t.tipo] || 'badge-celular';
 
+      const devolvido = isDevolvido(t);
+
       // Badge de status
       let statusBadge;
-      if (t.devolvido) {
-        statusBadge = `<span class="badge badge-assinado" style="background:rgba(16,185,129,0.15);color:#10b981;">📦 Devolvido</span>`;
+      if (devolvido) {
+        statusBadge = `<span class="badge" style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);">📦 Devolvido</span>`;
       } else if (t.status === 'assinado') {
         statusBadge = `<span class="badge badge-assinado">✅ Assinado</span>`;
       } else {
@@ -372,7 +380,7 @@
 
       // Coluna devolução
       let devCol;
-      if (t.devolvido) {
+      if (devolvido) {
         const dataDev = t.data_devolucao_real
           ? new Date(t.data_devolucao_real + 'T12:00:00').toLocaleDateString('pt-BR')
           : '—';

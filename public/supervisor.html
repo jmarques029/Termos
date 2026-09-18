@@ -101,6 +101,7 @@
         <option value="">Todos os status</option>
         <option value="pendente">Pendentes</option>
         <option value="assinado">Assinados</option>
+        <option value="devolvido">Devolvidos</option>
       </select>
       <select id="filtro-dept" class="input" onchange="filtrar()">
         <option value="">Todos os departamentos</option>
@@ -181,10 +182,14 @@
     }
   }
 
+  function isDevolvido(t) {
+    return t.devolvido === true || t.devolvido === 'true' || t.status === 'devolvido';
+  }
+
   function atualizarStats() {
     document.getElementById('stat-total').textContent = todosTermos.length;
     document.getElementById('stat-pendentes').textContent = todosTermos.filter(t => t.status === 'pendente').length;
-    document.getElementById('stat-assinados').textContent = todosTermos.filter(t => t.status === 'assinado').length;
+    document.getElementById('stat-assinados').textContent = todosTermos.filter(t => (t.status === 'assinado' || t.status === 'devolvido') && !isDevolvido(t)).length;
   }
 
   function preencherFiltrosDept() {
@@ -209,7 +214,13 @@
         (t.equipamento_modelo || '').toLowerCase().includes(busca) ||
         (t.numero_patrimonio || '').toLowerCase().includes(busca) ||
         (t.cargo || '').toLowerCase().includes(busca);
-      const matchStatus = !status || t.status === status;
+
+      const devolvido = isDevolvido(t);
+      let matchStatus = true;
+      if (status === 'pendente') matchStatus = t.status === 'pendente';
+      else if (status === 'assinado') matchStatus = (t.status === 'assinado' || t.status === 'devolvido') && !devolvido;
+      else if (status === 'devolvido') matchStatus = devolvido;
+
       const matchDept = !dept || t.departamento === dept;
       return matchBusca && matchStatus && matchDept;
     });
