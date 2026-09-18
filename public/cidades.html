@@ -8,24 +8,168 @@
   <link rel="stylesheet" href="/css/style.css">
   <script src="/js/responsive.js" defer></script>
   <style>
-    .city-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 28px; overflow: hidden; }
-    .city-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; background: linear-gradient(90deg, rgba(0,212,255,0.06), transparent); border-bottom: 1px solid var(--border); cursor: pointer; user-select: none; transition: background 0.2s; }
-    .city-header:hover { background: linear-gradient(90deg, rgba(0,212,255,0.10), transparent); }
-    .city-header-left { display: flex; align-items: center; gap: 12px; }
-    .city-icon { width: 38px; height: 38px; border-radius: var(--radius-sm); background: linear-gradient(135deg, rgba(0,212,255,0.15), rgba(99,102,241,0.15)); display: flex; align-items: center; justify-content: center; font-size: 18px; }
-    .city-name { font-size: 17px; font-weight: 700; }
-    .city-meta { font-size: 12px; color: var(--text-3); margin-top: 2px; }
-    .city-badges { display: flex; gap: 8px; align-items: center; }
-    .city-chevron { font-size: 14px; color: var(--text-3); transition: transform 0.25s; }
-    .city-chevron.open { transform: rotate(180deg); }
-    .city-body { display: none; }
-    .city-body.open { display: block; }
-    .city-stats-bar { display: flex; border-bottom: 1px solid var(--border); }
-    .city-stat { flex: 1; padding: 10px 16px; border-right: 1px solid var(--border); position: relative; overflow: hidden; }
-    .city-stat:last-child { border-right: none; }
-    .city-stat-accent { position: absolute; bottom: 0; left: 0; right: 0; height: 2px; }
-    .city-stat-label { font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing:.4px; margin-bottom: 2px; }
-    .city-stat-value { font-size: 18px; font-weight: 800; line-height: 1; }
+    .tabs-nav {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 22px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .tab-nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text-2);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .tab-nav-btn:hover {
+      background: var(--surface-hover);
+      color: var(--text-1);
+      border-color: rgba(255,255,255,0.15);
+    }
+    .tab-nav-btn.active {
+      background: linear-gradient(135deg, rgba(0,212,255,0.15), rgba(99,102,241,0.15));
+      border-color: var(--primary);
+      color: var(--text-1);
+      box-shadow: 0 0 12px rgba(0,212,255,0.15);
+    }
+    .tab-nav-btn .count-badge {
+      padding: 2px 7px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .tab-nav-btn.active .count-badge {
+      background: var(--primary);
+      color: #0b0f19;
+    }
+    .tab-nav-btn:not(.active) .count-badge {
+      background: rgba(255,255,255,0.08);
+      color: var(--text-3);
+    }
+
+    .city-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      margin-bottom: 24px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+      transition: border-color 0.2s;
+    }
+    .city-card:hover {
+      border-color: rgba(255,255,255,0.15);
+    }
+    .city-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      background: linear-gradient(90deg, rgba(0,212,255,0.06), transparent);
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.2s;
+    }
+    .city-header:hover {
+      background: linear-gradient(90deg, rgba(0,212,255,0.10), transparent);
+    }
+    .city-header.devolvido-style {
+      background: linear-gradient(90deg, rgba(16,185,129,0.08), transparent);
+    }
+    .city-header.devolvido-style:hover {
+      background: linear-gradient(90deg, rgba(16,185,129,0.13), transparent);
+    }
+    .city-header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .city-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, rgba(0,212,255,0.15), rgba(99,102,241,0.15));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 19px;
+    }
+    .city-icon.devolvido-icon {
+      background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(5,150,105,0.15));
+    }
+    .city-name {
+      font-size: 17px;
+      font-weight: 700;
+    }
+    .city-meta {
+      font-size: 12px;
+      color: var(--text-3);
+      margin-top: 2px;
+    }
+    .city-badges {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .city-chevron {
+      font-size: 13px;
+      color: var(--text-3);
+      transition: transform 0.25s;
+    }
+    .city-chevron.open {
+      transform: rotate(180deg);
+    }
+    .city-body {
+      display: none;
+    }
+    .city-body.open {
+      display: block;
+    }
+    .city-stats-bar {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .city-stat {
+      flex: 1;
+      min-width: 110px;
+      padding: 10px 16px;
+      border-right: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+      background: rgba(0,0,0,0.05);
+    }
+    .city-stat:last-child {
+      border-right: none;
+    }
+    .city-stat-accent {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+    }
+    .city-stat-label {
+      font-size: 10px;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      margin-bottom: 2px;
+    }
+    .city-stat-value {
+      font-size: 17px;
+      font-weight: 800;
+      line-height: 1;
+    }
   </style>
 </head>
 <body>
@@ -45,17 +189,21 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Novo Termo
       </a>
-      <a href="/cidades.html" class="nav-item active">
+      <a href="/cidades.html" class="nav-item" id="nav-cidades" onclick="trocarAba('ativos'); return false;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
         Por Cidade
       </a>
+      <a href="/cidades.html?aba=devolvidos" class="nav-item" id="nav-devolvidos" onclick="trocarAba('devolvidos'); return false;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Devolvidos por Cidade
+      </a>
       <a href="/usuarios.html" class="nav-item">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        Usuarios
+        Usuários
       </a>
       <a href="/configuracoes.html" class="nav-item">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l-.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        Configuracoes
+        Configurações
       </a>
       <a href="/conta.html" class="nav-item">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l-.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -78,17 +226,53 @@
   </aside>
 
   <main class="main-content">
-    <div class="page-title">📍 Termos por Cidade</div>
-    <div class="page-subtitle">Visualize e filtre os termos agrupados por localidade</div>
+    <!-- Abas no topo -->
+    <div class="tabs-nav">
+      <button id="tab-btn-ativos" class="tab-nav-btn active" onclick="trocarAba('ativos')">
+        <span>📍</span>
+        <span>Equipamentos em Aberto / Em Uso</span>
+        <span class="count-badge" id="badge-total-ativos">0</span>
+      </button>
+      <button id="tab-btn-devolvidos" class="tab-nav-btn" onclick="trocarAba('devolvidos')">
+        <span>💻</span>
+        <span>Computadores Devolvidos</span>
+        <span class="count-badge" id="badge-total-devolvidos">0</span>
+      </button>
+    </div>
 
+    <!-- Cabeçalho Dinâmico -->
+    <div class="page-title" id="view-title">📍 Termos por Cidade (Em Aberto)</div>
+    <div class="page-subtitle" id="view-subtitle">Visualize e filtre os equipamentos ainda em uso ou pendentes agrupados por cidade</div>
+
+    <!-- Barra de Filtros -->
     <div style="display:flex; gap:10px; margin-bottom:20px; align-items:center; flex-wrap:wrap;">
-      <input id="busca-cidade" type="text" class="input" placeholder="🔍 Filtrar por cidade ou colaborador..." style="max-width:320px;" oninput="renderCidades()">
-      <select id="filtro-status-cidade" class="select" style="width:auto;" onchange="renderCidades()">
-        <option value="">Todos os status</option>
-        <option value="pendente">⏳ Pendentes</option>
-        <option value="assinado">✅ Assinados</option>
-        <option value="devolvido">📦 Devolvidos</option>
-      </select>
+      <input id="busca-cidade" type="text" class="input" placeholder="🔍 Filtrar por cidade, colaborador ou equipamento..." style="max-width:320px;" oninput="renderView()">
+      
+      <!-- Filtro específico para Ativos -->
+      <div id="filtros-ativos" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+        <select id="filtro-status-ativo" class="select" style="width:auto;" onchange="renderView()">
+          <option value="">Todos os status ativos</option>
+          <option value="pendente">⏳ Pendentes</option>
+          <option value="assinado">✅ Assinados (Em uso)</option>
+        </select>
+        <select id="filtro-tipo-ativo" class="select" style="width:auto;" onchange="renderView()">
+          <option value="">Todos os tipos</option>
+          <option value="notebook">💻 Notebooks / Computadores</option>
+          <option value="celular">📱 Celulares</option>
+          <option value="tablet">📲 Tablets</option>
+        </select>
+      </div>
+
+      <!-- Filtro específico para Devolvidos -->
+      <div id="filtros-devolvidos" style="display:none; gap:10px; align-items:center; flex-wrap:wrap;">
+        <select id="filtro-tipo-devolvido" class="select" style="width:auto;" onchange="renderView()">
+          <option value="notebook" selected>💻 Apenas Computadores / Notebooks</option>
+          <option value="">📦 Todos os Equipamentos Devolvidos</option>
+          <option value="celular">📱 Celulares Devolvidos</option>
+          <option value="tablet">📲 Tablets Devolvidos</option>
+        </select>
+      </div>
+
       <span id="resumo-geral" style="font-size:13px; color:var(--text-3); margin-left:auto;"></span>
     </div>
 
@@ -101,8 +285,8 @@
       <div id="cidades-container"></div>
       <div id="empty-state" class="empty-state hidden">
         <div class="empty-state-icon">📭</div>
-        <h3>Nenhum termo encontrado</h3>
-        <p>Ajuste os filtros ou crie novos termos.</p>
+        <h3 id="empty-title">Nenhum termo encontrado</h3>
+        <p id="empty-sub">Ajuste os filtros de busca ou selecione outra categoria.</p>
       </div>
     </div>
   </main>
@@ -125,9 +309,72 @@
   }
 
   let todosTermos = [];
+  let abaAtual = 'ativos'; // 'ativos' ou 'devolvidos'
+
+  function isDevolvido(t) {
+    return t.devolvido === true || t.devolvido === 'true' || t.status === 'devolvido';
+  }
 
   function headers() {
     return { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' };
+  }
+
+  // Identifica parâmetro da URL ou Hash
+  function detectarAbaInicial() {
+    const params = new URLSearchParams(window.location.search);
+    const abaParam = params.get('aba');
+    if (abaParam === 'devolvidos' || window.location.hash === '#devolvidos') {
+      abaAtual = 'devolvidos';
+    } else {
+      abaAtual = 'ativos';
+    }
+    atualizarUIAbas();
+  }
+
+  function trocarAba(novaAba) {
+    abaAtual = novaAba;
+    
+    // Atualiza URL sem recarregar
+    const novaUrl = novaAba === 'devolvidos' ? '/cidades.html?aba=devolvidos' : '/cidades.html';
+    window.history.replaceState({}, '', novaUrl);
+
+    atualizarUIAbas();
+    renderView();
+  }
+
+  function atualizarUIAbas() {
+    const btnAtivos = document.getElementById('tab-btn-ativos');
+    const btnDevolvidos = document.getElementById('tab-btn-devolvidos');
+    const navCidades = document.getElementById('nav-cidades');
+    const navDevolvidos = document.getElementById('nav-devolvidos');
+    const filtrosAtivos = document.getElementById('filtros-ativos');
+    const filtrosDevolvidos = document.getElementById('filtros-devolvidos');
+    const viewTitle = document.getElementById('view-title');
+    const viewSubtitle = document.getElementById('view-subtitle');
+
+    if (abaAtual === 'devolvidos') {
+      btnAtivos.classList.remove('active');
+      btnDevolvidos.classList.add('active');
+      if (navCidades) navCidades.classList.remove('active');
+      if (navDevolvidos) navDevolvidos.classList.add('active');
+
+      filtrosAtivos.style.display = 'none';
+      filtrosDevolvidos.style.display = 'flex';
+
+      viewTitle.textContent = '💻 Computadores Devolvidos por Cidade';
+      viewSubtitle.textContent = 'Histórico e controle de equipamentos devolvidos separados por localidade';
+    } else {
+      btnAtivos.classList.add('active');
+      btnDevolvidos.classList.remove('active');
+      if (navCidades) navCidades.classList.add('active');
+      if (navDevolvidos) navDevolvidos.classList.remove('active');
+
+      filtrosAtivos.style.display = 'flex';
+      filtrosDevolvidos.style.display = 'none';
+
+      viewTitle.textContent = '📍 Termos por Cidade (Em Aberto / Em Uso)';
+      viewSubtitle.textContent = 'Equipamentos entregues a colaboradores e ainda não devolvidos, agrupados por cidade';
+    }
   }
 
   async function carregar() {
@@ -137,32 +384,61 @@
       todosTermos = await res.json();
       document.getElementById('loading').classList.add('hidden');
       document.getElementById('conteudo').classList.remove('hidden');
-      renderCidades();
+      
+      atualizarContadoresGlobais();
+      renderView();
     } catch {
       toast('Erro ao carregar termos', 'error');
     }
   }
 
-  function renderCidades() {
-    const busca  = document.getElementById('busca-cidade').value.toLowerCase();
-    const status = document.getElementById('filtro-status-cidade').value;
+  function atualizarContadoresGlobais() {
+    const totalAtivos = todosTermos.filter(t => !isDevolvido(t)).length;
+    const totalDevolvidos = todosTermos.filter(t => isDevolvido(t)).length;
+    const compDevolvidos = todosTermos.filter(t => isDevolvido(t) && t.tipo === 'notebook').length;
+
+    document.getElementById('badge-total-ativos').textContent = totalAtivos;
+    document.getElementById('badge-total-devolvidos').textContent = compDevolvidos + ' / ' + totalDevolvidos;
+    document.getElementById('badge-total-devolvidos').title = compDevolvidos + ' computadores (' + totalDevolvidos + ' equipamentos no total)';
+  }
+
+  function renderView() {
+    if (abaAtual === 'devolvidos') {
+      renderDevolvidos();
+    } else {
+      renderAtivos();
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // ABA 1: ATIVOS (NÃO DEVOLVIDOS)
+  // ─────────────────────────────────────────────────────────────
+  function renderAtivos() {
+    const busca  = document.getElementById('busca-cidade').value.toLowerCase().trim();
+    const status = document.getElementById('filtro-status-ativo').value;
+    const tipo   = document.getElementById('filtro-tipo-ativo').value;
 
     const termosFiltrados = todosTermos.filter(t => {
-      if (status === 'devolvido' && !t.devolvido) return false;
-      if (status === 'assinado'  && (t.status !== 'assinado' || t.devolvido)) return false;
-      if (status === 'pendente'  && t.status !== 'pendente') return false;
+      // REGRA DE OURO: Somente os que ainda NÃO foram devolvidos!
+      if (isDevolvido(t)) return false;
+
+      if (status === 'pendente' && t.status !== 'pendente') return false;
+      if (status === 'assinado' && t.status !== 'assinado') return false;
+      if (tipo && t.tipo !== tipo) return false;
+
       if (busca) {
         const mC = (t.cidade || '').toLowerCase().includes(busca);
         const mN = (t.colaborador_nome || '').toLowerCase().includes(busca);
         const mE = (t.equipamento_marca + ' ' + t.equipamento_modelo).toLowerCase().includes(busca);
-        if (!mC && !mN && !mE) return false;
+        const mP = (t.numero_patrimonio || '').toLowerCase().includes(busca);
+        if (!mC && !mN && !mE && !mP) return false;
       }
       return true;
     });
 
     const grupos = {};
     termosFiltrados.forEach(t => {
-      const cidade = t.cidade || 'Sem cidade';
+      const cidade = t.cidade || 'Sem cidade definida';
       if (!grupos[cidade]) grupos[cidade] = [];
       grupos[cidade].push(t);
     });
@@ -172,11 +448,13 @@
     const empty = document.getElementById('empty-state');
 
     document.getElementById('resumo-geral').textContent =
-      termosFiltrados.length + ' termo' + (termosFiltrados.length !== 1 ? 's' : '') +
+      termosFiltrados.length + ' termo' + (termosFiltrados.length !== 1 ? 's' : '') + ' ativo' + (termosFiltrados.length !== 1 ? 's' : '') +
       ' em ' + cidades.length + ' cidade' + (cidades.length !== 1 ? 's' : '');
 
     if (cidades.length === 0) {
       container.innerHTML = '';
+      document.getElementById('empty-title').textContent = 'Nenhum termo ativo encontrado';
+      document.getElementById('empty-sub').textContent = 'Todos os termos desta busca podem ter sido devolvidos ou não existem com estes filtros.';
       empty.classList.remove('hidden');
       return;
     }
@@ -186,30 +464,39 @@
       const lista     = grupos[cidade];
       const total     = lista.length;
       const pendentes = lista.filter(t => t.status === 'pendente').length;
-      const assinados = lista.filter(t => t.status === 'assinado' && !t.devolvido).length;
-      const devolvidos= lista.filter(t => t.devolvido).length;
-      const key       = cidade.replace(/\W+/g,'_');
+      const assinados = lista.filter(t => t.status === 'assinado').length;
+      const notebooks = lista.filter(t => t.tipo === 'notebook').length;
+      const celulares = lista.filter(t => t.tipo === 'celular' || t.tipo === 'tablet').length;
+      const key       = 'ativo_' + cidade.replace(/\W+/g, '_');
 
       const linhas = lista.map(t => {
         const tipoEmoji = { celular: '📱', tablet: '📲', notebook: '💻' }[t.tipo] || '📱';
-        const assinadoEm = t.assinado_em ? new Date(t.assinado_em).toLocaleDateString('pt-BR') : '—';
-        let badge;
-        if (t.devolvido) {
-          badge = '<span class="badge badge-assinado" style="background:rgba(16,185,129,0.15);color:#10b981;">📦 Devolvido</span>';
-        } else if (t.status === 'assinado') {
-          badge = '<span class="badge badge-assinado">✅ Assinado</span>';
-        } else {
-          badge = '<span class="badge badge-pendente">⏳ Pendente</span>';
-        }
+        const dataDoc = t.assinado_em 
+          ? new Date(t.assinado_em).toLocaleDateString('pt-BR') 
+          : (t.data_entrega ? new Date(t.data_entrega + 'T12:00:00').toLocaleDateString('pt-BR') : '—');
+        
+        let badge = t.status === 'assinado' 
+          ? '<span class="badge badge-assinado">✅ Assinado</span>' 
+          : '<span class="badge badge-pendente">⏳ Pendente</span>';
+
         return '<tr>' +
-          '<td><div style="font-weight:600;">' + t.colaborador_nome + '</div>' +
-          '<div style="font-size:12px;color:var(--text-3);">' + (t.cargo||'—') + ' · ' + (t.departamento||'—') + '</div></td>' +
-          '<td><div>' + tipoEmoji + ' ' + t.equipamento_marca + ' ' + t.equipamento_modelo + '</div>' +
-          '<div style="font-size:12px;color:var(--text-3);">' + (t.equipamento_serie_imei||'—') + '</div></td>' +
+          '<td>' +
+            '<div style="font-weight:600;">' + (t.colaborador_nome || '—') + '</div>' +
+            '<div style="font-size:12px;color:var(--text-3);">' + (t.cargo || '—') + ' · ' + (t.departamento || '—') + '</div>' +
+          '</td>' +
+          '<td>' +
+            '<div>' + tipoEmoji + ' ' + (t.equipamento_marca || '') + ' ' + (t.equipamento_modelo || '') + '</div>' +
+            '<div style="font-size:12px;color:var(--text-3);">' + 
+              (t.numero_patrimonio ? 'Patr: ' + t.numero_patrimonio + ' · ' : '') + 
+              (t.equipamento_serie_imei ? 'S/N: ' + t.equipamento_serie_imei : '') + 
+            '</div>' +
+          '</td>' +
           '<td>' + badge + '</td>' +
-          '<td style="color:var(--text-2);font-size:13px;">' + assinadoEm + '</td>' +
-          '<td style="text-align:right;"><a href="/visualizar.html?id=' + t._id + '" class="btn btn-sm btn-secondary">👁️ Ver</a></td>' +
-          '</tr>';
+          '<td style="color:var(--text-2);font-size:13px;">' + dataDoc + '</td>' +
+          '<td style="text-align:right;">' +
+            '<a href="/visualizar.html?id=' + t._id + '" class="btn btn-sm btn-secondary">👁️ Ver</a>' +
+          '</td>' +
+        '</tr>';
       }).join('');
 
       return '<div class="city-card">' +
@@ -218,27 +505,174 @@
             '<div class="city-icon">📍</div>' +
             '<div>' +
               '<div class="city-name">' + cidade + '</div>' +
-              '<div class="city-meta">' + total + ' termo' + (total!==1?'s':'') + '</div>' +
+              '<div class="city-meta">' + total + ' equipamento' + (total !== 1 ? 's' : '') + ' em uso</div>' +
             '</div>' +
           '</div>' +
           '<div style="display:flex;align-items:center;gap:12px;">' +
             '<div class="city-badges">' +
-              (pendentes  ? '<span class="badge badge-pendente">⏳ ' + pendentes + '</span>' : '') +
-              (assinados  ? '<span class="badge badge-assinado">✅ ' + assinados + '</span>' : '') +
-              (devolvidos ? '<span class="badge badge-assinado" style="background:rgba(16,185,129,0.15);color:#10b981;">📦 ' + devolvidos + '</span>' : '') +
+              (notebooks ? '<span class="badge" style="background:rgba(99,102,241,0.15);color:#818cf8;">💻 ' + notebooks + '</span>' : '') +
+              (celulares ? '<span class="badge" style="background:rgba(0,212,255,0.15);color:#00d4ff;">📱 ' + celulares + '</span>' : '') +
+              (pendentes ? '<span class="badge badge-pendente">⏳ ' + pendentes + '</span>' : '') +
+              (assinados ? '<span class="badge badge-assinado">✅ ' + assinados + '</span>' : '') +
             '</div>' +
             '<span class="city-chevron open" id="chev-' + key + '">▼</span>' +
           '</div>' +
         '</div>' +
         '<div class="city-body open" id="city-' + key + '">' +
           '<div class="city-stats-bar">' +
-            '<div class="city-stat"><div class="city-stat-accent" style="background:linear-gradient(90deg,#6366f1,#818cf8);"></div><div class="city-stat-label">Total</div><div class="city-stat-value">' + total + '</div></div>' +
+            '<div class="city-stat"><div class="city-stat-accent" style="background:linear-gradient(90deg,#6366f1,#818cf8);"></div><div class="city-stat-label">Total em Uso</div><div class="city-stat-value">' + total + '</div></div>' +
             '<div class="city-stat"><div class="city-stat-accent" style="background:linear-gradient(90deg,#f59e0b,#fbbf24);"></div><div class="city-stat-label">Pendentes</div><div class="city-stat-value" style="color:var(--warning);">' + pendentes + '</div></div>' +
             '<div class="city-stat"><div class="city-stat-accent" style="background:linear-gradient(90deg,#10b981,#34d399);"></div><div class="city-stat-label">Assinados</div><div class="city-stat-value" style="color:var(--success);">' + assinados + '</div></div>' +
-            '<div class="city-stat"><div class="city-stat-accent" style="background:linear-gradient(90deg,#059669,#10b981);"></div><div class="city-stat-label">Devolvidos</div><div class="city-stat-value" style="color:#10b981;">' + devolvidos + '</div></div>' +
+            '<div class="city-stat"><div class="city-stat-accent" style="background:linear-gradient(90deg,#ec4899,#f472b6);"></div><div class="city-stat-label">Computadores</div><div class="city-stat-value" style="color:#f472b6;">' + notebooks + '</div></div>' +
+            '<div class="city-stat"><div class="city-stat-accent" style="background:linear-gradient(90deg,#00d4ff,#38bdf8);"></div><div class="city-stat-label">Celulares/Tablets</div><div class="city-stat-value" style="color:#38bdf8;">' + celulares + '</div></div>' +
           '</div>' +
           '<div class="table-wrapper" style="border-radius:0;border:none;">' +
-            '<table><thead><tr><th>Colaborador</th><th>Equipamento</th><th>Status</th><th>Assinado em</th><th style="text-align:right;">Ações</th></tr></thead>' +
+            '<table><thead><tr><th>Colaborador</th><th>Equipamento</th><th>Status</th><th>Data</th><th style="text-align:right;">Ações</th></tr></thead>' +
+            '<tbody>' + linhas + '</tbody></table>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // ABA 2: COMPUTADORES DEVOLVIDOS (POR CIDADE)
+  // ─────────────────────────────────────────────────────────────
+  function renderDevolvidos() {
+    const busca = document.getElementById('busca-cidade').value.toLowerCase().trim();
+    const tipo  = document.getElementById('filtro-tipo-devolvido').value;
+
+    const termosFiltrados = todosTermos.filter(t => {
+      // REGRA: Apenas devolvidos!
+      if (!isDevolvido(t)) return false;
+
+      // Filtro de tipo (default: computadores/notebooks)
+      if (tipo && t.tipo !== tipo) return false;
+
+      if (busca) {
+        const mC = (t.cidade || '').toLowerCase().includes(busca);
+        const mN = (t.colaborador_nome || '').toLowerCase().includes(busca);
+        const mE = (t.equipamento_marca + ' ' + t.equipamento_modelo).toLowerCase().includes(busca);
+        const mP = (t.numero_patrimonio || '').toLowerCase().includes(busca);
+        const mO = (t.observacao_devolucao || '').toLowerCase().includes(busca);
+        if (!mC && !mN && !mE && !mP && !mO) return false;
+      }
+      return true;
+    });
+
+    const grupos = {};
+    termosFiltrados.forEach(t => {
+      const cidade = t.cidade || 'Sem cidade definida';
+      if (!grupos[cidade]) grupos[cidade] = [];
+      grupos[cidade].push(t);
+    });
+
+    const cidades = Object.keys(grupos).sort();
+    const container = document.getElementById('cidades-container');
+    const empty = document.getElementById('empty-state');
+
+    const tipoTexto = tipo === 'notebook' ? 'computador' : 'equipamento';
+    document.getElementById('resumo-geral').textContent =
+      termosFiltrados.length + ' ' + tipoTexto + (termosFiltrados.length !== 1 ? 'es devolvidos' : ' devolvido') +
+      ' em ' + cidades.length + ' cidade' + (cidades.length !== 1 ? 's' : '');
+
+    if (cidades.length === 0) {
+      container.innerHTML = '';
+      document.getElementById('empty-title').textContent = 'Nenhum computador devolvido encontrado';
+      document.getElementById('empty-sub').textContent = 'Não há registros de devolução correspondentes aos filtros selecionados.';
+      empty.classList.remove('hidden');
+      return;
+    }
+    empty.classList.add('hidden');
+
+    container.innerHTML = cidades.map(cidade => {
+      const lista      = grupos[cidade];
+      const total      = lista.length;
+      const notebooks  = lista.filter(t => t.tipo === 'notebook').length;
+      const outros     = total - notebooks;
+      const key        = 'dev_' + cidade.replace(/\W+/g, '_');
+
+      // Busca a data mais recente de devolução nesta cidade
+      let ultimaDataDev = '—';
+      const datasDev = lista
+        .map(t => t.data_devolucao_real || t.atualizado_em || t.criado_em)
+        .filter(Boolean)
+        .sort()
+        .reverse();
+      if (datasDev.length > 0) {
+        ultimaDataDev = new Date(datasDev[0].includes('T') ? datasDev[0] : datasDev[0] + 'T12:00:00').toLocaleDateString('pt-BR');
+      }
+
+      const linhas = lista.map(t => {
+        const tipoEmoji = { celular: '📱', tablet: '📲', notebook: '💻' }[t.tipo] || '💻';
+        const dataDevFormatada = t.data_devolucao_real
+          ? new Date(t.data_devolucao_real + 'T12:00:00').toLocaleDateString('pt-BR')
+          : 'Data não informada';
+
+        const fotosCount = (t.fotos_devolucao && t.fotos_devolucao.length) || 0;
+        const temObs = t.observacao_devolucao && t.observacao_devolucao.trim().length > 0;
+
+        let detalhesDev = '<div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap;">';
+        if (fotosCount > 0) {
+          detalhesDev += '<span style="font-size:11px;color:#10b981;background:rgba(16,185,129,0.12);padding:1px 6px;border-radius:4px;">📷 ' + fotosCount + ' foto(s)</span>';
+        }
+        if (temObs) {
+          detalhesDev += '<span style="font-size:11px;color:var(--text-3);background:rgba(255,255,255,0.06);padding:1px 6px;border-radius:4px;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="' + t.observacao_devolucao + '">📝 ' + t.observacao_devolucao + '</span>';
+        }
+        detalhesDev += '</div>';
+
+        return '<tr>' +
+          '<td>' +
+            '<div style="font-weight:600;">' + (t.colaborador_nome || '—') + '</div>' +
+            '<div style="font-size:12px;color:var(--text-3);">' + (t.cargo || '—') + ' · ' + (t.departamento || '—') + '</div>' +
+          '</td>' +
+          '<td>' +
+            '<div>' + tipoEmoji + ' ' + (t.equipamento_marca || '') + ' ' + (t.equipamento_modelo || '') + '</div>' +
+            '<div style="font-size:12px;color:var(--text-3);">' + 
+              (t.numero_patrimonio ? 'Patr: ' + t.numero_patrimonio + ' · ' : '') + 
+              (t.equipamento_serie_imei ? 'S/N: ' + t.equipamento_serie_imei : '') + 
+            '</div>' +
+          '</td>' +
+          '<td>' +
+            '<span class="badge" style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);">📦 Devolvido</span>' +
+            detalhesDev +
+          '</td>' +
+          '<td>' +
+            '<div style="font-weight:600;color:#10b981;">' + dataDevFormatada + '</div>' +
+            (t.data_entrega ? '<div style="font-size:11px;color:var(--text-3);">Entregue em: ' + new Date(t.data_entrega + 'T12:00:00').toLocaleDateString('pt-BR') + '</div>' : '') +
+          '</td>' +
+          '<td style="text-align:right;">' +
+            '<a href="/visualizar.html?id=' + t._id + '" class="btn btn-sm btn-secondary">👁️ Ver Detalhes</a>' +
+          '</td>' +
+        '</tr>';
+      }).join('');
+
+      return '<div class="city-card">' +
+        '<div class="city-header devolvido-style" onclick="toggleCidade(\'' + key + '\')">' +
+          '<div class="city-header-left">' +
+            '<div class="city-icon devolvido-icon">💻</div>' +
+            '<div>' +
+              '<div class="city-name">' + cidade + '</div>' +
+              '<div class="city-meta">' + total + ' equipamento' + (total !== 1 ? 's' : '') + ' devolvido' + (total !== 1 ? 's' : '') + '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div style="display:flex;align-items:center;gap:12px;">' +
+            '<div class="city-badges">' +
+              (notebooks ? '<span class="badge" style="background:rgba(16,185,129,0.18);color:#10b981;">💻 ' + notebooks + ' computadores</span>' : '') +
+              (outros ? '<span class="badge" style="background:rgba(255,255,255,0.08);color:var(--text-2);">📱 ' + outros + ' outros</span>' : '') +
+            '</div>' +
+            '<span class="city-chevron open" id="chev-' + key + '">▼</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="city-body open" id="city-' + key + '">' +
+          '<div class="city-stats-bar">' +
+            '<div class="city-stat"><div class="city-stat-accent" style="background:linear-gradient(90deg,#059669,#10b981);"></div><div class="city-stat-label">Total Devolvidos</div><div class="city-stat-value" style="color:#10b981;">' + total + '</div></div>' +
+            '<div class="city-stat"><div class="city-stat-accent" style="background:linear-gradient(90deg,#10b981,#34d399);"></div><div class="city-stat-label">Computadores</div><div class="city-stat-value" style="color:#34d399;">' + notebooks + '</div></div>' +
+            '<div class="city-stat"><div class="city-stat-accent" style="background:linear-gradient(90deg,#6366f1,#818cf8);"></div><div class="city-stat-label">Outros Dispositivos</div><div class="city-stat-value" style="color:#818cf8;">' + outros + '</div></div>' +
+            '<div class="city-stat"><div class="city-stat-accent" style="background:linear-gradient(90deg,#00d4ff,#38bdf8);"></div><div class="city-stat-label">Última Devolução</div><div class="city-stat-value" style="font-size:14px;color:var(--text-2);">' + ultimaDataDev + '</div></div>' +
+          '</div>' +
+          '<div class="table-wrapper" style="border-radius:0;border:none;">' +
+            '<table><thead><tr><th>Colaborador</th><th>Equipamento</th><th>Status</th><th>Data Devolução</th><th style="text-align:right;">Ações</th></tr></thead>' +
             '<tbody>' + linhas + '</tbody></table>' +
           '</div>' +
         '</div>' +
@@ -265,7 +699,7 @@
     const c = document.getElementById('toast-container');
     const t = document.createElement('div');
     t.className = 'toast toast-' + tipo;
-    t.innerHTML = '<span>' + (tipo==='success'?'✅':tipo==='error'?'❌':'ℹ️') + '</span> ' + msg;
+    t.innerHTML = '<span>' + (tipo === 'success' ? '✅' : tipo === 'error' ? '❌' : 'ℹ️') + '</span> ' + msg;
     c.appendChild(t);
     setTimeout(function() {
       t.style.animation = 'fadeOut 0.3s ease forwards';
@@ -273,6 +707,7 @@
     }, 3500);
   }
 
+  detectarAbaInicial();
   carregar();
 </script>
 </body>
