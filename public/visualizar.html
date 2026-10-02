@@ -211,13 +211,24 @@
             </div>
           </div>
           <div id="assinatura-realizada" class="hidden">
-            <div style="display: flex; flex-wrap: wrap; align-items: flex-start;">
-              <div style="margin-right: 28px; margin-bottom: 16px;">
-                <div class="term-field-label" style="margin-bottom: 8px;">Assinatura Digital</div>
+            <div style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: 20px;">
+              <!-- 1. Assinatura Manuscrita -->
+              <div id="coluna-assinatura-manuscrita" style="margin-bottom: 16px;">
+                <div class="term-field-label" style="margin-bottom: 8px;">1. Assinatura Digital Manuscrita</div>
                 <div id="box-assinatura-digital" style="background: var(--bg-3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px; display: inline-block;">
-                  <img id="v-assinatura" alt="Assinatura" style="max-width: 260px; max-height: 120px; width: auto; height: auto; display: block; position: relative; z-index: 2;">
+                  <img id="v-assinatura" alt="Assinatura" style="max-width: 250px; max-height: 120px; width: auto; height: auto; display: block; position: relative; z-index: 2;">
                 </div>
               </div>
+
+              <!-- 2. Foto de Validação -->
+              <div id="coluna-foto-validacao" style="margin-bottom: 16px;">
+                <div class="term-field-label" style="margin-bottom: 8px;">2. Foto de Validação e Entrega</div>
+                <div id="box-foto-assinatura" style="background: var(--bg-3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px; display: inline-block;">
+                  <img id="v-foto-assinatura" alt="Foto de Validação" style="max-width: 200px; max-height: 130px; width: auto; height: auto; border-radius: var(--radius-sm); object-fit: cover; display: block; position: relative; z-index: 2;">
+                </div>
+              </div>
+
+              <!-- Metadados de Auditoria -->
               <div style="flex: 1; min-width: 200px;">
                 <div class="term-field" style="margin-bottom: 12px;">
                   <div class="term-field-label">Assinado por</div>
@@ -456,7 +467,17 @@
     // Assinatura
     if (t.status === 'assinado' || t.status === 'devolvido' || isDev) {
       document.getElementById('assinatura-realizada').classList.remove('hidden');
-      document.getElementById('v-assinatura').src = t.assinatura_base64;
+      document.getElementById('v-assinatura').src = t.assinatura_base64 || '';
+
+      const colFotoAss = document.getElementById('coluna-foto-validacao');
+      const vFotoAss = document.getElementById('v-foto-assinatura');
+      if (t.foto_assinatura_base64) {
+        vFotoAss.src = t.foto_assinatura_base64;
+        colFotoAss.style.display = 'block';
+      } else {
+        colFotoAss.style.display = 'none';
+      }
+
       document.getElementById('v-assinado-nome').textContent = t.nome_confirmacao || t.colaborador_nome;
       document.getElementById('v-assinado-em').textContent = new Date(t.assinado_em).toLocaleString('pt-BR');
       document.getElementById('v-assinado-ip').textContent = t.assinado_ip || '—';
@@ -857,6 +878,15 @@
           const box = clonedDoc.getElementById('box-assinatura-digital');
           if (box) {
             box.style.backgroundColor = '#ffffff';
+          }
+          const sigFoto = clonedDoc.getElementById('v-foto-assinatura');
+          if (sigFoto) {
+            sigFoto.style.position = 'relative';
+            sigFoto.style.zIndex = '2';
+          }
+          const boxFoto = clonedDoc.getElementById('box-foto-assinatura');
+          if (boxFoto) {
+            boxFoto.style.backgroundColor = '#ffffff';
           }
           const foto = clonedDoc.getElementById('v-foto');
           if (foto) {

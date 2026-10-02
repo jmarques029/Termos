@@ -1242,7 +1242,8 @@ tbody tr:hover { background: var(--surface-hover); }
   z-index: 2 !important;
 }
 
-.term-document.pdf-export #box-assinatura-digital {
+.term-document.pdf-export #box-assinatura-digital,
+.term-document.pdf-export #box-foto-assinatura {
   background: #ffffff !important;
   border: 1px solid #e2e8f0 !important;
   padding: 6px !important;
@@ -1254,6 +1255,15 @@ tbody tr:hover { background: var(--surface-hover); }
   max-height: 95px !important;
   position: relative !important;
   z-index: 2 !important;
+}
+
+.term-document.pdf-export #v-foto-assinatura {
+  display: block !important;
+  max-width: 170px !important;
+  max-height: 110px !important;
+  position: relative !important;
+  z-index: 2 !important;
+  object-fit: cover !important;
 }
 
 @media print {
@@ -1337,7 +1347,8 @@ tbody tr:hover { background: var(--surface-hover); }
     page-break-inside: avoid;
     break-inside: avoid;
   }
-  .term-document #box-assinatura-digital {
+  .term-document #box-assinatura-digital,
+  .term-document #box-foto-assinatura {
     background: #ffffff !important;
     border: 1px solid #e2e8f0 !important;
     padding: 6px !important;
@@ -1348,6 +1359,16 @@ tbody tr:hover { background: var(--surface-hover); }
     max-height: 95px !important;
     position: relative !important;
     z-index: 2 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .term-document #v-foto-assinatura {
+    display: block !important;
+    max-width: 170px !important;
+    max-height: 110px !important;
+    position: relative !important;
+    z-index: 2 !important;
+    object-fit: cover !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
@@ -1719,6 +1740,7 @@ tbody tr:hover { background: var(--surface-hover); }
   }
 
   #box-assinatura-digital img,
+  #box-foto-assinatura img,
   #v-foto {
     max-width: 100% !important;
     height: auto !important;

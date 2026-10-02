@@ -164,122 +164,172 @@
 
     <!-- Assinatura -->
     <div class="card" style="margin-bottom: 24px;">
-      <h3 style="margin-bottom: 6px;">✍️ Assinatura Digital</h3>
-      <p style="font-size: 14px; color: var(--text-2); margin-bottom: 16px;">
-        Selecione o método de assinatura desejado:
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;">
+        <h3 style="margin-bottom: 0;">✍️ Assinatura e Validação Digital</h3>
+        <span class="badge badge-info" style="font-size: 11px; padding: 4px 10px;">Autenticação Obrigatória em 2 Etapas</span>
+      </div>
+      <p style="font-size: 14px; color: var(--text-2); margin-bottom: 20px; line-height: 1.5;">
+        Para validar este termo de compromisso, você deve assinar das duas formas: <strong>desenhar sua assinatura manuscrita</strong> e <strong>tirar uma foto de validação</strong>. Ambas as etapas são obrigatórias para o envio.
       </p>
 
-      <div class="tabs" style="display: flex; gap: 8px; margin-bottom: 16px;">
-        <button class="btn btn-sm btn-primary tab-btn" id="tab-desenhar" onclick="mudarMetodo('desenhar')" type="button">✍️ Desenhar Assinatura</button>
-        <button class="btn btn-sm btn-secondary tab-btn" id="tab-foto" onclick="mudarMetodo('foto')" type="button">📸 Tirar Foto</button>
-      </div>
-
-      <!-- Assinatura Clássica (Desenho) -->
-      <div id="area-desenho">
-        <div class="signature-container">
-          <canvas id="canvas-assinatura" class="signature-canvas"></canvas>
-          <div class="signature-hint" id="hint-assinatura">Assine aqui</div>
+      <!-- 1ª FORMA: Assinatura Clássica (Desenho) -->
+      <div class="card" style="background: var(--bg-2); border: 1px solid var(--border); padding: 18px; margin-bottom: 24px; border-radius: var(--radius);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+          <div>
+            <div style="font-weight: 700; font-size: 15px; color: var(--text); display: flex; align-items: center; gap: 8px;">
+              <span>✍️ 1ª Etapa: Assinatura Manuscrita</span>
+              <span style="color: var(--danger); font-size: 13px;">*</span>
+            </div>
+            <div style="font-size: 12px; color: var(--text-2); margin-top: 2px;">Assine com o dedo no celular ou com o mouse no computador</div>
+          </div>
+          <span id="badge-status-desenho" style="font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 20px; background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3);">
+            ⚠️ Pendente
+          </span>
         </div>
 
-        <div class="signature-actions mt-2" style="margin-bottom: 16px;">
-          <span class="text-sm text-muted">Pressione e arraste para assinar</span>
-          <button class="btn btn-ghost btn-sm" onclick="limparAssinatura()" type="button">🗑️ Limpar</button>
+        <div id="area-desenho">
+          <div class="signature-container" style="border: 2px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-3);">
+            <canvas id="canvas-assinatura" class="signature-canvas"></canvas>
+            <div class="signature-hint" id="hint-assinatura">Assine aqui neste espaço</div>
+          </div>
+
+          <div class="signature-actions mt-2" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <span class="text-sm text-muted">Pressione e arraste para desenhar seu traço</span>
+            <button class="btn btn-ghost btn-sm" onclick="limparAssinatura()" type="button" style="color: var(--text-2);">🗑️ Limpar Assinatura</button>
+          </div>
         </div>
       </div>
 
-      <!-- Assinatura por Foto / Câmera -->
-      <div id="area-foto" class="hidden">
-        <!-- Container principal da câmera / foto -->
-        <div class="camera-container" style="border: 2px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--bg-3); position: relative; min-height: 220px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px;">
-          
-          <!-- Imagem capturada / preview -->
-          <div id="box-preview-foto" style="display: none; width: 100%; text-align: center;">
-            <img id="img-capturada" style="max-width: 100%; max-height: 320px; border-radius: var(--radius-sm); object-fit: contain; border: 2px solid var(--primary); margin: 0 auto 12px auto; display: block;" alt="Foto capturada">
-            <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
-              <button class="btn btn-secondary btn-sm" id="btn-retake" onclick="resetarCamera()" type="button">🔄 Trocar Foto / Tirar Outra</button>
+      <!-- 2ª FORMA: Foto / Câmera -->
+      <div class="card" style="background: var(--bg-2); border: 1px solid var(--border); padding: 18px; margin-bottom: 24px; border-radius: var(--radius);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+          <div>
+            <div style="font-weight: 700; font-size: 15px; color: var(--text); display: flex; align-items: center; gap: 8px;">
+              <span>📸 2ª Etapa: Foto de Validação e Entrega</span>
+              <span style="color: var(--danger); font-size: 13px;">*</span>
             </div>
+            <div style="font-size: 12px; color: var(--text-2); margin-top: 2px;">Tire uma foto sua segurando o equipamento ou ao lado dele</div>
           </div>
+          <span id="badge-status-foto" style="font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 20px; background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3);">
+            ⚠️ Pendente
+          </span>
+        </div>
 
-          <!-- Feed de vídeo ao vivo (para PCs / Webcams com suporte a stream) -->
-          <div id="box-video-stream" style="display: none; width: 100%; text-align: center;">
-            <video id="video-feed" autoplay playsinline style="width: 100%; max-height: 280px; border-radius: var(--radius-sm); object-fit: cover;"></video>
-            <div style="margin-top: 10px; display: flex; gap: 8px; justify-content: center;">
-              <button class="btn btn-primary btn-sm" id="btn-capture" onclick="capturarFoto()" type="button">📸 Tirar Foto Agora</button>
-              <button class="btn btn-ghost btn-sm" type="button" onclick="pararCameraModoManual()">❌ Cancelar</button>
-            </div>
-          </div>
-          
-          <!-- Painel Inicial / Opções de Captura -->
-          <div id="painel-opcoes-foto" style="text-align: center; padding: 12px 6px; width: 100%;">
-            <div style="font-size: 42px; margin-bottom: 8px;">📸</div>
-            <div style="font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 6px;">Tire uma foto para validar sua assinatura</div>
-            <div style="font-size: 13px; color: var(--text-2); margin-bottom: 16px; max-width: 380px; margin-left: auto; margin-right: auto; line-height: 1.5;">
-              Tire uma foto sua segurando o equipamento ou ao lado dele para registrar a entrega.
-            </div>
-
-            <!-- Dica HTTPS para Notebooks -->
-            <div id="banner-https-pc" style="display: none; background: rgba(0, 212, 255, 0.08); border: 1px solid rgba(0, 212, 255, 0.25); border-radius: var(--radius-sm); padding: 10px; margin-bottom: 14px; text-align: left; font-size: 12px; max-width: 340px; margin-left: auto; margin-right: auto;">
-              <div style="font-weight: 700; color: var(--primary-light); margin-bottom: 4px;">💻 No Notebook ou PC?</div>
-              <div style="color: var(--text-2); margin-bottom: 8px; line-height: 1.5;">
-                Para usar a webcam ao vivo na tela do notebook, acesse pelo modo seguro HTTPS:
+        <div id="area-foto">
+          <!-- Container principal da câmera / foto -->
+          <div class="camera-container" style="border: 2px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--bg-3); position: relative; min-height: 220px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px;">
+            
+            <!-- Imagem capturada / preview -->
+            <div id="box-preview-foto" style="display: none; width: 100%; text-align: center;">
+              <img id="img-capturada" style="max-width: 100%; max-height: 320px; border-radius: var(--radius-sm); object-fit: contain; border: 2px solid var(--success); margin: 0 auto 12px auto; display: block;" alt="Foto capturada">
+              <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+                <button class="btn btn-secondary btn-sm" id="btn-retake" onclick="resetarCamera()" type="button">🔄 Trocar Foto / Tirar Outra</button>
               </div>
-              <button type="button" class="btn btn-xs btn-primary" onclick="alternarParaHttps()" style="width: 100%;">
-                🔒 Abrir com HTTPS (Câmera ao Vivo)
-              </button>
             </div>
 
-            <!-- Botões de ação direta no Celular e PC -->
-            <div style="display: flex; flex-direction: column; gap: 12px; max-width: 360px; margin: 0 auto 14px auto;">
-              
-              <!-- Botão 1: Câmera Nativa (Celular e Notebook) -->
-              <div style="position: relative; overflow: hidden; border-radius: var(--radius); width: 100%; box-shadow: 0 4px 14px rgba(0, 212, 255, 0.25);">
-                <button type="button" class="btn btn-primary btn-lg" style="width: 100%; pointer-events: none; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 16px; font-weight: 700; padding: 14px 18px;">
-                  📸 Tirar Foto com a Câmera
+            <!-- Feed de vídeo ao vivo (para PCs / Webcams com suporte a stream) -->
+            <div id="box-video-stream" style="display: none; width: 100%; text-align: center;">
+              <video id="video-feed" autoplay playsinline style="width: 100%; max-height: 280px; border-radius: var(--radius-sm); object-fit: cover;"></video>
+              <div style="margin-top: 10px; display: flex; gap: 8px; justify-content: center;">
+                <button class="btn btn-primary btn-sm" id="btn-capture" onclick="capturarFoto()" type="button">📸 Tirar Foto Agora</button>
+                <button class="btn btn-ghost btn-sm" type="button" onclick="pararCameraModoManual()">❌ Cancelar</button>
+              </div>
+            </div>
+            
+            <!-- Painel Inicial / Opções de Captura -->
+            <div id="painel-opcoes-foto" style="text-align: center; padding: 12px 6px; width: 100%;">
+              <div style="font-size: 38px; margin-bottom: 6px;">📸</div>
+              <div style="font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 4px;">Escolha como capturar sua foto</div>
+              <div style="font-size: 13px; color: var(--text-2); margin-bottom: 16px; max-width: 380px; margin-left: auto; margin-right: auto; line-height: 1.5;">
+                Você pode usar a câmera do seu celular, webcam ou selecionar um arquivo de foto.
+              </div>
+
+              <!-- Dica HTTPS para Notebooks -->
+              <div id="banner-https-pc" style="display: none; background: rgba(0, 212, 255, 0.08); border: 1px solid rgba(0, 212, 255, 0.25); border-radius: var(--radius-sm); padding: 10px; margin-bottom: 14px; text-align: left; font-size: 12px; max-width: 340px; margin-left: auto; margin-right: auto;">
+                <div style="font-weight: 700; color: var(--primary-light); margin-bottom: 4px;">💻 No Notebook ou PC?</div>
+                <div style="color: var(--text-2); margin-bottom: 8px; line-height: 1.5;">
+                  Para usar a webcam ao vivo na tela do notebook, acesse pelo modo seguro HTTPS:
+                </div>
+                <button type="button" class="btn btn-xs btn-primary" onclick="alternarParaHttps()" style="width: 100%;">
+                  🔒 Abrir com HTTPS (Câmera ao Vivo)
                 </button>
-                <input type="file" id="input-foto-camera" accept="image/*" capture="camera" 
-                  style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10;" 
-                  onchange="carregarFotoCelular(event)">
               </div>
 
-              <!-- Botão 2: Galeria / Arquivos -->
-              <div style="position: relative; overflow: hidden; border-radius: var(--radius); width: 100%;">
-                <button type="button" class="btn btn-secondary btn-md" style="width: 100%; pointer-events: none; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; font-weight: 600; padding: 12px 18px;">
-                  📁 Escolher Foto da Galeria / Arquivo
+              <!-- Botões de ação direta no Celular e PC -->
+              <div style="display: flex; flex-direction: column; gap: 12px; max-width: 360px; margin: 0 auto 14px auto;">
+                
+                <!-- Botão 1: Câmera Nativa (Celular e Notebook) -->
+                <div style="position: relative; overflow: hidden; border-radius: var(--radius); width: 100%; box-shadow: 0 4px 14px rgba(0, 212, 255, 0.25);">
+                  <button type="button" class="btn btn-primary btn-lg" style="width: 100%; pointer-events: none; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 15px; font-weight: 700; padding: 13px 18px;">
+                    📸 Tirar Foto com a Câmera
+                  </button>
+                  <input type="file" id="input-foto-camera" accept="image/*" capture="camera" 
+                    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10;" 
+                    onchange="carregarFotoCelular(event)">
+                </div>
+
+                <!-- Botão 2: Galeria / Arquivos -->
+                <div style="position: relative; overflow: hidden; border-radius: var(--radius); width: 100%;">
+                  <button type="button" class="btn btn-secondary btn-md" style="width: 100%; pointer-events: none; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; font-weight: 600; padding: 12px 18px;">
+                    📁 Escolher Foto da Galeria / Arquivo
+                  </button>
+                  <input type="file" id="input-foto-galeria" accept="image/*" 
+                    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10;" 
+                    onchange="carregarFotoCelular(event)">
+                </div>
+
+                <!-- Opção Webcam ao Vivo no Computador -->
+                <button class="btn btn-ghost btn-sm" id="btn-webcam-pc" type="button" onclick="iniciarCameraStream()" style="color: var(--primary-light); font-size: 13px; padding: 8px;">
+                  🎥 Abrir Webcam ao Vivo no Navegador
                 </button>
-                <input type="file" id="input-foto-galeria" accept="image/*" 
-                  style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10;" 
-                  onchange="carregarFotoCelular(event)">
               </div>
 
-              <!-- Opção Webcam ao Vivo no Computador -->
-              <button class="btn btn-ghost btn-sm" id="btn-webcam-pc" type="button" onclick="iniciarCameraStream()" style="color: var(--primary-light); font-size: 13px; padding: 8px;">
-                🎥 Abrir Webcam ao Vivo no Navegador
-              </button>
+              <div id="msg-erro-camera" style="display: none; margin-top: 12px; font-size: 13px; color: #f59e0b; background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); border-radius: var(--radius-sm); padding: 10px;"></div>
+
+              <!-- QR Code Fallback para abrir no celular se estiver no PC -->
+              <div id="qr-container" style="display: none; flex-direction: column; align-items: center; gap: 6px; margin-top: 16px; border-top: 1px solid var(--border); padding-top: 14px;">
+                <p class="text-xs" style="color: var(--primary-light); font-weight: 600;">📱 Prefere assinar e fotografar pelo Celular?</p>
+                <p class="text-xs text-muted" style="max-width: 320px; margin-bottom: 6px;">Aponte a câmera do seu celular para este QR Code para continuar diretamente no celular:</p>
+                <div id="qrcode-box" style="padding: 8px; background: white; border-radius: var(--radius-sm); display: inline-block;"></div>
+              </div>
             </div>
 
-            <div id="msg-erro-camera" style="display: none; margin-top: 12px; font-size: 13px; color: #f59e0b; background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); border-radius: var(--radius-sm); padding: 10px;"></div>
-
-            <!-- QR Code Fallback para abrir no celular se estiver no PC -->
-            <div id="qr-container" style="display: none; flex-direction: column; align-items: center; gap: 6px; margin-top: 16px; border-top: 1px solid var(--border); padding-top: 14px;">
-              <p class="text-xs" style="color: var(--primary-light); font-weight: 600;">📱 Abrir direto no Celular</p>
-              <p class="text-xs text-muted" style="max-width: 300px; margin-bottom: 6px;">Aponte a câmera do seu celular para o QR Code para assinar facilmente pelo celular:</p>
-              <div id="qrcode-box" style="padding: 8px; background: white; border-radius: var(--radius-sm); display: inline-block;"></div>
-            </div>
           </div>
 
-        </div>
-
-        <div class="camera-actions mt-2" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-          <span class="text-sm text-muted" id="camera-status">Pronto para capturar foto</span>
+          <div class="camera-actions mt-2" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <span class="text-sm text-muted" id="camera-status">Pronto para capturar foto</span>
+          </div>
         </div>
       </div>
 
-      <div class="divider"></div>
+      <!-- 3ª ETAPA: Confirmação de nome -->
+      <div class="card" style="background: var(--bg-2); border: 1px solid var(--border); padding: 18px; margin-bottom: 24px; border-radius: var(--radius);">
+        <div class="form-group" style="margin-bottom: 0;">
+          <div style="font-weight: 700; font-size: 15px; color: var(--text); margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+            <span>👤 3ª Etapa: Confirme seu nome completo</span>
+            <span style="color: var(--danger); font-size: 13px;">*</span>
+          </div>
+          <p style="font-size: 13px; color: var(--text-2); margin-bottom: 10px;">
+            Digite seu nome exatamente como consta no documento para autenticar as assinaturas.
+          </p>
+          <input id="nome-confirmacao" type="text" class="input" placeholder="Digite seu nome exatamente como no documento" oninput="atualizarStatusValidacao()">
+        </div>
+      </div>
 
-      <!-- Confirmação de nome -->
-      <div class="form-group">
-        <label for="nome-confirmacao">Confirme seu nome completo *</label>
-        <input id="nome-confirmacao" type="text" class="input" placeholder="Digite seu nome exatamente como no documento">
+      <!-- Checklist de Validação Obrigatória -->
+      <div style="background: var(--bg-3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 18px; margin-bottom: 16px;">
+        <div style="font-weight: 700; font-size: 13px; color: var(--text); margin-bottom: 8px;">📋 Validação das etapas para envio do termo:</div>
+        <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px;">
+          <div id="chk-desenho" style="color: #f59e0b; display: flex; align-items: center; gap: 8px; font-weight: 500;">
+            <span id="ico-chk-desenho">⏳</span> <span id="txt-chk-desenho">1ª Etapa: Assinatura manuscrita digital (pendente)</span>
+          </div>
+          <div id="chk-foto" style="color: #f59e0b; display: flex; align-items: center; gap: 8px; font-weight: 500;">
+            <span id="ico-chk-foto">⏳</span> <span id="txt-chk-foto">2ª Etapa: Foto de validação e entrega (pendente)</span>
+          </div>
+          <div id="chk-nome" style="color: #f59e0b; display: flex; align-items: center; gap: 8px; font-weight: 500;">
+            <span id="ico-chk-nome">⏳</span> <span id="txt-chk-nome">3ª Etapa: Confirmação do nome completo (pendente)</span>
+          </div>
+        </div>
       </div>
 
       <div id="assinar-error" class="alert alert-error hidden mt-4">
@@ -357,6 +407,10 @@
       preencherDocumento(data);
       document.getElementById('conteudo').classList.remove('hidden');
       inicializarCanvas();
+      if (!isDispositivoMovel()) {
+        mostrarQRCode();
+      }
+      atualizarStatusValidacao();
 
     } catch (err) {
       mostrarErro('Erro de conexão', 'Não foi possível carregar o documento. Verifique sua conexão e tente novamente.');
@@ -513,45 +567,101 @@
     signaturePad.addEventListener('beginStroke', () => {
       document.getElementById('hint-assinatura').style.opacity = '0';
     });
+    signaturePad.addEventListener('endStroke', () => {
+      atualizarStatusValidacao();
+    });
   }
 
   let streamCandidato = null;
   let fotoBase64 = null;
-  let metodoAssinatura = 'desenhar'; // 'desenhar' ou 'foto'
 
   function isDispositivoMovel() {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
   }
 
-  function mudarMetodo(metodo) {
-    metodoAssinatura = metodo;
-    
-    const tabDesenhar = document.getElementById('tab-desenhar');
-    const tabFoto = document.getElementById('tab-foto');
-    const areaDesenho = document.getElementById('area-desenho');
-    const areaFoto = document.getElementById('area-foto');
+  function atualizarStatusValidacao() {
+    const temDesenho = signaturePad && !signaturePad.isEmpty();
+    const badgeDesenho = document.getElementById('badge-status-desenho');
+    const chkDesenho = document.getElementById('chk-desenho');
+    const icoDesenho = document.getElementById('ico-chk-desenho');
+    const txtDesenho = document.getElementById('txt-chk-desenho');
 
-    if (metodo === 'desenhar') {
-      tabDesenhar.className = 'btn btn-sm btn-primary tab-btn';
-      tabFoto.className = 'btn btn-sm btn-secondary tab-btn';
-      areaDesenho.classList.remove('hidden');
-      areaFoto.classList.add('hidden');
-      pararCamera();
+    if (temDesenho) {
+      if (badgeDesenho) {
+        badgeDesenho.style.background = 'rgba(16, 185, 129, 0.15)';
+        badgeDesenho.style.color = '#10b981';
+        badgeDesenho.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+        badgeDesenho.textContent = '✅ Concluída';
+      }
+      if (chkDesenho) {
+        chkDesenho.style.color = '#10b981';
+        if (icoDesenho) icoDesenho.textContent = '✅';
+        if (txtDesenho) txtDesenho.textContent = '1ª Etapa: Assinatura manuscrita digital (preenchida)';
+      }
     } else {
-      tabDesenhar.className = 'btn btn-sm btn-secondary tab-btn';
-      tabFoto.className = 'btn btn-sm btn-primary tab-btn';
-      areaDesenho.classList.add('hidden');
-      areaFoto.classList.remove('hidden');
-      
-      // Se não for celular (Notebook / PC):
-      if (!isDispositivoMovel()) {
-        mostrarQRCode();
-        if (window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-          iniciarCameraStream();
-        } else {
-          const banner = document.getElementById('banner-https-pc');
-          if (banner) banner.style.display = 'block';
-        }
+      if (badgeDesenho) {
+        badgeDesenho.style.background = 'rgba(245, 158, 11, 0.15)';
+        badgeDesenho.style.color = '#f59e0b';
+        badgeDesenho.style.borderColor = 'rgba(245, 158, 11, 0.3)';
+        badgeDesenho.textContent = '⚠️ Pendente';
+      }
+      if (chkDesenho) {
+        chkDesenho.style.color = '#f59e0b';
+        if (icoDesenho) icoDesenho.textContent = '⏳';
+        if (txtDesenho) txtDesenho.textContent = '1ª Etapa: Assinatura manuscrita digital (pendente)';
+      }
+    }
+
+    const temFoto = !!fotoBase64;
+    const badgeFoto = document.getElementById('badge-status-foto');
+    const chkFoto = document.getElementById('chk-foto');
+    const icoFoto = document.getElementById('ico-chk-foto');
+    const txtFoto = document.getElementById('txt-chk-foto');
+
+    if (temFoto) {
+      if (badgeFoto) {
+        badgeFoto.style.background = 'rgba(16, 185, 129, 0.15)';
+        badgeFoto.style.color = '#10b981';
+        badgeFoto.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+        badgeFoto.textContent = '✅ Capturada';
+      }
+      if (chkFoto) {
+        chkFoto.style.color = '#10b981';
+        if (icoFoto) icoFoto.textContent = '✅';
+        if (txtFoto) txtFoto.textContent = '2ª Etapa: Foto de validação e entrega (capturada)';
+      }
+    } else {
+      if (badgeFoto) {
+        badgeFoto.style.background = 'rgba(245, 158, 11, 0.15)';
+        badgeFoto.style.color = '#f59e0b';
+        badgeFoto.style.borderColor = 'rgba(245, 158, 11, 0.3)';
+        badgeFoto.textContent = '⚠️ Pendente';
+      }
+      if (chkFoto) {
+        chkFoto.style.color = '#f59e0b';
+        if (icoFoto) icoFoto.textContent = '⏳';
+        if (txtFoto) txtFoto.textContent = '2ª Etapa: Foto de validação e entrega (pendente)';
+      }
+    }
+
+    const nomeInput = document.getElementById('nome-confirmacao');
+    const nomeVal = nomeInput ? nomeInput.value.trim() : '';
+    const nomeConfere = termoData && termoData.colaborador_nome && (nomeVal.toLowerCase() === termoData.colaborador_nome.toLowerCase());
+    const chkNome = document.getElementById('chk-nome');
+    const icoNome = document.getElementById('ico-chk-nome');
+    const txtNome = document.getElementById('txt-chk-nome');
+
+    if (nomeConfere) {
+      if (chkNome) {
+        chkNome.style.color = '#10b981';
+        if (icoNome) icoNome.textContent = '✅';
+        if (txtNome) txtNome.textContent = '3ª Etapa: Confirmação do nome completo (conferida)';
+      }
+    } else {
+      if (chkNome) {
+        chkNome.style.color = '#f59e0b';
+        if (icoNome) icoNome.textContent = '⏳';
+        if (txtNome) txtNome.textContent = '3ª Etapa: Confirmação do nome completo (pendente)';
       }
     }
   }
@@ -689,6 +799,7 @@
     imgCapturada.src = fotoBase64;
     document.getElementById('box-preview-foto').style.display = 'block';
     status.textContent = 'Foto capturada com sucesso ✅';
+    atualizarStatusValidacao();
   }
 
   function carregarFotoCelular(event) {
@@ -732,6 +843,7 @@
         imgCapturada.src = fotoBase64;
         document.getElementById('box-preview-foto').style.display = 'block';
         status.textContent = 'Foto carregada com sucesso ✅';
+        atualizarStatusValidacao();
       };
       img.src = e.target.result;
     };
@@ -757,6 +869,7 @@
     document.getElementById('box-video-stream').style.display = 'none';
     document.getElementById('painel-opcoes-foto').style.display = 'block';
     document.getElementById('camera-status').textContent = 'Pronto para capturar foto';
+    atualizarStatusValidacao();
 
     if (!isDispositivoMovel() && (window.location.protocol === 'https:' || window.location.hostname === 'localhost')) {
       iniciarCameraStream();
@@ -767,6 +880,7 @@
     if (signaturePad) {
       signaturePad.clear();
       document.getElementById('hint-assinatura').style.opacity = '1';
+      atualizarStatusValidacao();
     }
   }
 
@@ -778,43 +892,47 @@
 
     erroDiv.classList.add('hidden');
 
-    let assinatura_base64 = '';
-
-    if (metodoAssinatura === 'desenhar') {
-      if (!signaturePad || signaturePad.isEmpty()) {
-        erroMsg.textContent = 'Por favor, assine no campo de assinatura antes de continuar.';
-        erroDiv.classList.remove('hidden');
-        return;
-      }
-      assinatura_base64 = signaturePad.toDataURL('image/png');
-    } else {
-      // Se a webcam estiver rodando mas o usuário não clicou no botão para bater a foto, captura automaticamente
-      if (!fotoBase64 && streamCandidato) {
-        capturarFoto();
-      }
-      
-      if (!fotoBase64) {
-        erroMsg.textContent = 'Por favor, tire uma foto para realizar a assinatura.';
-        erroDiv.classList.remove('hidden');
-        return;
-      }
-      assinatura_base64 = fotoBase64;
+    // Se a webcam estiver rodando ao vivo mas o usuário não clicou no botão de bater foto, captura automaticamente
+    if (!fotoBase64 && streamCandidato) {
+      capturarFoto();
     }
 
-    if (!nomeConfirmacao) {
-      erroMsg.textContent = 'Por favor, confirme seu nome completo.';
+    // 1ª Validação: Desenho obrigatório
+    if (!signaturePad || signaturePad.isEmpty()) {
+      erroMsg.innerHTML = '<strong>❌ 1ª Etapa pendente:</strong> É obrigatório desenhar sua assinatura manuscrita no campo acima.';
       erroDiv.classList.remove('hidden');
+      document.getElementById('canvas-assinatura').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    // 2ª Validação: Foto obrigatória
+    if (!fotoBase64) {
+      erroMsg.innerHTML = '<strong>❌ 2ª Etapa pendente:</strong> É obrigatório tirar ou carregar sua foto de validação com o equipamento.';
+      erroDiv.classList.remove('hidden');
+      document.getElementById('area-foto').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    // 3ª Validação: Confirmação do nome completo
+    if (!nomeConfirmacao) {
+      erroMsg.innerHTML = '<strong>❌ 3ª Etapa pendente:</strong> Por favor, confirme seu nome completo antes de continuar.';
+      erroDiv.classList.remove('hidden');
+      document.getElementById('nome-confirmacao').focus();
       return;
     }
 
     if (nomeConfirmacao.toLowerCase() !== termoData.colaborador_nome.toLowerCase()) {
-      erroMsg.textContent = `O nome digitado não confere. Digite exatamente: "${termoData.colaborador_nome}"`;
+      erroMsg.innerHTML = `<strong>❌ Nome incorreto:</strong> O nome digitado não confere. Digite exatamente: <em>"${termoData.colaborador_nome}"</em>`;
       erroDiv.classList.remove('hidden');
+      document.getElementById('nome-confirmacao').focus();
       return;
     }
 
+    const assinatura_base64 = signaturePad.toDataURL('image/png');
+    const foto_assinatura_base64 = fotoBase64;
+
     btn.disabled = true;
-    btn.textContent = 'Enviando...';
+    btn.textContent = 'Enviando assinaturas...';
 
     // Para a câmera preventivamente se estivesse ativa
     pararCamera();
@@ -823,7 +941,11 @@
       const res = await fetch(`/api/assinar/${token}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ assinatura_base64, nome_confirmacao: nomeConfirmacao })
+        body: JSON.stringify({
+          assinatura_base64,
+          foto_assinatura_base64,
+          nome_confirmacao: nomeConfirmacao
+        })
       });
 
       const data = await res.json();

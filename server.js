@@ -585,6 +585,7 @@ app.post('/api/termos', autenticar, upload.single('foto'), async (req, res) => {
       data_devolucao_prevista: data_devolucao_prevista || '',
       foto_path,
       assinatura_base64: null,
+      foto_assinatura_base64: null,
       assinado_em: null,
       assinado_ip: null,
       criado_por: req.usuario.id,
@@ -653,7 +654,7 @@ app.get('/api/assinar/:token', async (req, res) => {
       return res.json({ ...termo, ja_assinado: true });
     }
     // Remove assinatura dos dados enviados ao colaborador
-    const { assinatura_base64, ...dadosPublicos } = termo;
+    const { assinatura_base64, foto_assinatura_base64, ...dadosPublicos } = termo;
     res.json({ ...dadosPublicos, ja_assinado: false });
   } catch (err) {
     res.status(500).json({ erro: 'Erro ao buscar termo' });
@@ -663,9 +664,9 @@ app.get('/api/assinar/:token', async (req, res) => {
 // POST /api/assinar/:token — envia assinatura
 app.post('/api/assinar/:token', async (req, res) => {
   try {
-    const { assinatura_base64, nome_confirmacao } = req.body;
-    if (!assinatura_base64 || !nome_confirmacao) {
-      return res.status(400).json({ erro: 'Assinatura e nome são obrigatórios' });
+    const { assinatura_base64, foto_assinatura_base64, nome_confirmacao } = req.body;
+    if (!assinatura_base64 || !foto_assinatura_base64 || !nome_confirmacao) {
+      return res.status(400).json({ erro: 'O termo deve ser assinado das duas formas (assinatura manuscrita e foto de validação) e conter a confirmação de nome.' });
     }
 
     const termo = await termos.findOne({ token_unico: req.params.token });
@@ -682,6 +683,7 @@ app.post('/api/assinar/:token', async (req, res) => {
         $set: {
           status: 'assinado',
           assinatura_base64,
+          foto_assinatura_base64,
           nome_confirmacao,
           assinado_em: new Date().toISOString(),
           assinado_ip: ip
